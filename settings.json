@@ -1,0 +1,43 @@
+{
+  "BrewMaster": {
+    "OrderInterval": "0.2",
+    "OrderCompleteOffset": "0.5,2.5"
+  },
+  "Inventory": {
+    "IngSpawnPos": "7.275,2.375",
+    "SaltSpawnPos": "5.7,-5.3",
+    "CauldronOffset": "0.0,5.0",
+    "AlwaysDissolve": "true"
+  },
+  "Mortar": {
+    "ShowPath": "false",
+    "MortarOffset" : "0.0,0.0",
+    "FlourishMax": "1",
+    "MinGrindUpdates": "200"
+  },
+  "Cauldron": {
+    "StirTolerance": "0.0001",
+    "StirThreshSlow": "0.5",
+    "StirFast": "0.5",
+    "StirSlow": "0.01"
+  },
+  "Solvent": {
+    "PourTolerance": "0.0001",
+    "PourThreshSlow": "0.2",
+    "PourFastAngle": "320.0",
+    "PourSlowAngle": "340.0",
+    "PourSlowSpeed": "0.01",
+    "LerpDuration": "0.2"
+  },
+  "Bellows": {
+    "LogVortexMove": "false",
+    "SparkAmount": "10",
+    "SparkIntervalOn": "1.6",
+    "SparkIntervalOff": "0.4",
+    "HeatFast": "0.25",
+    "HeatSlow": "0.05",
+    "HeatThreshSlow": "45.0",
+    "HeatThreshStop": "0.5",
+    "HeatEffectTime": "2.0"
+  }
+}

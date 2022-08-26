@@ -1,0 +1,34 @@
+[
+    {
+        "order": "AddIngredient",
+        "item": "Terraria",
+        "target": "0.0"
+    },
+    {
+        "order": "AddIngredient",
+        "item": "Terraria",
+        "target": "75.0"
+    },
+    {
+        "order": "AddIngredient",
+        "item": "Waterbloom",
+        "target": "0.0"
+    },
+    {
+        "order": "AddIngredient",
+        "item": "Waterbloom",
+        "target": "75.0"
+    },
+    {
+        "order": "StirCauldron",
+        "target": "18.7"
+    },
+    {
+        "order": "PourSolvent",
+        "target": "1.6"
+    },
+    {
+        "order": "AddEffect",
+        "target": "3"
+    }
+]
