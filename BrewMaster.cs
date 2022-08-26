@@ -143,7 +143,8 @@ namespace AutoBrew
             string filepath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/settings.json";
             if (!File.Exists(filepath))
             {
-                AutoBrewPlugin.Log.LogError("Error: settings.json could not be found in the same folder as the plugin");
+                AutoBrewPlugin.Log.LogInfo("Settings file not detected. Using plugin defaults");
+                return false;
             }
 
             try
