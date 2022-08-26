@@ -18,7 +18,7 @@ A plugin for PotionCraft 0.5.0, powered by BepInEx. Automatically brews a potion
 Valid JSON data takes the form of an array of collections of key value pairs, with each collection representing a single brewing instruction to the plugin.
 There are 6 different instructions currently available: `AddIngredient`, `StirCauldron`, `HeatVortex`, `PourSolvent`, `AddSalt` and `AddEffect`.
 
-####Example of AddIngredient:
+**Example of AddIngredient:**
 
 The `AddIngredient` instruction requires 3 values: the order, an item (the ingredient) and a target (used for grinding):
 
@@ -28,7 +28,8 @@ The `AddIngredient` instruction requires 3 values: the order, an item (the ingre
             "target": "100.0"
         }
 
-####Example of StirCauldron:
+**Example of StirCauldron:**
+
 The `StirCauldron` instruction requires only 2 values: the order and a target (the amount to stir):
 
     {
@@ -36,7 +37,8 @@ The `StirCauldron` instruction requires only 2 values: the order and a target (t
         "target": "7.8"
     }
 
-####Example of HeatVortex:
+**Example of HeatVortex:**
+
 The `HeatVortex` instruction requires 2 values (the order and target), but accepts a 3rd, a version number. The value of the third argument determines how the plugin interprets the target. If no version value is provided, the plugin interprets the target value as an angle in degrees, but if the value is 1 or 0, the plugin will interpret the target value as a distance as measured by the potionous website (0 and 1 being two different versions of the measurement system):
 
         {
@@ -45,7 +47,8 @@ The `HeatVortex` instruction requires 2 values (the order and target), but accep
             "version": "1"
         }
 
-####Example of PourSolvent:
+**Example of PourSolvent:**
+
 The `PourSolvent` instruction is indentical to the `StirCauldron` instruction, in that it only requires 2 values: the order and the target (though this time, target denotes how much to base pour into the potion):
 
     {
@@ -53,7 +56,8 @@ The `PourSolvent` instruction is indentical to the `StirCauldron` instruction, i
         "target": "10.0"
     }
 
-####Example of AddEffect:
+**Example of AddEffect:**
+
 The `AddEffect` instruction requires only 1 value (the order), but will accept a target value too (the target denoting the desired tier). The target can be 0, 1, 2, 3 (can't recall if this actually has any impact atm):
 
     {
@@ -61,7 +65,8 @@ The `AddEffect` instruction requires only 1 value (the order), but will accept a
         "target": "3"
     }
 
-####Example of AddSalt:
+**Example of AddSalt:**
+
 The `AddSalt` instruction takes 3 arguments: the order, an item (the name of the salt to add) and a target (the integer amount of the salt to add):
 
     {
@@ -70,7 +75,8 @@ The `AddSalt` instruction takes 3 arguments: the order, an item (the name of the
         "target": "100"
     }
 
-####Example of complete JSON data:
+**Example of complete JSON data:**
+
 To create a method, simply stack any number of these instructions blocks, add a comma between each and enclose in square brackets to turn it into an array that the JSON parser can read.
 
 Example that creates a strength 3 potion on the water base:
