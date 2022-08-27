@@ -61,15 +61,25 @@ namespace AutoBrew
                 case BrewStage.AddIngredient:
                 {
                     var ingOrder = BrewOrder.IngOrderFromDict(data);
-                    var grindOrder = BrewOrder.GrindOrderFromDict(data);
-
-                    if ((ingOrder != null) && (grindOrder != null))
+                    if (ingOrder == null)
                     {
-                        this.AddOrder(ingOrder);
-                        this.AddOrder(grindOrder);
-                        return true;
+                        return false;
                     }
-                    break;
+
+                    if (ingOrder.Target != 0f)
+                    {
+                        var grindOrder = BrewOrder.GrindOrderFromDict(data);
+                        if (grindOrder != null)
+                        {
+                            this.AddOrder(ingOrder);
+                            this.AddOrder(grindOrder);
+                            return true;
+                        }
+                        return false;
+                    }
+
+                    this.AddOrder(ingOrder);
+                    return true;
                 }
                 case BrewStage.PourSolvent:
                 {

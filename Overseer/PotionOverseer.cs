@@ -49,7 +49,21 @@ namespace AutoBrew.Overseer
 			{
 				return;
 			}
-			BrewMaster.Grinder.AddIngredientMark(ingredient, grindStatus);
+
+            BrewMaster.GetCurrentInstruction(out var order);
+            switch (order.Stage)
+            {
+                case BrewStage.AddIngredient:
+                {
+                    BrewMaster.Larder.AddIngredientMark(ingredient, grindStatus);
+                    break;
+                }
+                case BrewStage.GrindPercent:
+                {
+                    BrewMaster.Grinder.AddIngredientMark(ingredient, grindStatus);
+                    break;
+                }
+            }
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(PotionManager.RecipeMarksSubManager), "AddSaltMark")]

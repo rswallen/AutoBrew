@@ -74,17 +74,28 @@ namespace AutoBrew.Overseer
                 {
                     if (!_thingThrown)
                     {
-                        if (Managers.Ingredient.mortar.containedStack != null)
+                        if (_order.Target == 0f)
                         {
-                            Log.LogError("AddIngredient: There is something in the mortar already. Aborting");
-                            Stage = OverseerStage.Failed;
-                            return;
+                            if (!ThrowIngredient(_order.Item as Ingredient, StackThrowerTarget.ToCauldron))
+                            {
+                                Stage = OverseerStage.Failed;
+                                return;
+                            }
                         }
-                        
-                        if (!ThrowIngredient(_order.Item as Ingredient, StackThrowerTarget.ToMortar))
+                        else
                         {
-                            Stage = OverseerStage.Failed;
-                            return;
+                            if (Managers.Ingredient.mortar.containedStack != null)
+                            {
+                                Log.LogError("AddIngredient: There is something in the mortar already. Aborting");
+                                Stage = OverseerStage.Failed;
+                                return;
+                            }
+
+                            if (!ThrowIngredient(_order.Item as Ingredient, StackThrowerTarget.ToMortar))
+                            {
+                                Stage = OverseerStage.Failed;
+                                return;
+                            }
                         }
                         _thingThrown = true;
                     }
@@ -246,6 +257,22 @@ namespace AutoBrew.Overseer
             {
                 item.PutInInventory();
             }
+        }
+
+        public void AddIngredientMark(Ingredient item, float grindStatus)
+        {
+            if ((Stage != OverseerStage.Active) || !_thingThrown)
+            {
+                return;
+            }
+
+            if ((item != _order.Item) || (grindStatus != 0.0))
+            {
+                BrewMaster.Abort("Ingredient added without authorisation");
+                return;
+            }
+            
+            Stage = OverseerStage.Complete;
         }
 
         public void AddSaltMark(List<SerializedRecipeMark> recipeMarksList, Salt salt)
