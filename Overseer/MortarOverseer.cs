@@ -57,7 +57,7 @@ namespace AutoBrew.Overseer
                 return;
             }
             _grindStep = GetGrindStepRate(item);
-            _grindTarget = (float)order.Target / 100f;
+            _grindTarget = (float)order.Target;
             _gStage = GrindStage.Grinding;
             
             Stage = OverseerStage.Active;
@@ -81,7 +81,7 @@ namespace AutoBrew.Overseer
 
                 if (item.overallGrindStatus >= _grindTarget)
                 {
-                    item.overallGrindStatus = (float)_grindTarget;
+                    item.overallGrindStatus = _grindTarget;
                     _gStage = GrindStage.Flourish;
                     return;
                 }

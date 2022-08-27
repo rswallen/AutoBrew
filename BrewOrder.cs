@@ -4,6 +4,7 @@ using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Ingredient;
 using PotionCraft.ScriptableObjects.Salts;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace AutoBrew
 {
@@ -25,6 +26,7 @@ namespace AutoBrew
                 Log.LogError($"Unknown ingredient '{data["item"]}' in order");
                 return null;
             }
+
             return new BrewOrder(BrewStage.AddIngredient, item: ingItem);
         }
 
@@ -43,7 +45,11 @@ namespace AutoBrew
             if ((target < 0f) || (target > 100f))
             {
                 Log.LogWarning($"GrindPercent must satisfy (0.0 <= x <= 100.0), received '{target}'");
+                target = Mathf.Clamp(target, 0f, 100f);
             }
+            
+            //overallGrindStatus is a value between 0f and 1f
+            target /= 100f;
             return new BrewOrder(BrewStage.GrindPercent, target);
         }
         
