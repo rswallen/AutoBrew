@@ -1,11 +1,8 @@
 ﻿using HarmonyLib;
 using PotionCraft.Core.Extensions;
 using PotionCraft.ManagersSystem;
-using PotionCraft.ManagersSystem.Potion;
 using PotionCraft.ObjectBased.Ladle;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace AutoBrew.Overseer

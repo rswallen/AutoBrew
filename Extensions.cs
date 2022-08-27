@@ -1,8 +1,4 @@
-﻿using PotionCraft.Core.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using System;
 
 namespace AutoBrew
 {

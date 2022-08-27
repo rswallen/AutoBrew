@@ -2,13 +2,8 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using PotionCraft.ManagersSystem;
-using PotionCraft.ObjectBased.Stack;
-using PotionCraft.ObjectBased.Stack.StackItem;
 using PotionCraft.ObjectBased.UIElements.PotionCustomizationPanel;
 using QFSW.QC;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace AutoBrew
 {

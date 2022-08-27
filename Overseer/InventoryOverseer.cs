@@ -8,11 +8,8 @@ using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Ingredient;
 using PotionCraft.ScriptableObjects.Salts;
 using System.Collections.Generic;
-using System;
 using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
-using PotionCraft.ObjectBased.Cauldron;
 
 namespace AutoBrew.Overseer
 {

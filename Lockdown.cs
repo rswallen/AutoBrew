@@ -1,17 +1,12 @@
 ﻿using HarmonyLib;
-using PotionCraft.ManagersSystem;
-using PotionCraft.ManagersSystem.RecipeMap;
 using PotionCraft.ObjectBased.Bellows;
 using PotionCraft.ObjectBased.InteractiveItem;
 using PotionCraft.ObjectBased.InteractiveItem.InventoryObject;
 using PotionCraft.ObjectBased.Ladle;
 using PotionCraft.ObjectBased.Pestle;
-using PotionCraft.ObjectBased.RecipeMap.RecipeMapObject;
 using PotionCraft.ObjectBased.Salt;
 using PotionCraft.ObjectBased.Spoon;
 using PotionCraft.ObjectBased.Stack;
-using PotionCraft.ObjectBased.UIElements.FloatingText;
-using PotionCraft.Settings;
 using UnityEngine;
 
 namespace AutoBrew

@@ -1,12 +1,10 @@
 ﻿using AutoBrew.PlotterConverter;
 using HarmonyLib;
-using PotionCraft.Core.Extensions;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ManagersSystem.RecipeMap;
 using PotionCraft.ObjectBased.Bellows;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace AutoBrew.Overseer

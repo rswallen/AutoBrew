@@ -2,23 +2,20 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PotionCraft.ManagersSystem;
-using PotionCraft.NotificationSystem;
+using PotionCraft.ManagersSystem.Potion;
 using PotionCraft.ManagersSystem.SaveLoad;
+using PotionCraft.NotificationSystem;
+using PotionCraft.ObjectBased.RecipeMap.RecipeMapObject;
+using PotionCraft.ObjectBased.UIElements.FloatingText;
 using PotionCraft.ObjectBased.UIElements.PotionCustomizationPanel;
 using PotionCraft.ScriptableObjects;
+using PotionCraft.Settings;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using PotionCraft.ManagersSystem.RecipeMap;
-using PotionCraft.ObjectBased.RecipeMap.RecipeMapObject;
-using PotionCraft.ObjectBased.UIElements.FloatingText;
-using PotionCraft.Settings;
-using HarmonyLib;
-using PotionCraft.ManagersSystem.Potion;
-using UnityEngine.UIElements;
 
 namespace AutoBrew
 {
