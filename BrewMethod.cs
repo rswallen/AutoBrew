@@ -20,7 +20,7 @@ namespace AutoBrew
             }
             catch (JsonReaderException e)
             {
-                AutoBrewPlugin.Log.LogError("Json parse error: " + e.ToString());
+                Log.LogError("Json parse error: " + e.ToString());
                 return null;
             }
 
@@ -52,7 +52,7 @@ namespace AutoBrew
 
             if (!Enum.TryParse(data["order"], out BrewStage order))
             {
-                AutoBrewPlugin.Log.LogError($"Method.FromJson - Unknown order type: {data["order"]}");
+                Log.LogError($"Method.FromJson - Unknown order type: {data["order"]}");
                 return false;
             }
 
@@ -128,7 +128,7 @@ namespace AutoBrew
         public void AddOrder(BrewOrder order)
         {
             _data.Add(order);
-            AutoBrewPlugin.Log.LogDebug($"Method: Parsed order '{order}'");
+            Log.LogDebug($"Method: Parsed order '{order}'");
         }
 
         public bool GetOrder(int idx, out BrewOrder order)

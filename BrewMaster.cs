@@ -1,4 +1,5 @@
 ﻿using AutoBrew.Overseer;
+using BepInEx.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PotionCraft.ManagersSystem;
@@ -21,6 +22,8 @@ namespace AutoBrew
 {
     internal static class BrewMaster
     {
+        private static ManualLogSource Log => AutoBrewPlugin.Log;
+
         private static bool _init;
         private static bool _brewing;
         private static double _orderInterval;
@@ -71,7 +74,7 @@ namespace AutoBrew
 
             if (_recipe.Complete)
             {
-                AutoBrewPlugin.Log.LogInfo("Brew succeeded");
+                Log.LogInfo("Brew succeeded");
                 Notification.ShowText("AutoBrew: Brew succeeded", "Brew complete", Notification.TextType.EventText);
                 Reset();
                 return;
@@ -116,7 +119,7 @@ namespace AutoBrew
                 {
                     reason = "Something went wrong";
                 }
-                AutoBrewPlugin.Log.LogInfo($"Brew Aborted: {reason}");
+                Log.LogInfo($"Brew Aborted: {reason}");
                 Notification.ShowText("AutoBrew: Brew aborted", reason, Notification.TextType.EventText);
                 Reset();
             }
@@ -140,7 +143,7 @@ namespace AutoBrew
             string filepath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/settings.json";
             if (!File.Exists(filepath))
             {
-                AutoBrewPlugin.Log.LogInfo("Settings file not detected. Using plugin defaults");
+                Log.LogInfo("Settings file not detected. Using plugin defaults");
                 return false;
             }
 
@@ -174,13 +177,13 @@ namespace AutoBrew
             }
             catch (JsonReaderException e)
             {
-                AutoBrewPlugin.Log.LogError("Error parsing settings: ");
-                AutoBrewPlugin.Log.LogError(e.ToString());
+                Log.LogError("Error parsing settings: ");
+                Log.LogError(e.ToString());
             }
             catch (Exception e)
             {
-                AutoBrewPlugin.Log.LogError("Unknown error: ");
-                AutoBrewPlugin.Log.LogError(e.ToString());
+                Log.LogError("Unknown error: ");
+                Log.LogError(e.ToString());
             }
 
             return true;
@@ -195,7 +198,7 @@ namespace AutoBrew
 
             if (Managers.SaveLoad.SystemState != SaveLoadManager.SystemStateEnum.Idle)
             {
-                AutoBrewPlugin.Log.LogInfo("Can't brew a potion during load or save");
+                Log.LogInfo("Can't brew a potion during load or save");
                 return false;
             }
 
@@ -204,7 +207,7 @@ namespace AutoBrew
             string data = string.Copy(customizer.currentDescriptionText);
             if (data == string.Empty)
             {
-                AutoBrewPlugin.Log.LogInfo("Please paste json data into the custom description of the potion customizer panel");
+                Log.LogInfo("Please paste json data into the custom description of the potion customizer panel");
                 return false;
             }
 
@@ -222,13 +225,13 @@ namespace AutoBrew
                 {
                     if (count == 0)
                     {
-                        AutoBrewPlugin.Log.LogInfo($"Not enough '{item.name}' to brew");
+                        Log.LogInfo($"Not enough '{item.name}' to brew");
                     }
                 }
-                AutoBrewPlugin.Log.LogInfo("Error detected in ingredients. Cancelling brew.");
+                Log.LogInfo("Error detected in ingredients. Cancelling brew.");
                 return false;
             }
-            AutoBrewPlugin.Log.LogInfo("We have enough ingredients. Proceeding to brew.");
+            Log.LogInfo("We have enough ingredients. Proceeding to brew.");
 
             _brewing = true;
             return true;
@@ -285,7 +288,7 @@ namespace AutoBrew
         {
             if (!Brewing)
             {
-                AutoBrewPlugin.Log.LogInfo("Brewer idle");
+                Log.LogInfo("Brewer idle");
                 return;
             }
 
@@ -295,7 +298,7 @@ namespace AutoBrew
 
         public static void LogFailedOrder(BrewOrder order)
         {
-            AutoBrewPlugin.Log.LogError($"Brew Cancelled - {order.Stage} failed");
+            Log.LogError($"Brew Cancelled - {order.Stage} failed");
         }
 
         public static void PrintRecipeMapMessage(string message, Vector2 offset)
