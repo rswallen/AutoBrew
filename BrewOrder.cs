@@ -27,7 +27,15 @@ namespace AutoBrew
                 return null;
             }
 
-            return new BrewOrder(BrewStage.AddIngredient, item: ingItem);
+            float target = 0f;
+            if (data.ContainsKey("target"))
+            {
+                if (float.TryParse(data["target"], out target))
+                {
+                    target = Mathf.Clamp(target, 0f, 100f) / 100f;
+                }
+            }
+            return new BrewOrder(BrewStage.AddIngredient, target, item: ingItem);
         }
 
         public static BrewOrder GrindOrderFromDict(Dictionary<string, string> data)
