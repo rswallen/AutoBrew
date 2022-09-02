@@ -22,28 +22,22 @@
   
   <ItemGroup>
     <Reference Include="PotionCraft.Core">
-      <HintPath>..\..\..\..\..\Dropbox\Documents\Unity Projects\BepInEx Plugins\PotionCraft\PotionCraftLibs\PotionCraft.Core.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\PotionCraftLibs\PotionCraft.Core.dll</HintPath>
     </Reference>
     <Reference Include="PotionCraft.Scripts">
       <HintPath>..\PotionCraftLibs\PotionCraft.Scripts.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="PotionCraft.Settings">
       <HintPath>..\PotionCraftLibs\PotionCraft.Settings.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="QFSW.QC">
       <HintPath>..\PotionCraftLibs\QFSW.QC.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>..\..\..\..\..\Dropbox\Documents\Unity Projects\BepInEx Plugins\PotionCraft\PotionCraftLibs\Unity.TextMeshPro.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\PotionCraftLibs\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\..\Dropbox\Documents\Unity Projects\BepInEx Plugins\PotionCraft\PotionCraftLibs\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\PotionCraftLibs\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   
