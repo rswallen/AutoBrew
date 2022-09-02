@@ -23,21 +23,27 @@
   <ItemGroup>
     <Reference Include="PotionCraft.Core">
       <HintPath>..\PotionCraftLibs\PotionCraft.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PotionCraft.Scripts">
       <HintPath>..\PotionCraftLibs\PotionCraft.Scripts.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PotionCraft.Settings">
       <HintPath>..\PotionCraftLibs\PotionCraft.Settings.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="QFSW.QC">
       <HintPath>..\PotionCraftLibs\QFSW.QC.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>..\PotionCraftLibs\Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\PotionCraftLibs\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   
