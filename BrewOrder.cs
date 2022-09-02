@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Ingredient;
 using PotionCraft.ScriptableObjects.Salts;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,37 @@ namespace AutoBrew
     internal class BrewOrder
     {
         private static ManualLogSource Log => AutoBrewPlugin.Log;
+
+        private static int _ingSaltBase;
+        private static int _grindSaltBase;
+        private static int _stirSaltBase;
+        private static int _pourSaltBase;
+        private static int _heatSaltBase;
+        private static int _saltSaltBase;
+        private static int _effectSaltBase;
+
+        private static float _grindSaltMult;
+        private static float _stirSaltMult;
+        private static float _pourSaltMult;
+        private static float _heatSaltMult;
+        private static float _saltSaltMult;
+
+        public static void Reconfigure(Dictionary<string, string> data)
+        {
+            ABSettings.SetOrigin("BrewOrder");
+            ABSettings.GetInt(data, "SaltIngBase", out _ingSaltBase, 50);
+            ABSettings.GetInt(data, "SaltGrindBase", out _grindSaltBase, 5);
+            ABSettings.GetInt(data, "SaltStirBase", out _stirSaltBase, 5);
+            ABSettings.GetInt(data, "SaltPourBase", out _pourSaltBase, 5);
+            ABSettings.GetInt(data, "SaltHeatBase", out _heatSaltBase, 50);
+            ABSettings.GetInt(data, "SaltSaltBase", out _saltSaltBase, 5);
+            ABSettings.GetInt(data, "SaltEffectBase", out _effectSaltBase, 50);
+            ABSettings.GetFloat(data, "SaltGrindMult", out _grindSaltMult, 10f);
+            ABSettings.GetFloat(data, "SaltStirMult", out _stirSaltMult, 10f);
+            ABSettings.GetFloat(data, "SaltPourMult", out _pourSaltMult, 10f);
+            ABSettings.GetFloat(data, "SaltHeatMult", out _heatSaltMult, 10f);
+            ABSettings.GetFloat(data, "SaltSaltMult", out _saltSaltMult, 0.1f);
+        }
 
         public static BrewOrder IngOrderFromDict(Dictionary<string, string> data)
         {
@@ -199,6 +231,44 @@ namespace AutoBrew
             Target = target;
             Item = item;
             Version = version;
+        }
+
+        public int SaltCost => GetSaltCost();
+        
+        public int GetSaltCost()
+        {
+            switch (Stage)
+            {
+                case BrewStage.AddIngredient:
+                {
+                    return _ingSaltBase;
+                }
+                case BrewStage.GrindPercent:
+                {
+                    return _grindSaltBase + (int)Math.Ceiling(_grindSaltMult * Target);
+                }
+                case BrewStage.StirCauldron:
+                {
+                    return _stirSaltBase + (int)Math.Ceiling(_stirSaltMult * Target);
+                }
+                case BrewStage.PourSolvent:
+                {
+                    return _pourSaltBase + (int)Math.Ceiling(_pourSaltMult * Target);
+                }
+                case BrewStage.HeatVortex:
+                {
+                    return _heatSaltBase; // + (int)Math.Ceiling(_heatSaltMult * Target);
+                }
+                case BrewStage.AddSalt:
+                {
+                    return _saltSaltBase + (int)Math.Ceiling(_saltSaltMult * Target);
+                }
+                case BrewStage.AddEffect:
+                {
+                    return _effectSaltBase;
+                }
+            }
+            return 100;
         }
     }
 }

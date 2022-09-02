@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using Newtonsoft.Json;
 using PotionCraft.ScriptableObjects;
+using PotionCraft.ScriptableObjects.Salts;
 using System;
 using System.Collections.Generic;
 
@@ -171,11 +172,7 @@ namespace AutoBrew
 
         public Dictionary<InventoryItem, int> GetItemsRequired()
         {
-            if (this.Length == 0)
-            {
-                return null;
-            }
-
+            int saltCost = 0;
             Dictionary<InventoryItem, int> items = new();
             foreach (BrewOrder order in _data)
             {
@@ -190,8 +187,30 @@ namespace AutoBrew
                     }
                     default: break;
                 }
+                saltCost += order.SaltCost;
+            }
+
+            Salt saltType = Salt.GetByName("Void Salt", true, true);
+            if (saltType == null)
+            {
+                Log.LogError("Could not find salt 'Void Salt', so this one is free");
+            }
+            else
+            {
+                items.TryGetValue(saltType, out int current);
+                items[saltType] = current + saltCost;
             }
             return items;
+        }
+
+        public int GetSaltCost()
+        {
+            int cost = 0;
+            foreach (BrewOrder order in _data)
+            {
+                cost += order.SaltCost;
+            }
+            return cost;
         }
     }
 }

@@ -58,7 +58,7 @@ namespace AutoBrew.Overseer
                 }
             }
             _order = order;
-            Stage = OverseerStage.Active;
+            base.Setup(order);
         }
 
         public override void Process()
@@ -279,8 +279,6 @@ namespace AutoBrew.Overseer
         {
             if ((Idle) || (salt != _order.Item))
             {
-                BrewMaster.Abort("Salt added without authorisation");
-                Log.LogError("Salt added without permission");
                 return;
             }
 

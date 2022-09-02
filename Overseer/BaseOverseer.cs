@@ -1,8 +1,13 @@
 ﻿using BepInEx.Logging;
+using PotionCraft.ManagersSystem.Potion;
+using PotionCraft.ManagersSystem;
+using PotionCraft.ScriptableObjects;
+using PotionCraft.ScriptableObjects.Salts;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace AutoBrew.Overseer
 {
@@ -90,7 +95,11 @@ namespace AutoBrew.Overseer
 
         public abstract void Reset();
 
-        public abstract void Setup(BrewOrder order);
+        public virtual void Setup(BrewOrder order)
+        {
+            ConsumeVoidSalt(order.SaltCost);
+            SetActive();
+        }
 
         public abstract void Process();
 
@@ -119,6 +128,32 @@ namespace AutoBrew.Overseer
         {
             _gtEnd = Time.timeAsDouble;
             _stage = OverseerStage.Failed;
+        }
+
+        private protected bool ConsumeVoidSalt(int amount)
+        {
+            Salt voidSalt = Salt.GetByName("Void Salt", true, true);
+            if (voidSalt == null)
+            {
+                // if salt don't exist, we can't do anything
+                Log.LogError("ConsumeVoidSalt: 'Void Salt' does not exist");
+                return false;
+            }
+
+            if (Managers.Player.inventory.GetItemCount(voidSalt) < amount)
+            {
+                Log.LogError("ConsumeVoidSalt: Not enough void salt");
+                return false;
+            }
+
+            for (int i = 0; i < amount; i++)
+            {
+                Potion.UsedComponent.AddToList(Managers.Potion.usedComponents, voidSalt, true);
+            }
+            PotionManager.RecipeMarksSubManager.AddSaltMark(Managers.Potion.recipeMarks.GetMarksList(), voidSalt, amount);
+            Managers.Potion.potionCraftPanel.onPotionUpdated?.Invoke();
+            Managers.Player.inventory.RemoveItem(voidSalt, amount);
+            return true;
         }
     }
 

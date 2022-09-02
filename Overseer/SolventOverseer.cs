@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using PotionCraft.Core.Extensions;
 using PotionCraft.ManagersSystem;
+using PotionCraft.ManagersSystem.RecipeMap;
 using PotionCraft.ObjectBased.Ladle;
 using System.Collections.Generic;
 using UnityEngine;
@@ -50,8 +51,7 @@ namespace AutoBrew.Overseer
         {
             _pourTarget = order.Target;
             _pouredTotal = 0f;
-
-            Stage = OverseerStage.Active;
+            base.Setup(order);
         }
         
         public override void Process()

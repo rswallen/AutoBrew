@@ -94,7 +94,7 @@ namespace AutoBrew.Overseer
                     break;
                 }
             }
-            Stage = OverseerStage.Active;
+            base.Setup(order);
         }
 
         public override void Process()

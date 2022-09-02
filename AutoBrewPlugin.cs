@@ -2,8 +2,10 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using PotionCraft.ManagersSystem;
 using PotionCraft.ObjectBased.UIElements.PotionCustomizationPanel;
 using QFSW.QC;
+using UnityEngine;
 
 namespace AutoBrew
 {
@@ -51,6 +53,15 @@ namespace AutoBrew
         public static void Cmd_LogStatus()
         {
             BrewMaster.LogCurrentStageProgress();
+        }
+
+        [Command("Autobrew-LogIndicatorRot", "Logs the rotation of the potion indicator", true, true, Platform.AllPlatforms, MonoTargetType.Single)]
+        public static void Cmd_LogIndicatorRot()
+        {
+            Vector2 position = Managers.RecipeMap.recipeMapObject.indicatorContainer.localPosition;
+            float rotation = Managers.RecipeMap.indicatorRotation.VisualValue;
+            Log.LogInfo($"Indicator Position: ({position.x}|{position.y})");
+            Log.LogInfo($"Indicator Rotation: {rotation}");
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(PotionCustomizationPanel), "OnPanelContainerStart")]

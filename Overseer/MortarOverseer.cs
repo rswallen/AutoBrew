@@ -59,8 +59,7 @@ namespace AutoBrew.Overseer
             _grindStep = GetGrindStepRate(item);
             _grindTarget = (float)order.Target;
             _gStage = GrindStage.Grinding;
-            
-            Stage = OverseerStage.Active;
+            base.Setup(order);
         }
 
         public override void Process()

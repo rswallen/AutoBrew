@@ -18,8 +18,7 @@ namespace AutoBrew.Overseer
         public override void Setup(BrewOrder order)
         {
             _order = order;
-
-            Stage = OverseerStage.Active;
+            base.Setup(order);
         }
 
         public override void Process()

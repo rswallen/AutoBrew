@@ -36,7 +36,7 @@ namespace AutoBrew.Overseer
         {
             _order = order;
             _stirredTotal = 0f;
-            Stage = OverseerStage.Active;
+            base.Setup(order);
         }
 
         public override void Process()
