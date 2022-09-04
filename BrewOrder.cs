@@ -220,6 +220,177 @@ namespace AutoBrew
             return new BrewOrder(BrewStage.AddEffect, target);
         }
 
+        public static BrewOrder IngOrderFromPlotter(Dictionary<string, string> data)
+        {
+            if (!data.ContainsKey("ingredientId"))
+            {
+                Log.LogError("Order does not contain an ingredient to add");
+                return null;
+            }
+
+            Ingredient ingItem = Ingredient.GetByName(data["ingredientId"]);
+            if (ingItem == null)
+            {
+                Log.LogError($"Unknown ingredient '{data["ingredientId"]}' in order");
+                return null;
+            }
+
+            float target = 0f;
+            if (data.ContainsKey("grindPercent"))
+            {
+                if (float.TryParse(data["grindPercent"], out target))
+                {
+                    target = Mathf.Clamp(target, 0f, 1f);
+                }
+            }
+            return new BrewOrder(BrewStage.AddIngredient, target, item: ingItem);
+        }
+
+        public static BrewOrder GrindOrderFromPlotter(Dictionary<string, string> data)
+        {
+            if (!data.ContainsKey("grindPercent"))
+            {
+                Log.LogError("You must specify a target for GrindPercent");
+                return null;
+            }
+            if (!float.TryParse(data["grindPercent"], out float target))
+            {
+                Log.LogError($"GrindPercent needs a float, received '{data["grindPercent"]}'");
+                return null;
+            }
+            if ((target < 0f) || (target > 1f))
+            {
+                Log.LogWarning($"GrindPercent must satisfy (0.0 <= x <= 1.0), received '{target}'");
+                target = Mathf.Clamp(target, 0f, 1f);
+            }
+            return new BrewOrder(BrewStage.GrindPercent, target);
+        }
+
+        public static BrewOrder StirOrderFromPlotter(Dictionary<string, string> data)
+        {
+            if (!data.ContainsKey("distance"))
+            {
+                Log.LogError("You must specify a target for StirCauldron");
+                return null;
+            }
+
+            if (!float.TryParse(data["distance"], out float target))
+            {
+                Log.LogError($"StirCauldron requires a float, received '{data["distance"]}'");
+                return null;
+            }
+
+            if (target < 0)
+            {
+                Log.LogError($"StirCauldron requires a float that is greater than or equal to 0, received '{data["distance"]}'");
+                return null;
+            }
+            return new BrewOrder(BrewStage.StirCauldron, target);
+        }
+
+        public static BrewOrder PourOrderFromPlotter(Dictionary<string, string> data)
+        {
+            if (!data.ContainsKey("distance"))
+            {
+                Log.LogError("You must specify a target for PourSolvent");
+                return null;
+            }
+
+            if (!float.TryParse(data["distance"], out float target))
+            {
+                Log.LogError($"PourSolvent requires a float, received '{data["distance"]}'");
+                return null;
+            }
+
+            if (target < 0)
+            {
+                Log.LogError($"PourSolvent requires a float that is greater than or equal to 0, received '{target}'");
+                return null;
+            }
+            return new BrewOrder(BrewStage.PourSolvent, target);
+        }
+
+        public static BrewOrder HeatOrderFromPlotter(Dictionary<string, string> data)
+        {
+            if (!data.ContainsKey("distance"))
+            {
+                Log.LogError("You must specify a target for HeatVortex");
+                return null;
+            }
+
+            if (!float.TryParse(data["distance"], out float target))
+            {
+                Log.LogError($"HeatVortex requires a float, received '{data["distance"]}'");
+                return null;
+            }
+
+            if (!data.ContainsKey("version") || !int.TryParse(data["version"], out int version))
+            {
+                Log.LogWarning("No plotter version specified. Defaulting to 0");
+                version = 0;
+            }
+            else if (!PlotterVortex.IsValidVersion(version))
+            {
+                Log.LogWarning($"Invalid plotter version given, received {version}");
+                return null;
+            }
+            return new BrewOrder(BrewStage.HeatVortex, target, version);
+        }
+
+        public static BrewOrder SaltOrderFromPlotter(Dictionary<string, string> data)
+        {
+            if (!data.ContainsKey("salt"))
+            {
+                Log.LogError("You must specify a salt for AddSalt");
+                return null;
+            }
+
+            if (!data.ContainsKey("grains"))
+            {
+                Log.LogError("You must specify a target for AddSalt");
+                return null;
+            }
+
+            Salt saltItem = null;
+            switch (data["salt"])
+            {
+                case "void":
+                {
+                    saltItem = Salt.GetByName("Void Salt");
+                    break;
+                }
+                case "sun":
+                {
+                    saltItem = Salt.GetByName("Sun Salt");
+                    break;
+                }
+                case "moon":
+                {
+                    saltItem = Salt.GetByName("Moon Salt");
+                    break;
+                }
+            }
+            
+            if (saltItem == null)
+            {
+                Log.LogError($"Unknown salt '{data["salt"]}' in order");
+                return null;
+            }
+
+            if (!int.TryParse(data["grains"], out int amount))
+            {
+                Log.LogError($"SaltAmount needs an int, received '{data["grains"]}'");
+                return null;
+            }
+
+            if (amount < 1)
+            {
+                Log.LogError($"SaltAmount must be an int greater than or equal to 1. Received {amount}");
+                return null;
+            }
+            return new BrewOrder(BrewStage.AddSalt, amount, item: saltItem);
+        }
+
         public readonly BrewStage Stage;
         public readonly double Target;
         public readonly InventoryItem Item;

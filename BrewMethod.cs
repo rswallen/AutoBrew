@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Salts;
 using System;
@@ -29,6 +30,50 @@ namespace AutoBrew
             foreach (var dict in buffer)
             {
                 _method.AddOrder(dict);
+            }
+            return _method;
+        }
+
+        public static BrewMethod FromPlotterUrl(string url)
+        {
+            string json = PlotterUrlDecoder.ProcessURL(url);
+            if (json == null)
+            {
+                return null;
+            }
+
+            var jobj = JObject.Parse(json);
+            if (jobj == null)
+            {
+                return null;
+            }
+
+            var id = jobj.GetValue("datasetId");
+            if (id == null || id.ToString() != "2XP7bCigUeobr2HDtbWUrF")
+            {
+                return null;
+            }
+
+            var plotItems = jobj.GetValue("plotItems");
+            if (plotItems == null)
+            {
+                return null;
+            }
+
+            var buffer = new List<Dictionary<string, string>>();
+            foreach (var item in (JArray)plotItems)
+            {
+                if (item is not JObject dict)
+                {
+                    break;
+                }
+                buffer.Add(dict.ToObject<Dictionary<string, string>>());
+            }
+
+            BrewMethod _method = new();
+            foreach (var dict in buffer)
+            {
+                _method.AddPlotterOrder(dict);
             }
             return _method;
         }
@@ -133,6 +178,94 @@ namespace AutoBrew
                 }
             }
 
+            return false;
+        }
+
+        public bool AddPlotterOrder(Dictionary<string, string> data)
+        {
+            if (!data.ContainsKey("type"))
+            {
+                return false;
+            }
+
+            switch (data["type"])
+            {
+                case "add-ingredient":
+                {
+                    var ingOrder = BrewOrder.IngOrderFromPlotter(data);
+                    if (ingOrder == null)
+                    {
+                        return false;
+                    }
+
+                    if (ingOrder.Target != 0f)
+                    {
+                        var grindOrder = BrewOrder.GrindOrderFromPlotter(data);
+                        if (grindOrder != null)
+                        {
+                            this.AddOrder(ingOrder);
+                            this.AddOrder(grindOrder);
+                            return true;
+                        }
+                        return false;
+                    }
+
+                    this.AddOrder(ingOrder);
+                    return true;
+                }
+                case "pour-solvent":
+                {
+                    var pourOrder = BrewOrder.PourOrderFromPlotter(data);
+                    if (pourOrder != null)
+                    {
+                        this.AddOrder(pourOrder);
+                    }
+                    break;
+                }
+                case "stir-cauldron":
+                {
+                    var stirOrder = BrewOrder.StirOrderFromPlotter(data);
+                    if (stirOrder != null)
+                    {
+                        this.AddOrder(stirOrder);
+                        return true;
+                    }
+                    break;
+                }
+                case "heat-vortex":
+                {
+                    var heatOrder = BrewOrder.HeatOrderFromPlotter(data);
+                    if (heatOrder != null)
+                    {
+                        this.AddOrder(heatOrder);
+                        return true;
+                    }
+                    break;
+                }
+                case "add-rotation-salt":
+                {
+                    data["type"] = "add-salt";
+                    var saltOrder = BrewOrder.SaltOrderFromPlotter(data);
+                    if (saltOrder != null)
+                    {
+                        this.AddOrder(saltOrder);
+                        return true;
+                    }
+                    break;
+                }
+                case "void-salt":
+                {
+                    data["type"] = "add-salt";
+                    data["salt"] = "void";
+                    var saltOrder = BrewOrder.SaltOrderFromPlotter(data);
+                    if (saltOrder != null)
+                    {
+                        this.AddOrder(saltOrder);
+                        return true;
+                    }
+                    break;
+                }
+            }
             return false;
         }
 

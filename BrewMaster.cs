@@ -125,7 +125,7 @@ namespace AutoBrew
             }
         }
 
-        public static void InitBrew()
+        public static void InitBrewFromJson()
         {
             if (Managers.SaveLoad.SystemState != SaveLoadManager.SystemStateEnum.Idle)
             {
@@ -142,6 +142,36 @@ namespace AutoBrew
             if (!LoadJsonFromDesc())
             {
                 Notification.ShowText("AutoBrew: Can't start", "Error detected in JSON. See BepInEx log for details", Notification.TextType.EventText);
+                return;
+            }
+
+            if (CheckInventoryStock())
+            {
+                Notification.ShowText("AutoBrew: Brew started", "And so it begins", Notification.TextType.EventText);
+            }
+            else
+            {
+                Notification.ShowText("AutoBrew: Can't start", "Not enough ingredients", Notification.TextType.EventText);
+            }
+        }
+
+        public static void InitBrewFromPlotterURL()
+        {
+            if (Managers.SaveLoad.SystemState != SaveLoadManager.SystemStateEnum.Idle)
+            {
+                Log.LogInfo("Can't brew a potion during load or save");
+                return;
+            }
+
+            if (Brewing)
+            {
+                Notification.ShowText("AutoBrew: Can't start", "Already brewing", Notification.TextType.EventText);
+                return;
+            }
+
+            if (!LoadPlotterUrlFromDesc())
+            {
+                Notification.ShowText("AutoBrew: Can't start", "Error detected in PlotterURL. See BepInEx log for details", Notification.TextType.EventText);
                 return;
             }
 
@@ -223,6 +253,24 @@ namespace AutoBrew
             }
 
             _recipe = BrewMethod.FromJson(customizer.currentDescriptionText);
+            return ((_recipe != null) && (_recipe.Length != 0));
+        }
+
+        public static bool LoadPlotterUrlFromDesc()
+        {
+            if (Brewing)
+            {
+                return false;
+            }
+
+            PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
+            if (customizer.currentDescriptionText == string.Empty)
+            {
+                Log.LogError("Please paste json data into the custom description of the potion customizer panel");
+                return false;
+            }
+
+            _recipe = BrewMethod.FromPlotterUrl(customizer.currentDescriptionText);
             return ((_recipe != null) && (_recipe.Length != 0));
         }
 

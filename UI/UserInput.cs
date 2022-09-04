@@ -18,8 +18,8 @@ namespace AutoBrew.UI
         {
             _callbacks = new()
             {
-                { "AutoBrew", BrewMaster.InitBrew },
-                { "AutoBrew-Plotter", BrewMaster.InitBrew }
+                { "AutoBrew", BrewMaster.InitBrewFromJson },
+                { "AutoBrew-Plotter", BrewMaster.InitBrewFromPlotterURL }
             };
 
             if (__instance.titleInputField != null)
