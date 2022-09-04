@@ -18,6 +18,7 @@ namespace AutoBrew.Overseer
 
         private GrindStage _gStage;
         private float _grindTarget;
+        private float _grindTotal;
         private float _grindStep;
         private int _flourishNum;
 
@@ -58,6 +59,7 @@ namespace AutoBrew.Overseer
             }
             _grindStep = GetGrindStepRate(item);
             _grindTarget = (float)order.Target;
+            _grindTotal = 0f;
             _gStage = GrindStage.Grinding;
             base.Setup(order);
         }
@@ -239,8 +241,8 @@ namespace AutoBrew.Overseer
         public void UpdateGrindStatus(Stack item)
         {
             item.UpdateGrindedSubstance();
-            float grindStatus = Mathf.Clamp01(item.substanceGrinding.CurrentGrindStatus + _grindStep);
-            item.substanceGrinding.CurrentGrindStatus = grindStatus;
+            _grindTotal += _grindStep;
+            item.substanceGrinding.CurrentGrindStatus = _grindTotal;
         }
 
         public int GetTotalGrindUpdates(Stack item)
