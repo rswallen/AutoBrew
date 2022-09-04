@@ -16,24 +16,22 @@ namespace AutoBrew
             {
                 case 0:
                 {
-                    Log.LogError("No padding required");
                     break;
                 }
                 case 3:
                 {
-                    Log.LogError("Padding 1");
                     urlsafebase64 += '=';
                     break;
                 }
                 case 2:
                 {
-                    Log.LogError("Padding 2");
                     urlsafebase64 += "==";
                     break;
                 }
                 case 1:
                 {
-                    throw new InvalidDataException("Invalid base64 string");
+                    Log.LogError("Base Base64 data");
+                    return null;
                 }
             }
             
@@ -68,6 +66,11 @@ namespace AutoBrew
             Log.LogDebug($"PlotterDecoder: Data - {lumps[1]}");
 
             string base64Data = ConvertUrlSafeBase64ToBase64(lumps[1]);
+            if (base64Data == null)
+            {
+                return null;
+            }
+
             var rawData = Convert.FromBase64String(base64Data);
             Log.LogDebug("PlotterDecoder: Base64 conversion succeeded");
 
@@ -87,7 +90,6 @@ namespace AutoBrew
                     Log.LogError("Could not deflate");
                     return null;
                 }
-                Log.LogDebug($"JSON: {unzipped}");
                 return unzipped;
             }
             catch (Exception e)
