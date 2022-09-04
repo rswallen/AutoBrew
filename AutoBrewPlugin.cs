@@ -1,8 +1,8 @@
 ﻿using AutoBrew.Overseer;
+using AutoBrew.UI;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using PotionCraft.ObjectBased.UIElements.PotionCustomizationPanel;
 using QFSW.QC;
 
 namespace AutoBrew
@@ -27,7 +27,7 @@ namespace AutoBrew
             Harmony.CreateAndPatchAll(typeof(InventoryOverseer));
             Harmony.CreateAndPatchAll(typeof(Lockdown));
             Harmony.CreateAndPatchAll(typeof(BrewMaster));
-            Harmony.CreateAndPatchAll(typeof(AutoBrewPlugin));
+            Harmony.CreateAndPatchAll(typeof(UserInput));
         }
 
         public void Update()
@@ -51,26 +51,6 @@ namespace AutoBrew
         public static void Cmd_LogStatus()
         {
             BrewMaster.LogCurrentStageProgress();
-        }
-
-        [HarmonyPostfix, HarmonyPatch(typeof(PotionCustomizationPanel), "OnPanelContainerStart")]
-        public static void OnPanelContainerStart_Postfix(PotionCustomizationPanel __instance)
-        {
-            if (__instance.titleInputField != null)
-            {
-                __instance.titleInputField.onSubmit.AddListener(delegate (string text)
-                {
-                    if (BrewMaster.Brewing)
-                    {
-                        return;
-                    }
-
-                    if ((text.Length == 8) && text.Equals("AutoBrew"))
-                    {
-                        BrewMaster.InitBrew();
-                    }
-                });
-            }
         }
     }
 }
