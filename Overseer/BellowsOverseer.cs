@@ -237,6 +237,8 @@ namespace AutoBrew.Overseer
 
             if (Managers.RecipeMap.indicator.IsIndicatorTeleporting())
             {
+                // if potion teleports, assume 100% accuracy
+                _heatedTotal = _heatTarget;
                 Stage = OverseerStage.Complete;
                 return;
             }
