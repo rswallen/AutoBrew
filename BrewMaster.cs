@@ -203,6 +203,9 @@ namespace AutoBrew
                 newSettings = jsonData["BrewMaster"].ToObject<Dictionary<string, string>>();
                 Reconfigure(newSettings);
 
+                newSettings = jsonData["BrewOrder"].ToObject<Dictionary<string, string>>();
+                BrewOrder.Reconfigure(newSettings);
+
                 newSettings = jsonData["Bellows"].ToObject<Dictionary<string, string>>();
                 Boiler.Reconfigure(newSettings);
                 Boiler.Reset();

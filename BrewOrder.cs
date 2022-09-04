@@ -40,7 +40,7 @@ namespace AutoBrew
             ABSettings.GetFloat(data, "SaltGrindMult", out _grindSaltMult, 10f);
             ABSettings.GetFloat(data, "SaltStirMult", out _stirSaltMult, 10f);
             ABSettings.GetFloat(data, "SaltPourMult", out _pourSaltMult, 10f);
-            ABSettings.GetFloat(data, "SaltHeatMult", out _heatSaltMult, 10f);
+            ABSettings.GetFloat(data, "SaltHeatMult", out _heatSaltMult, 0f);
             ABSettings.GetFloat(data, "SaltSaltMult", out _saltSaltMult, 0.1f);
         }
 
@@ -428,7 +428,7 @@ namespace AutoBrew
                 }
                 case BrewStage.HeatVortex:
                 {
-                    return _heatSaltBase; // + (int)Math.Ceiling(_heatSaltMult * Target);
+                    return _heatSaltBase + (int)Math.Ceiling(_heatSaltMult * Target);
                 }
                 case BrewStage.AddSalt:
                 {

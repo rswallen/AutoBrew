@@ -3,6 +3,20 @@
     "OrderInterval": "0.2",
     "OrderCompleteOffset": "0.5,2.5"
   },
+  "BrewOrder": {
+    "SaltIngBase": "50",
+    "SaltGrindBase": "5",
+    "SaltStirBase": "5",
+    "SaltPourBase": "5",
+    "SaltHeatBase": "50",
+    "SaltSaltBase": "5",
+    "SaltEffectBase": "50",
+    "SaltGrindMult": "10",
+    "SaltStirMult": "10",
+    "SaltPourMult": "10",
+    "SaltHeatMult": "0",
+    "SaltSaltMult": "0.1"
+  },
   "Inventory": {
     "IngSpawnPos": "7.275,2.375",
     "SaltSpawnPos": "5.7,-5.3",
