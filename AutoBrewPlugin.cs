@@ -7,7 +7,7 @@ using QFSW.QC;
 
 namespace AutoBrew
 {
-    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, "0.1.0")]
+    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, "0.2.0")]
     public class AutoBrewPlugin : BaseUnityPlugin
     {
         public static ManualLogSource Log;
