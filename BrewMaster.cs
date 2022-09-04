@@ -193,6 +193,14 @@ namespace AutoBrew
             if (!File.Exists(filepath))
             {
                 Log.LogInfo("Settings file not detected. Using plugin defaults");
+                var nullsettings = new Dictionary<string, string>();
+                Reconfigure(nullsettings);
+                BrewOrder.Reconfigure(nullsettings);
+                Boiler.Reconfigure(nullsettings);
+                Stirrer.Reconfigure(nullsettings);
+                Larder.Reconfigure(nullsettings);
+                Grinder.Reconfigure(nullsettings);
+                Pourer.Reconfigure(nullsettings);
                 return false;
             }
 
