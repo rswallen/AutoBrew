@@ -18,11 +18,10 @@ namespace AutoBrew.Overseer
 
         public override void Reconfigure(Dictionary<string, string> data)
         {
-            ABSettings.SetOrigin("CauldronOverseer");
-            ABSettings.GetFloat(data, "StirTolerance", out _stirTolerance, 0.0001f, false);
-            ABSettings.GetFloat(data, "StirThreshSlow", out _stirThreshSlow, 0.5f, false);
-            ABSettings.GetFloat(data, "StirFast", out _stirFast, 0.5f, false);
-            ABSettings.GetFloat(data, "StirSlow", out _stirSlow, 0.05f, false);
+            ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirTolerance", out _stirTolerance, 0.0001f, false);
+            ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirThreshSlow", out _stirThreshSlow, 0.5f, false);
+            ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirFast", out _stirFast, 0.5f, false);
+            ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirSlow", out _stirSlow, 0.05f, false);
         }
 
         public override void Reset()

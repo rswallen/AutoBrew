@@ -8,116 +8,100 @@ namespace AutoBrew
     {
         private static ManualLogSource Log => AutoBrewPlugin.Log;
 
-        private static string _origin = "Settings";
-
-        public static void SetOrigin(string origin)
+        public static void LogConfigMissing(string source, string settingName)
         {
-            if ((origin != null) && (origin != ""))
-            {
-                _origin = origin;
-            }
+            Log.LogWarning($"{source}: Error parsing '{settingName}'. Either could not find or could not parse");
         }
 
-        public static void LogConfigMissing(string settingName)
+        public static void LogConfigParseFail<T>(string source, string settingName, T defaultValue)
         {
-            if ((_origin == null) || (_origin == ""))
-            {
-                _origin = "Settings";
-            }
-            Log.LogWarning($"{_origin}: Error parsing '{settingName}'. Either could not find or could not parse");
+            Log.LogWarning($"{source}: Error parsing '{settingName}'. Expected {typeof(T)}. Assigned default value of {defaultValue}");
         }
 
-        public static void LogConfigParseFail<T>(string settingName, T defaultValue)
-        {
-            string expected = typeof(T).ToString();
-            Log.LogWarning($"{_origin}: Error parsing '{settingName}'. Expected {expected}. Assigned default value of {defaultValue}");
-
-        }
-
-        public static bool GetBool(Dictionary<string, string> repo, string key, out bool output, bool defaultValue = false, bool logFailure = true)
+        public static bool GetBool(string source, Dictionary<string, string> repo, string key, out bool output, bool defaultValue = false, bool logFailure = true)
         {
             output = defaultValue;
             if (!repo.ContainsKey(key))
             {
                 if (logFailure)
                 {
-                    LogConfigMissing(key);
+                    LogConfigMissing(source, key);
                 }
                 return false;
             }
             bool success = (bool.TryParse(repo[key], out output));
             if (!success && logFailure)
             {
-                LogConfigParseFail<bool>(key, defaultValue);
+                LogConfigParseFail<bool>(source, key, defaultValue);
             }
             return success;
         }
         
-        public static bool GetInt(Dictionary<string, string> repo, string key, out int output, int defaultValue = 0, bool logFailure = true)
+        public static bool GetInt(string source, Dictionary<string, string> repo, string key, out int output, int defaultValue = 0, bool logFailure = true)
         {
             output = defaultValue;
             if (!repo.ContainsKey(key))
             {
                 if (logFailure)
                 {
-                    LogConfigMissing(key);
+                    LogConfigMissing(source, key);
                 }
                 return false;
             }
             bool success = (int.TryParse(repo[key], out output));
             if (!success && logFailure)
             {
-                ABSettings.LogConfigParseFail<int>(key, defaultValue);
+                ABSettings.LogConfigParseFail<int>(source, key, defaultValue);
             }
             return success;
         }
         
-        public static bool GetFloat(Dictionary<string, string> repo, string key, out float output, float defaultValue = 0f, bool logFailure = true)
+        public static bool GetFloat(string source, Dictionary<string, string> repo, string key, out float output, float defaultValue = 0f, bool logFailure = true)
         {
             output = defaultValue;
             if (!repo.ContainsKey(key))
             {
                 if (logFailure)
                 {
-                    LogConfigMissing(key);
+                    LogConfigMissing(source, key);
                 }
                 return false;
             }
             bool success = (float.TryParse(repo[key], out output));
             if (!success && logFailure)
             {
-                LogConfigParseFail<float>(key, defaultValue);
+                LogConfigParseFail<float>(source, key, defaultValue);
             }
             return success;
         }
 
-        public static bool GetDouble(Dictionary<string, string> repo, string key, out double output, double defaultValue = 0f, bool logFailure = true)
+        public static bool GetDouble(string source, Dictionary<string, string> repo, string key, out double output, double defaultValue = 0f, bool logFailure = true)
         {
             output = defaultValue;
             if (!repo.ContainsKey(key))
             {
                 if (logFailure)
                 {
-                    LogConfigMissing(key);
+                    LogConfigMissing(source, key);
                 }
                 return false;
             }
             bool success = (double.TryParse(repo[key], out output));
             if (!success && logFailure)
             {
-                LogConfigParseFail<double>(key, defaultValue);
+                LogConfigParseFail<double>(source, key, defaultValue);
             }
             return success;
         }
 
-        public static bool GetString(Dictionary<string, string> repo, string key, out string output, string defaultValue = "", bool logFailure = true)
+        public static bool GetString(string source, Dictionary<string, string> repo, string key, out string output, string defaultValue = "", bool logFailure = true)
         {
             output = defaultValue;
             if (!repo.ContainsKey(key))
             {
                 if (logFailure)
                 {
-                    LogConfigMissing(key);
+                    LogConfigMissing(source, key);
                 }
                 return false;
             }
@@ -125,10 +109,10 @@ namespace AutoBrew
             return true;
         }
 
-        public static bool GetVector2(Dictionary<string, string> repo, string key, out Vector2 output, Vector2 defaultValue, bool logFailure = true)
+        public static bool GetVector2(string source, Dictionary<string, string> repo, string key, out Vector2 output, Vector2 defaultValue, bool logFailure = true)
         {
             output = defaultValue;
-            if (!GetString(repo, key, out string value, "", logFailure))
+            if (!GetString(source, repo, key, out string value, "", logFailure))
             {
                 return false;
             }
@@ -138,7 +122,7 @@ namespace AutoBrew
             {
                 if (logFailure)
                 {
-                    LogConfigParseFail<Vector2>(key, defaultValue);
+                    LogConfigParseFail<Vector2>(source, key, defaultValue);
                 }
                 return false;
             }
@@ -151,7 +135,7 @@ namespace AutoBrew
             {
                 if (logFailure)
                 {
-                    LogConfigParseFail<Vector2>(key, defaultValue);
+                    LogConfigParseFail<Vector2>(source, key, defaultValue);
                 }
                 return false;
             }
@@ -159,10 +143,10 @@ namespace AutoBrew
             return true;
         }
 
-        public static bool GetVector3(Dictionary<string, string> repo, string key, out Vector3 output, Vector3 defaultValue, bool logFailure = true)
+        public static bool GetVector3(string source, Dictionary<string, string> repo, string key, out Vector3 output, Vector3 defaultValue, bool logFailure = true)
         {
             output = defaultValue;
-            if (!GetString(repo, key, out string value, "", logFailure))
+            if (!GetString(source, repo, key, out string value, "", logFailure))
             {
                 return false;
             }
@@ -172,7 +156,7 @@ namespace AutoBrew
             {
                 if (logFailure)
                 {
-                    LogConfigParseFail<Vector2>(key, defaultValue);
+                    LogConfigParseFail<Vector2>(source, key, defaultValue);
                 }
                 return false;
             }
@@ -186,7 +170,7 @@ namespace AutoBrew
             {
                 if (logFailure)
                 {
-                    LogConfigParseFail<Vector3>(key, defaultValue);
+                    LogConfigParseFail<Vector3>(source, key, defaultValue);
                 }
                 return false;
             }

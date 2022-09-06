@@ -28,13 +28,12 @@ namespace AutoBrew.Overseer
 
         public override void Reconfigure(Dictionary<string, string> data)
         {
-            ABSettings.SetOrigin("SolventOverseer");
-            ABSettings.GetFloat(data, "PourTolerance", out _pourTolerance, 1.0f, false);
-            ABSettings.GetFloat(data, "PourThreshSlow", out _pourThreshSlow, 1.0f, false);
-            ABSettings.GetFloat(data, "PourFastAngle", out _pourFastAngle, 320f, false);
-            ABSettings.GetFloat(data, "PourSlowAngle", out _pourSlowAngle, 340f, false);
-            ABSettings.GetFloat(data, "PourSlowSpeed", out _pourSlowSpeed, 0.01f, false);
-            ABSettings.GetFloat(data, "LerpDuration", out _lerpDuration, 0.2f, false);
+            ABSettings.GetFloat(nameof(SolventOverseer), data, "PourTolerance", out _pourTolerance, 1.0f, false);
+            ABSettings.GetFloat(nameof(SolventOverseer), data, "PourThreshSlow", out _pourThreshSlow, 1.0f, false);
+            ABSettings.GetFloat(nameof(SolventOverseer), data, "PourFastAngle", out _pourFastAngle, 320f, false);
+            ABSettings.GetFloat(nameof(SolventOverseer), data, "PourSlowAngle", out _pourSlowAngle, 340f, false);
+            ABSettings.GetFloat(nameof(SolventOverseer), data, "PourSlowSpeed", out _pourSlowSpeed, 0.01f, false);
+            ABSettings.GetFloat(nameof(SolventOverseer), data, "LerpDuration", out _lerpDuration, 0.2f, false);
         }
 
         public override void Reset()

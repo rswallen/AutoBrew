@@ -26,11 +26,10 @@ namespace AutoBrew.Overseer
 
         public override void Reconfigure(Dictionary<string, string> data)
         {
-            ABSettings.SetOrigin("InventoryOverseer");
-            ABSettings.GetVector2(data, "IngSpawnPos", out _ingredientSpawnPos, new Vector2(7.275f, 2.375f), false);
-            ABSettings.GetVector2(data, "SaltSpawnPos", out _saltItemSpawnPos, new Vector2(5.7f, -5.3f), false);
-            ABSettings.GetVector2(data, "CauldronOffset", out _cauldronOffset, new Vector2(0f, 5f), false);
-            ABSettings.GetBool(data, "AlwaysDissolve", out _alwaysDissolve, true, false);
+            ABSettings.GetVector2(nameof(InventoryOverseer), data, "IngSpawnPos", out _ingredientSpawnPos, new Vector2(7.275f, 2.375f), false);
+            ABSettings.GetVector2(nameof(InventoryOverseer), data, "SaltSpawnPos", out _saltItemSpawnPos, new Vector2(5.7f, -5.3f), false);
+            ABSettings.GetVector2(nameof(InventoryOverseer), data, "CauldronOffset", out _cauldronOffset, new Vector2(0f, 5f), false);
+            ABSettings.GetBool(nameof(InventoryOverseer), data, "AlwaysDissolve", out _alwaysDissolve, true, false);
         }
 
         public override void Reset()

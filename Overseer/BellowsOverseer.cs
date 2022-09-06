@@ -34,15 +34,14 @@ namespace AutoBrew.Overseer
 
         public override void Reconfigure(Dictionary<string, string> data)
         {
-            ABSettings.SetOrigin("BellowsOverseer");
-            ABSettings.GetFloat(data, "SparkAmount", out _sparkAmount, 10f, false);
-            ABSettings.GetFloat(data, "SparkIntervalOn", out _sparkIntervalOn, 1.6f, false);
-            ABSettings.GetFloat(data, "SparkIntervalOff", out _sparkIntervalOff, 0.4f, false);
-            ABSettings.GetFloat(data, "HeatFast", out _heatFast, 0.25f, false);
-            ABSettings.GetFloat(data, "HeatSlow", out _heatSlow, 0.05f, false);
-            ABSettings.GetFloat(data, "HeatThreshSlow", out _heatThreshSlow, 45.0f, false);
-            ABSettings.GetFloat(data, "HeatThreshStop", out _heatThreshStop, 0.5f, false);
-            ABSettings.GetFloat(data, "HeatEffectTime", out _heatEffectTime, 2.0f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkAmount", out _sparkAmount, 10f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkIntervalOn", out _sparkIntervalOn, 1.6f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkIntervalOff", out _sparkIntervalOff, 0.4f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatFast", out _heatFast, 0.25f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatSlow", out _heatSlow, 0.05f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatThreshSlow", out _heatThreshSlow, 45.0f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatThreshStop", out _heatThreshStop, 0.5f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatEffectTime", out _heatEffectTime, 2.0f, false);
         }
 
         public override void Reset()

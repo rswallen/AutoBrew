@@ -29,19 +29,18 @@ namespace AutoBrew
 
         public static void Reconfigure(Dictionary<string, string> data)
         {
-            ABSettings.SetOrigin("BrewOrder");
-            ABSettings.GetInt(data, "SaltIngBase", out _ingSaltBase, 50, false);
-            ABSettings.GetInt(data, "SaltGrindBase", out _grindSaltBase, 5, false);
-            ABSettings.GetInt(data, "SaltStirBase", out _stirSaltBase, 5, false);
-            ABSettings.GetInt(data, "SaltPourBase", out _pourSaltBase, 5, false);
-            ABSettings.GetInt(data, "SaltHeatBase", out _heatSaltBase, 50, false);
-            ABSettings.GetInt(data, "SaltSaltBase", out _saltSaltBase, 5, false);
-            ABSettings.GetInt(data, "SaltEffectBase", out _effectSaltBase, 50, false);
-            ABSettings.GetFloat(data, "SaltGrindMult", out _grindSaltMult, 10f, false);
-            ABSettings.GetFloat(data, "SaltStirMult", out _stirSaltMult, 10f, false);
-            ABSettings.GetFloat(data, "SaltPourMult", out _pourSaltMult, 10f, false);
-            ABSettings.GetFloat(data, "SaltHeatMult", out _heatSaltMult, 0f, false);
-            ABSettings.GetFloat(data, "SaltSaltMult", out _saltSaltMult, 0.1f, false);
+            ABSettings.GetInt("BrewOrder", data, "SaltIngBase", out _ingSaltBase, 50, false);
+            ABSettings.GetInt("BrewOrder", data, "SaltGrindBase", out _grindSaltBase, 5, false);
+            ABSettings.GetInt("BrewOrder", data, "SaltStirBase", out _stirSaltBase, 5, false);
+            ABSettings.GetInt("BrewOrder", data, "SaltPourBase", out _pourSaltBase, 5, false);
+            ABSettings.GetInt("BrewOrder", data, "SaltHeatBase", out _heatSaltBase, 50, false);
+            ABSettings.GetInt("BrewOrder", data, "SaltSaltBase", out _saltSaltBase, 5, false);
+            ABSettings.GetInt("BrewOrder", data, "SaltEffectBase", out _effectSaltBase, 50, false);
+            ABSettings.GetFloat("BrewOrder", data, "SaltGrindMult", out _grindSaltMult, 10f, false);
+            ABSettings.GetFloat("BrewOrder", data, "SaltStirMult", out _stirSaltMult, 10f, false);
+            ABSettings.GetFloat("BrewOrder", data, "SaltPourMult", out _pourSaltMult, 10f, false);
+            ABSettings.GetFloat("BrewOrder", data, "SaltHeatMult", out _heatSaltMult, 0f, false);
+            ABSettings.GetFloat("BrewOrder", data, "SaltSaltMult", out _saltSaltMult, 0.1f, false);
         }
 
         public static BrewOrder IngOrderFromDict(Dictionary<string, string> data)

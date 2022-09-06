@@ -20,7 +20,7 @@ using UnityEngine;
 
 namespace AutoBrew
 {
-    internal static class BrewMaster
+    internal class BrewMaster
     {
         private static ManualLogSource Log => AutoBrewPlugin.Log;
 
@@ -92,9 +92,8 @@ namespace AutoBrew
 
         public static void Reconfigure(Dictionary<string, string> data)
         {
-            ABSettings.SetOrigin("BrewMaster");
-            ABSettings.GetDouble(data, "OrderInterval", out _orderInterval, 0.2, false);
-            ABSettings.GetVector2(data, "OrderCompleteOffset", out OrderCompleteOffset, new Vector2(0.5f, 2.5f), false);
+            ABSettings.GetDouble(nameof(BrewMaster), data, "OrderInterval", out _orderInterval, 0.2, false);
+            ABSettings.GetVector2(nameof(BrewMaster), data, "OrderCompleteOffset", out OrderCompleteOffset, new Vector2(0.5f, 2.5f), false);
         }
 
         public static void Reset()

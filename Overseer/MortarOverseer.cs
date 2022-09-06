@@ -33,11 +33,10 @@ namespace AutoBrew.Overseer
 
         public override void Reconfigure(Dictionary<string, string> data)
         {
-            ABSettings.SetOrigin("MortarOverseer");
-            ABSettings.GetBool(data, "ShowPath", out _showPath, false, false);
-            ABSettings.GetVector2(data, "MortarOffset", out _mortarOffset, Vector2.zero, false);
-            ABSettings.GetInt(data, "FlourishMax", out _flourishMax, 1, false);
-            ABSettings.GetInt(data, "MinGrindUpdates", out _minUpdates, 200, false);
+            ABSettings.GetBool(nameof(MortarOverseer), data, "ShowPath", out _showPath, false, false);
+            ABSettings.GetVector2(nameof(MortarOverseer), data, "MortarOffset", out _mortarOffset, Vector2.zero, false);
+            ABSettings.GetInt(nameof(MortarOverseer), data, "FlourishMax", out _flourishMax, 1, false);
+            ABSettings.GetInt(nameof(MortarOverseer), data, "MinGrindUpdates", out _minUpdates, 200, false);
         }
 
         public override void Reset()
