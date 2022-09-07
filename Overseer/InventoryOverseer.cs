@@ -177,7 +177,7 @@ namespace AutoBrew.Overseer
         public bool CheckItemStock(ref Dictionary<InventoryItem, int> checklist)
         {
             bool haveEnough = true;
-            foreach ((InventoryItem item, int count) in checklist.Select(kvp => (kvp.Key, kvp.Value)))
+            foreach ((InventoryItem item, int count) in checklist.ToArray().Select(kvp => (kvp.Key, kvp.Value)))
             {
                 int excess = Managers.Player.inventory.GetItemCount(item) - count;
                 if (excess < 0)
