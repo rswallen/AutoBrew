@@ -440,5 +440,10 @@ namespace AutoBrew
             }
             return 100;
         }
+
+        public override string ToString()
+        {
+            return $"{{ Order: '{Stage,15}', Version: '{Version,2}', Item: '{Item?.name,15}', Target: '{Target}' }}";
+        }
     }
 }

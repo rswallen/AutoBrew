@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using AutoBrew.Extensions;
+using HarmonyLib;
 using PotionCraft.Core.Extensions;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ManagersSystem.RecipeMap;

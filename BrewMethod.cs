@@ -1,9 +1,11 @@
-﻿using BepInEx.Logging;
+﻿using AutoBrew.JsonObjects;
+using BepInEx.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Salts;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace AutoBrew
@@ -14,10 +16,10 @@ namespace AutoBrew
 
         public static BrewMethod FromJson(string json)
         {
-            List<Dictionary<string, string>> buffer;
+            List<JsonOrder> buffer;
             try
             {
-                buffer = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(json);
+                buffer = JsonConvert.DeserializeObject<List<JsonOrder>>(json);
                 Log.LogInfo("Deserialised JSON successfully");
             }
             catch (JsonReaderException e)
@@ -26,14 +28,14 @@ namespace AutoBrew
                 return null;
             }
 
-            BrewMethod _method = new();
-            foreach (var dict in buffer)
+            if (buffer == null)
             {
-                _method.AddOrder(dict);
+                Log.LogError("Deserialised to null");
+                return null;
             }
-            return _method;
+            return ProcessJsonOrders(buffer);
         }
-
+        
         public static BrewMethod FromPlotterUrl(string url)
         {
             string json = PlotterUrlDecoder.ProcessURL(url);
@@ -42,40 +44,53 @@ namespace AutoBrew
                 return null;
             }
 
-            var jobj = JObject.Parse(json);
-            if (jobj == null)
+            var buffer = JsonConvert.DeserializeObject<PlotterRecipe>(json);
+            if ((buffer == null) || (buffer.PlotItems == null))
             {
+                Log.LogError("Deserialised to null");
                 return null;
             }
+            var buffer2 = buffer.PlotItems.Cast<JsonOrder>().ToList();
+            return ProcessJsonOrders(buffer2);
+        }
 
-            var id = jobj.GetValue("datasetId");
-            if (id == null || id.ToString() != "2XP7bCigUeobr2HDtbWUrF")
+        public static BrewMethod ProcessJsonOrders(List<JsonOrder> data)
+        {
+            BrewMethod method = new();
+            foreach (var order in data)
             {
-                return null;
-            }
-
-            var plotItems = jobj.GetValue("plotItems");
-            if (plotItems == null)
-            {
-                return null;
-            }
-
-            var buffer = new List<Dictionary<string, string>>();
-            foreach (var item in (JArray)plotItems)
-            {
-                if (item is not JObject dict)
+                switch (order.Order)
                 {
-                    break;
+                    case BrewStage.AddIngredient:
+                    {
+                        var ingOrder = order.GetBrewOrder();
+                        if (ingOrder == null)
+                        {
+                            Log.LogError($"Error detected in order '{order}'");
+                            break;
+                        }
+                        method.AddOrder(ingOrder);
+                        method.AddOrder(order.GetBrewOrder(BrewStage.GrindPercent));
+                        break;
+                    }
+                    case BrewStage.StirCauldron:
+                    case BrewStage.PourSolvent:
+                    case BrewStage.HeatVortex:
+                    case BrewStage.AddSalt:
+                    case BrewStage.AddEffect:
+                    {
+                        var bOrder = order.GetBrewOrder();
+                        if (bOrder == null)
+                        {
+                            Log.LogError($"Error detected in order '{order}'");
+                            break;
+                        }
+                        method.AddOrder(bOrder);
+                        break;
+                    }
                 }
-                buffer.Add(dict.ToObject<Dictionary<string, string>>());
             }
-
-            BrewMethod _method = new();
-            foreach (var dict in buffer)
-            {
-                _method.AddPlotterOrder(dict);
-            }
-            return _method;
+            return method;
         }
 
         private readonly List<BrewOrder> _data;
@@ -87,6 +102,11 @@ namespace AutoBrew
         public BrewMethod()
         {
             _data = new();
+        }
+
+        public List<BrewOrder> OrderList
+        {
+            get { return _data; }
         }
 
         public bool AddOrder(Dictionary<string, string> data)
@@ -271,6 +291,11 @@ namespace AutoBrew
 
         public void AddOrder(BrewOrder order)
         {
+            if (order == null)
+            {
+                Log.LogError($"BrewMethod: Cannot add null order");
+                return;
+            }
             _data.Add(order);
             Log.LogDebug($"Method: Parsed order '{order}'");
         }
