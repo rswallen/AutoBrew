@@ -3,6 +3,7 @@ using AutoBrew.UI;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using PotionCraft.LocalizationSystem;
 using QFSW.QC;
 
 namespace AutoBrew
@@ -11,6 +12,8 @@ namespace AutoBrew
     public class AutoBrewPlugin : BaseUnityPlugin
     {
         public static ManualLogSource Log;
+
+        public static readonly Key _abortCommand = new("autobrew_brew_abort_command");
 
         public void Awake()
         {
@@ -27,6 +30,7 @@ namespace AutoBrew
             Harmony.CreateAndPatchAll(typeof(InventoryOverseer));
             Harmony.CreateAndPatchAll(typeof(Lockdown));
             Harmony.CreateAndPatchAll(typeof(BrewMaster));
+            Harmony.CreateAndPatchAll(typeof(PluginLocalization));
             Harmony.CreateAndPatchAll(typeof(UserInput));
         }
 
@@ -41,10 +45,16 @@ namespace AutoBrew
             BrewMaster.LoadSettings();
         }
 
+        [Command("Autobrew-ReloadLocales", "Manually trigger ParseLocalizationData", true, true, Platform.AllPlatforms, MonoTargetType.Single)]
+        public static void Cmd_ReloadLocales()
+        {
+            PluginLocalization.ParseLocalizationData(true);
+        }
+
         [Command("Autobrew-Abort", "Aborts the current brew", true, true, Platform.AllPlatforms, MonoTargetType.Single)]
         public static void Cmd_Abort()
         {
-            BrewMaster.Abort("You aborted the brew via command");
+            BrewMaster.Abort(_abortCommand);
         }
 
         [Command("Autobrew-LogStatus", "Prints the status of the current order to the BepInEx console", true, true, Platform.AllPlatforms, MonoTargetType.Single)]

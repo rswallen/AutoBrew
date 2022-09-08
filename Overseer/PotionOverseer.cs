@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using PotionCraft.LocalizationSystem;
 using PotionCraft.ManagersSystem.Potion;
 using PotionCraft.ObjectBased.Potion;
 using PotionCraft.ScriptableObjects.Ingredient;
@@ -9,6 +10,8 @@ namespace AutoBrew.Overseer
 {
     internal static class PotionOverseer
     {
+        private static readonly Key _potionFailed = new("autobrew_brew_abort_potionfail");
+
 		[HarmonyPostfix, HarmonyPatch(typeof(PotionManager), "ResetPotion")]
         public static void ResetPotion_Postfix(bool resetEffectMapItems = true)
         {
@@ -16,7 +19,7 @@ namespace AutoBrew.Overseer
             {
                 return;
             }
-            BrewMaster.Abort("Potion failed");
+            BrewMaster.Abort(_potionFailed);
 		}
 
         [HarmonyPostfix, HarmonyPatch(typeof(PotionManager.RecipeMarksSubManager), "AddFloatMark")]

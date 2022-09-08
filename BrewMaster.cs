@@ -1,7 +1,9 @@
-﻿using AutoBrew.Overseer;
+﻿using AutoBrew.Extensions;
+using AutoBrew.Overseer;
 using BepInEx.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PotionCraft.LocalizationSystem;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ManagersSystem.Potion;
 using PotionCraft.ManagersSystem.SaveLoad;
@@ -24,6 +26,19 @@ namespace AutoBrew
     {
         private static ManualLogSource Log => AutoBrewPlugin.Log;
 
+        private static readonly Key _brewStart = new("autobrew_brew_started");
+        private static readonly Key _brewStartMsg = new("autobrew_brew_started_desc");
+        private static readonly Key _brewComplete = new("autobrew_brew_complete");
+        private static readonly Key _brewCompleteMsg = new("autobrew_brew_complete_desc");
+        private static readonly Key _brewAbort = new("autobrew_brew_abort");
+        private static readonly Key _brewAbortDef = new("autobrew_brew_abort_unknown");
+        private static readonly Key _brewAbortAdvFail = new("autobrew_brew_abort_advancefail");
+        private static readonly Key _brewFalseStart = new("autobrew_brew_falsestart");
+        private static readonly Key _brewFalseStartBrewing = new("autobrew_brew_falsestart_brewing");
+        private static readonly Key _brewFalseStartJsonErr = new("autobrew_brew_falsestart_jsonerror");
+        private static readonly Key _brewFalseStartUrlErr = new("autobrew_brew_falsestart_urlerror");
+        private static readonly Key _brewFalseStartNotEnough = new("autobrew_brew_falsestart_notenough");
+        
         private static bool _init;
         private static bool _brewing;
         private static double _orderInterval;
@@ -75,7 +90,8 @@ namespace AutoBrew
             if (_recipe.Complete)
             {
                 Log.LogInfo("Brew succeeded");
-                Notification.ShowText("AutoBrew: Brew succeeded", "Brew complete", Notification.TextType.EventText);
+                //Notification.ShowText("AutoBrew: Brew succeeded", "Brew complete", Notification.TextType.EventText);
+                Notification.ShowText(_brewComplete.GetCustText(), _brewCompleteMsg.GetCustText(), Notification.TextType.EventText);
                 Reset();
                 return;
             }
@@ -124,6 +140,20 @@ namespace AutoBrew
             }
         }
 
+        public static void Abort(Key reason)
+        {
+            if (_brewing)
+            {
+                if (reason == null)
+                {
+                    reason = new("#autobrew_brew_abort_unknown");
+                }
+                Log.LogInfo($"Brew Aborted: {reason.GetDefText()}");
+                Notification.ShowText(_brewAbort.GetCustText(), reason.GetCustText(), Notification.TextType.EventText);
+                Reset();
+            }
+        }
+
         public static void InitBrewFromJson()
         {
             if (Managers.SaveLoad.SystemState != SaveLoadManager.SystemStateEnum.Idle)
@@ -134,23 +164,24 @@ namespace AutoBrew
 
             if (Brewing)
             {
-                Notification.ShowText("AutoBrew: Can't start", "Already brewing", Notification.TextType.EventText);
+                //Notification.ShowText("AutoBrew: Can't start", "Already brewing", Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetCustText(), "Already brewing", Notification.TextType.EventText);
                 return;
             }
 
             if (!LoadJsonFromDesc())
             {
-                Notification.ShowText("AutoBrew: Can't start", "Error detected in JSON. See BepInEx log for details", Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetCustText(), "Error detected in JSON. See BepInEx log for details", Notification.TextType.EventText);
                 return;
             }
 
             if (CheckInventoryStock())
             {
-                Notification.ShowText("AutoBrew: Brew started", "And so it begins", Notification.TextType.EventText);
+                Notification.ShowText(_brewStart.GetCustText(), "And so it begins", Notification.TextType.EventText);
             }
             else
             {
-                Notification.ShowText("AutoBrew: Can't start", "Not enough ingredients", Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetCustText(), "Not enough ingredients", Notification.TextType.EventText);
             }
         }
 
@@ -276,7 +307,7 @@ namespace AutoBrew
             PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
             if (customizer.currentDescriptionText == string.Empty)
             {
-                Log.LogError("Please paste json data into the custom description of the potion customizer panel");
+                Log.LogError("Please paste plotter url into the custom description of the potion customizer panel");
                 return false;
             }
 
@@ -379,6 +410,14 @@ namespace AutoBrew
             
             Vector2 msgPos = recipeMapObject.transmitterWindow.ViewRect.center + offset;
             CollectedFloatingText.SpawnNewText(prefab, msgPos, new CollectedFloatingText.FloatingTextContent(message, CollectedFloatingText.FloatingTextContent.Type.Text, 0f), Managers.Game.Cam.transform, false, false);
+        }
+
+        public static void PrintRecipeMapMessage(Key message, Vector2 offset)
+        {
+            RecipeMapObject recipeMapObject = Managers.RecipeMap.recipeMapObject;
+            var prefab = Settings<PotionManagerSettings>.Asset.collectedFloatingTextPrefab;
+            Vector2 msgPos = recipeMapObject.transmitterWindow.ViewRect.center + offset;
+            CollectedFloatingText.SpawnNewText(prefab, msgPos, new CollectedFloatingText.FloatingTextContent(message.GetCustText(), CollectedFloatingText.FloatingTextContent.Type.Text, 0f), Managers.Game.Cam.transform, false, false);
         }
     }
 

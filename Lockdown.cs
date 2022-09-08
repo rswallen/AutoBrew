@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using PotionCraft.LocalizationSystem;
 using PotionCraft.ObjectBased.Bellows;
 using PotionCraft.ObjectBased.InteractiveItem;
 using PotionCraft.ObjectBased.InteractiveItem.InventoryObject;
@@ -15,6 +16,9 @@ namespace AutoBrew
     {
         private static double _gtLastWarning = 0.0;
         private static double _warnInterval = 2.0;
+
+        private readonly static Key _noTouchEquip = new("#autobrew_recipemap_notouchequip");
+        private readonly static Key _noTouchIngred = new("#autobrew_recipemap_notouchingred");
 
         // there has got to be a better method of doing this
         [HarmonyPostfix, HarmonyPatch(typeof(InteractiveItem), "CanBeInteractedNow")]
@@ -35,7 +39,8 @@ namespace AutoBrew
                 case Spoon:
                 {
                     __result = !BrewMaster.Brewing;
-                    DoNotTouch("Don't touch the equipment!");
+                    // DoNotTouch("Don't touch the equipment!");
+                    DoNotTouch(_noTouchEquip);
                     return;
                 }
                 case InventoryObject:
@@ -43,7 +48,8 @@ namespace AutoBrew
                 case Stack:
                 {
                     __result = !BrewMaster.Brewing;
-                    DoNotTouch("Don't touch the ingredients!");
+                    // DoNotTouch("Don't touch the ingredients!");
+                    DoNotTouch(_noTouchIngred);
                     return;
                 }
             }
@@ -55,7 +61,16 @@ namespace AutoBrew
             if (Time.timeAsDouble >= gtNextWarning)
             {
                 BrewMaster.PrintRecipeMapMessage(message, Vector2.zero);
-                //Notification.ShowText(message, "Do not interfere with the brewing process!", Notification.TextType.EventText);
+                _gtLastWarning = Time.timeAsDouble;
+            }
+        }
+
+        public static void DoNotTouch(Key key)
+        {
+            double gtNextWarning = _gtLastWarning + _warnInterval;
+            if (Time.timeAsDouble >= gtNextWarning)
+            {
+                BrewMaster.PrintRecipeMapMessage(key, Vector2.zero);
                 _gtLastWarning = Time.timeAsDouble;
             }
         }

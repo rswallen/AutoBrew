@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using PotionCraft.LocalizationSystem;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ObjectBased.PhysicalParticle;
 using PotionCraft.ObjectBased.Potion;
@@ -15,6 +16,9 @@ namespace AutoBrew.Overseer
 {
     internal class InventoryOverseer : BaseOverseer
     {
+        private static readonly Key _abortBadOrder = new("autobrew_brew_abort_invovsr_badorder");
+        private static readonly Key _abortExtraIngAdded = new("autobrew_brew_abort_extraingadded");
+
         private Vector2 _ingredientSpawnPos;
         private Vector2 _saltItemSpawnPos;
         private Vector2 _cauldronOffset;
@@ -135,7 +139,7 @@ namespace AutoBrew.Overseer
                 }
                 default:
                 {
-                    BrewMaster.Abort("InventoryOverseer was asked to handle the wrong order");
+                    BrewMaster.Abort(_abortBadOrder);
                     return;
                 }
             }
@@ -267,7 +271,7 @@ namespace AutoBrew.Overseer
 
             if ((item != _order.Item) || (grindStatus != 0.0))
             {
-                BrewMaster.Abort("Ingredient added without authorisation");
+                BrewMaster.Abort(_abortExtraIngAdded);
                 return;
             }
             
