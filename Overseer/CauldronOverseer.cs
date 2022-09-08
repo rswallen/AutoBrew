@@ -21,7 +21,7 @@ namespace AutoBrew.Overseer
         {
             ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirTolerance", out _stirTolerance, 0.0001f, false);
             ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirThreshSlow", out _stirThreshSlow, 0.5f, false);
-            ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirFast", out _stirFast, 0.5f, false);
+            ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirFast", out _stirFast, 0.2f, false);
             ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirSlow", out _stirSlow, 0.05f, false);
         }
 

@@ -32,7 +32,7 @@
   "Cauldron": {
     "StirTolerance": "0.0001",
     "StirThreshSlow": "0.5",
-    "StirFast": "0.5",
+    "StirFast": "0.2",
     "StirSlow": "0.01"
   },
   "Solvent": {
