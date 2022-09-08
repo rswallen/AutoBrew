@@ -101,7 +101,7 @@ namespace AutoBrew
 
         public static string Decompress(byte[] data)
         {
-            MemoryStream memStream = new MemoryStream(data);
+            using var memStream = new MemoryStream(data);
             // skip version number
             memStream.ReadByte();
 
@@ -109,8 +109,9 @@ namespace AutoBrew
             memStream.ReadByte();
             memStream.ReadByte();
 
-            DeflateStream deflate = new DeflateStream(memStream, CompressionMode.Decompress);
-            return new StreamReader(deflate, System.Text.Encoding.UTF8).ReadToEnd();
+            using var deflate = new DeflateStream(memStream, CompressionMode.Decompress);
+            using var reader = new StreamReader(deflate, System.Text.Encoding.UTF8);
+            return reader.ReadToEnd();
         }
     }
 }
