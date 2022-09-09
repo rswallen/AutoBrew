@@ -1,5 +1,6 @@
 ﻿using AutoBrew.PlotterConverter;
 using BepInEx.Logging;
+using PotionCraft.LocalizationSystem;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Ingredient;
 using PotionCraft.ScriptableObjects.Salts;
@@ -11,7 +12,13 @@ namespace AutoBrew
 {
     internal class BrewOrder
     {
-        private static ManualLogSource Log => AutoBrewPlugin.Log;
+        private static readonly Key _brewOrderFailAddIng = new("autobrew_orderfail_addingredient");
+        private static readonly Key _brewOrderFailGrind = new("autobrew_orderfail_grindpercent");
+        private static readonly Key _brewOrderFailStir = new("autobrew_orderfail_stircauldron");
+        private static readonly Key _brewOrderFailPour = new("autobrew_orderfail_poursolvent");
+        private static readonly Key _brewOrderFailHeat = new("autobrew_orderfail_heatvortex");
+        private static readonly Key _brewOrderFailAddSalt = new("autobrew_orderfail_addsalt");
+        private static readonly Key _brewOrderFailEffect = new("autobrew_orderfail_addeffect");
 
         private static int _ingSaltBase;
         private static int _grindSaltBase;
@@ -92,6 +99,45 @@ namespace AutoBrew
                 }
             }
             return 100;
+        }
+
+        public Key GetFailKey()
+        {
+            switch (Stage)
+            {
+                case BrewStage.AddIngredient:
+                {
+                    return _brewOrderFailAddIng;
+                }
+                case BrewStage.GrindPercent:
+                {
+                    return _brewOrderFailGrind;
+                }
+                case BrewStage.StirCauldron:
+                {
+                    return _brewOrderFailStir;
+                }
+                case BrewStage.PourSolvent:
+                {
+                    return _brewOrderFailPour;
+                }
+                case BrewStage.HeatVortex:
+                {
+                    return _brewOrderFailHeat;
+                }
+                case BrewStage.AddSalt:
+                {
+                    return _brewOrderFailAddSalt;
+                }
+                case BrewStage.AddEffect:
+                {
+                    return _brewOrderFailEffect;
+                }
+                default:
+                {
+                    return null;
+                }
+            }
         }
 
         public override string ToString()

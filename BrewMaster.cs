@@ -27,9 +27,9 @@ namespace AutoBrew
         private static ManualLogSource Log => AutoBrewPlugin.Log;
 
         private static readonly Key _brewStart = new("autobrew_brew_started");
-        private static readonly Key _brewStartMsg = new("autobrew_brew_started_desc");
+        private static readonly Key _brewStartDesc = new("autobrew_brew_started_desc");
         private static readonly Key _brewComplete = new("autobrew_brew_complete");
-        private static readonly Key _brewCompleteMsg = new("autobrew_brew_complete_desc");
+        private static readonly Key _brewCompleteDesc = new("autobrew_brew_complete_desc");
         private static readonly Key _brewAbort = new("autobrew_brew_abort");
         private static readonly Key _brewAbortDef = new("autobrew_brew_abort_unknown");
         private static readonly Key _brewAbortAdvFail = new("autobrew_brew_abort_advancefail");
@@ -91,7 +91,7 @@ namespace AutoBrew
             {
                 Log.LogInfo("Brew succeeded");
                 //Notification.ShowText("AutoBrew: Brew succeeded", "Brew complete", Notification.TextType.EventText);
-                Notification.ShowText(_brewComplete.GetCustText(), _brewCompleteMsg.GetCustText(), Notification.TextType.EventText);
+                Notification.ShowText(_brewComplete.GetCustText(), _brewCompleteDesc.GetCustText(), Notification.TextType.EventText);
                 Reset();
                 return;
             }
@@ -126,27 +126,13 @@ namespace AutoBrew
             Boiler.Reset();
         }
 
-        public static void Abort(string reason)
-        {
-            if (_brewing)
-            {
-                if (reason == string.Empty)
-                {
-                    reason = "Something went wrong";
-                }
-                Log.LogInfo($"Brew Aborted: {reason}");
-                Notification.ShowText("AutoBrew: Brew aborted", reason, Notification.TextType.EventText);
-                Reset();
-            }
-        }
-
         public static void Abort(Key reason)
         {
             if (_brewing)
             {
                 if (reason == null)
                 {
-                    reason = new("#autobrew_brew_abort_unknown");
+                    reason = new("autobrew_brew_abort_unknown");
                 }
                 Log.LogInfo($"Brew Aborted: {reason.GetDefText()}");
                 Notification.ShowText(_brewAbort.GetCustText(), reason.GetCustText(), Notification.TextType.EventText);
@@ -164,24 +150,23 @@ namespace AutoBrew
 
             if (Brewing)
             {
-                //Notification.ShowText("AutoBrew: Can't start", "Already brewing", Notification.TextType.EventText);
-                Notification.ShowText(_brewFalseStart.GetCustText(), "Already brewing", Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartBrewing.GetCustText(), Notification.TextType.EventText);
                 return;
             }
 
             if (!LoadJsonFromDesc())
             {
-                Notification.ShowText(_brewFalseStart.GetCustText(), "Error detected in JSON. See BepInEx log for details", Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartJsonErr.GetCustText(), Notification.TextType.EventText);
                 return;
             }
 
             if (CheckInventoryStock())
             {
-                Notification.ShowText(_brewStart.GetCustText(), "And so it begins", Notification.TextType.EventText);
+                Notification.ShowText(_brewStart.GetCustText(), _brewStartDesc.GetCustText(), Notification.TextType.EventText);
             }
             else
             {
-                Notification.ShowText(_brewFalseStart.GetCustText(), "Not enough ingredients", Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartNotEnough.GetCustText(), Notification.TextType.EventText);
             }
         }
 
@@ -195,23 +180,23 @@ namespace AutoBrew
 
             if (Brewing)
             {
-                Notification.ShowText("AutoBrew: Can't start", "Already brewing", Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartBrewing.GetCustText(), Notification.TextType.EventText);
                 return;
             }
 
             if (!LoadPlotterUrlFromDesc())
             {
-                Notification.ShowText("AutoBrew: Can't start", "Error detected in PlotterURL. See BepInEx log for details", Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartUrlErr.GetCustText(), Notification.TextType.EventText);
                 return;
             }
 
             if (CheckInventoryStock())
             {
-                Notification.ShowText("AutoBrew: Brew started", "And so it begins", Notification.TextType.EventText);
+                Notification.ShowText(_brewStart.GetCustText(), _brewStartDesc.GetCustText(), Notification.TextType.EventText);
             }
             else
             {
-                Notification.ShowText("AutoBrew: Can't start", "Not enough ingredients", Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartNotEnough.GetCustText(), Notification.TextType.EventText);
             }
         }
 
@@ -343,7 +328,7 @@ namespace AutoBrew
             {
                 if (!_recipe.Advance())
                 {
-                    Abort("Could not advance the BrewMethod");
+                    Abort(_brewAbortAdvFail);
                 }
                 _gtLastOrder = Time.timeAsDouble;
             }

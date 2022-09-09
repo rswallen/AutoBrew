@@ -1,4 +1,6 @@
-﻿using BepInEx.Logging;
+﻿using AutoBrew.Extensions;
+using BepInEx.Logging;
+using PotionCraft.LocalizationSystem;
 using PotionCraft.ManagersSystem.Potion;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ScriptableObjects;
@@ -14,7 +16,7 @@ namespace AutoBrew.Overseer
     internal abstract class BaseOverseer
     {
         private protected static ManualLogSource Log => AutoBrewPlugin.Log;
-        
+
         private OverseerStage _stage;
         private double _gtStart;
         private double _gtEnd;
@@ -87,7 +89,7 @@ namespace AutoBrew.Overseer
             else if (_stage == OverseerStage.Failed)
             {
                 BrewMaster.LogFailedOrder(order);
-                BrewMaster.Abort($"Brew cancelled - {order.Stage} failed");
+                BrewMaster.Abort(order.GetFailKey());
             }
         }
 

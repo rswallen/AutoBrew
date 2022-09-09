@@ -1,4 +1,5 @@
-﻿using PotionCraft.ManagersSystem;
+﻿using PotionCraft.LocalizationSystem;
+using PotionCraft.ManagersSystem;
 using PotionCraft.ObjectBased.Pestle;
 using PotionCraft.ObjectBased.Stack;
 using PotionCraft.ObjectBased.Stack.StackItem;
@@ -11,6 +12,8 @@ namespace AutoBrew.Overseer
 {
     internal class MortarOverseer : BaseOverseer
     {
+        private static readonly Key _abortExtraIngAdded = new("autobrew_brew_abort_extraingadded");
+
         private bool _showPath;
         private int _flourishMax;
         private int _minUpdates;
@@ -170,7 +173,7 @@ namespace AutoBrew.Overseer
                 }
                 default:
                 {
-                    BrewMaster.Abort("Ingredient added without authorisation");
+                    BrewMaster.Abort(_abortExtraIngAdded);
                     return;
                 }
             }
