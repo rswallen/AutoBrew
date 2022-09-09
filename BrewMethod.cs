@@ -1,10 +1,8 @@
 ﻿using AutoBrew.JsonObjects;
 using BepInEx.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Salts;
-using System;
 using System.Linq;
 using System.Collections.Generic;
 

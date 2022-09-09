@@ -1,12 +1,7 @@
-﻿using AutoBrew.PlotterConverter;
-using BepInEx.Logging;
-using PotionCraft.LocalizationSystem;
+﻿using PotionCraft.LocalizationSystem;
 using PotionCraft.ScriptableObjects;
-using PotionCraft.ScriptableObjects.Ingredient;
-using PotionCraft.ScriptableObjects.Salts;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace AutoBrew
 {

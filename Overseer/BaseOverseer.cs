@@ -1,15 +1,10 @@
-﻿using AutoBrew.Extensions;
-using BepInEx.Logging;
-using PotionCraft.LocalizationSystem;
+﻿using BepInEx.Logging;
 using PotionCraft.ManagersSystem.Potion;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Salts;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace AutoBrew.Overseer
 {

@@ -1,9 +1,7 @@
 ﻿using BepInEx.Logging;
 using HarmonyLib;
 using PotionCraft.ObjectBased.UIElements.PotionCustomizationPanel;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine.Events;
 
 namespace AutoBrew.UI

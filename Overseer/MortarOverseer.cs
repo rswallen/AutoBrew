@@ -7,7 +7,6 @@ using PotionCraft.ScriptableObjects.Ingredient;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace AutoBrew.Overseer
 {
     internal class MortarOverseer : BaseOverseer

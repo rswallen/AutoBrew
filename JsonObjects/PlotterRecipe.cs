@@ -1,8 +1,5 @@
 ﻿using BepInEx.Logging;
 using Newtonsoft.Json;
-using PotionCraft.Npc.Browser;
-using PotionCraft.Npc.Parts;
-using System;
 using System.Collections.Generic;
 
 namespace AutoBrew.JsonObjects
