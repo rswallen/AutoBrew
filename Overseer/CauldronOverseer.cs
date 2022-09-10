@@ -13,11 +13,11 @@ namespace AutoBrew.Overseer
     {
         private float _tolerance;
         private Vector3 _pidValues;
-        private PIDController _pidControl;
         private float _speedMin;
         private float _speedMax;
         
         private BrewOrder _order;
+        private PIDController _pidControl;
         private float _stirredTotal;
         private double _lastPIDVal;
 
