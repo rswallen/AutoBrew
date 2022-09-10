@@ -204,7 +204,8 @@ namespace AutoBrew
         {
             JObject jsonData;
             Dictionary<string, string> newSettings;
-            string filepath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/settings.json";
+            string basepath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string filepath = Path.Combine(basepath, "settings.json");
             if (!File.Exists(filepath))
             {
                 Log.LogInfo("Settings file not detected. Using plugin defaults");
