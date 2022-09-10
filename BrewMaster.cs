@@ -311,10 +311,10 @@ namespace AutoBrew
                 {
                     if (count == 0)
                     {
-                        Log.LogInfo($"Not enough '{item.name}' to brew");
+                        Log.LogDebug($"Not enough '{item.name}' to brew");
                     }
                 }
-                Log.LogInfo("Error detected in ingredients. Cancelling brew.");
+                Log.LogDebug("Error detected in ingredients. Cancelling brew.");
                 return false;
             }
             Log.LogInfo("We have enough ingredients. Proceeding to brew.");
