@@ -1,4 +1,5 @@
-﻿using AutoBrew.PlotterConverter;
+﻿using AutoBrew.Extensions;
+using AutoBrew.PlotterConverter;
 using HarmonyLib;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ManagersSystem.RecipeMap;
@@ -14,13 +15,15 @@ namespace AutoBrew.Overseer
         private float _sparkAmount;
         private float _sparkIntervalOn;
         private float _sparkIntervalOff;
-        private float _heatFast;
-        private float _heatSlow;
-        private float _heatThreshSlow;
-        private float _heatThreshStop;
         private float _heatEffectTime;
-
+        
+        private float _tolerance;
+        private float _heatMin;
+        private float _heatMax;
+        private Vector3 _pidValues;
+        
         private BrewOrder _mode;
+        private PIDController _pidControl;
         private double _gtLastSparkChange;
         private bool _sparksActive;
         private double _heatedTotal;
@@ -31,17 +34,18 @@ namespace AutoBrew.Overseer
         private int _fullRotCount;
         private float _gtEffectStart;
         private int _effectTier;
+        private double _lastPIDVal;
 
         public override void Reconfigure(Dictionary<string, string> data)
         {
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkAmount", out _sparkAmount, 10f, false);
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkIntervalOn", out _sparkIntervalOn, 1.6f, false);
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkIntervalOff", out _sparkIntervalOff, 0.4f, false);
-            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatFast", out _heatFast, 0.25f, false);
-            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatSlow", out _heatSlow, 0.05f, false);
-            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatThreshSlow", out _heatThreshSlow, 45.0f, false);
-            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatThreshStop", out _heatThreshStop, 0.5f, false);
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatEffectTime", out _heatEffectTime, 2.0f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "Tolerance", out _tolerance, 0.5f, false);
+            ABSettings.GetVector3(nameof(BellowsOverseer), data, "PIDValues", out _pidValues, new Vector3(1f, 0f, 0f));
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatMin", out _heatMin, 0.01f);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatMax", out _heatMax, 0.8f);
         }
 
         public override void Reset()
@@ -58,6 +62,7 @@ namespace AutoBrew.Overseer
             _gtLastSparkChange = Time.timeAsDouble;
             _sparksActive = true;
             _heatedTotal = 0f;
+            _pidControl = new(_pidValues);
 
             switch (order.Stage)
             {
@@ -167,21 +172,16 @@ namespace AutoBrew.Overseer
             {
                 case BrewStage.HeatVortex:
                 {
-                    double diff = Math.Abs(_heatTarget - _heatedTotal);
-                    if (diff <= _heatThreshStop)
+                    double diff = Math.Abs(_heatTarget) - Math.Abs(_heatedTotal);
+                    if (diff <= _tolerance)
                     {
                         Stage = OverseerStage.Complete;
                         Managers.Ingredient.coals.Heat = 0f;
                         return;
                     }
-                    else if (diff <= _heatThreshSlow)
-                    {
-                        Managers.Ingredient.coals.Heat = _heatSlow;
-                    }
-                    else
-                    {
-                        Managers.Ingredient.coals.Heat = _heatFast;
-                    }
+
+                    _lastPIDVal = Math.Abs(_pidControl.GetStep(_heatTarget, _heatedTotal, Time.deltaTime));
+                    Managers.Ingredient.coals.Heat = (float)_lastPIDVal.Clamp(_heatMin, _heatMax);
                     return;
                 }
                 case BrewStage.AddEffect:
@@ -250,8 +250,13 @@ namespace AutoBrew.Overseer
                 _fullRotCount++;
             }
 
-            _heatedTotal = (_fullRotCount * -360f) + angle;
+            double newTotal = (_fullRotCount * -360f) + angle;
+            double delta = newTotal - _heatedTotal;
+            _heatedTotal = newTotal;
             _lastAngle = angle;
+
+            double clampPID = _lastPIDVal.Clamp(_heatMin, _heatMax);
+            Log.LogDebug($"StirUpdate: PIDVal - {_lastPIDVal:N5} | ClampPID - {clampPID:N5} | Delta - {delta:N5}");
         }
 
         public void CollectEffect(int tier)
