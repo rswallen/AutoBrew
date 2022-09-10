@@ -156,7 +156,7 @@ namespace AutoBrew
             {
                 if (logFailure)
                 {
-                    LogConfigParseFail<Vector2>(source, key, defaultValue);
+                    LogConfigParseFail<Vector3>(source, key, defaultValue);
                 }
                 return false;
             }
