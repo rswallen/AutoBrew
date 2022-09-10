@@ -75,9 +75,13 @@ namespace AutoBrew
                 Boiler ??= new BellowsOverseer();
                 Reset();
 
-                LoadSettings();
                 _init = true;
             }
+        }
+
+        public static void Start()
+        {
+            LoadSettings();
         }
 
         public static void Update()

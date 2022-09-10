@@ -34,6 +34,11 @@ namespace AutoBrew
             Harmony.CreateAndPatchAll(typeof(UserInput));
         }
 
+        public void Start()
+        {
+            BrewMaster.Start();
+        }
+
         public void Update()
         {
             BrewMaster.Update();
