@@ -13,7 +13,7 @@ namespace AutoBrew
     {
         public static ManualLogSource Log;
 
-        public static readonly Key _abortCommand = new("autobrew_brew_abort_command");
+        private static readonly Key _abortCommand = new("autobrew_brew_abort_command");
 
         public void Awake()
         {
