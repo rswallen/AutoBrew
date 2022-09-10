@@ -33,7 +33,10 @@
     "StirTolerance": "0.0001",
     "StirThreshSlow": "0.5",
     "StirFast": "0.2",
-    "StirSlow": "0.01"
+    "StirSlow": "0.01",
+    "StirPID": "0.02,0.001,0.0001",
+    "ClampMin": "0.0",
+    "ClampMax": "0.5",
   },
   "Solvent": {
     "PourTolerance": "0.0001",

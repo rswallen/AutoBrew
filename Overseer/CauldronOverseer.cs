@@ -3,26 +3,30 @@ using HarmonyLib;
 using PotionCraft.Core.Extensions;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ObjectBased.Cauldron;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace AutoBrew.Overseer
 {
     internal class CauldronOverseer : BaseOverseer
     {
-        private float _stirTolerance;
-        private float _stirThreshSlow;
-        private float _stirFast;
-        private float _stirSlow;
-
+        private float _tolerance;
+        private Vector3 _pidValues;
+        private PIDController _pidControl;
+        private float _speedMin;
+        private float _speedMax;
+        
         private BrewOrder _order;
         private float _stirredTotal;
+        private double _lastPIDVal;
 
         public override void Reconfigure(Dictionary<string, string> data)
         {
-            ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirTolerance", out _stirTolerance, 0.0001f, false);
-            ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirThreshSlow", out _stirThreshSlow, 0.5f, false);
-            ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirFast", out _stirFast, 0.2f, false);
-            ABSettings.GetFloat(nameof(CauldronOverseer), data, "StirSlow", out _stirSlow, 0.05f, false);
+            ABSettings.GetFloat(nameof(CauldronOverseer), data, "Tolerance", out _tolerance, 0.0001f, false);
+            ABSettings.GetVector3(nameof(CauldronOverseer), data, "PIDValues", out _pidValues, new Vector3(0.075f, 0.001f, 0.05f));
+            ABSettings.GetFloat(nameof(CauldronOverseer), data, "SpeedMin", out _speedMin, 0.5f);
+            ABSettings.GetFloat(nameof(CauldronOverseer), data, "SpeedMax", out _speedMax, 0.5f);
         }
 
         public override void Reset()
@@ -36,6 +40,7 @@ namespace AutoBrew.Overseer
         {
             _order = order;
             _stirredTotal = 0f;
+            _pidControl = new(_pidValues);
             base.Setup(order);
         }
 
@@ -91,20 +96,16 @@ namespace AutoBrew.Overseer
             }
 
             Cauldron bowl = Managers.Ingredient.cauldron;
-            double diff = _order.Target - _stirredTotal;
-            if (diff <= _stirTolerance)
+            float diff = (float)_order.Target - _stirredTotal;
+            if (diff <= _tolerance)
             {
                 Stage = OverseerStage.Complete;
                 bowl.StirringValue = 0f;
+                return;
             }
-            else if (diff <= _stirThreshSlow)
-            {
-                bowl.StirringValue = _stirSlow;
-            }
-            else
-            {
-                bowl.StirringValue = _stirFast;
-            }
+
+            _lastPIDVal = _pidControl.GetStep(_order.Target, _stirredTotal, Time.deltaTime);
+            bowl.StirringValue = (float)_lastPIDVal.Clamp(_speedMin, _speedMax);
         }
 
         public void AddSpoonAmount(float value, float multiplier)
@@ -115,7 +116,10 @@ namespace AutoBrew.Overseer
                 {
                     return;
                 }
-                _stirredTotal += (value / multiplier);
+                float delta = (value / multiplier);
+                _stirredTotal += delta;
+                double clampPID = _lastPIDVal.Clamp(_speedMin, _speedMax);
+                Log.LogDebug($"StirUpdate: PIDVal - {_lastPIDVal:N5} | ClampPID - {clampPID:N5} | Delta - {delta:N5}");
             }
         }
 
