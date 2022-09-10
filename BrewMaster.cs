@@ -130,10 +130,7 @@ namespace AutoBrew
         {
             if (_brewing)
             {
-                if (reason == null)
-                {
-                    reason = new("autobrew_brew_abort_unknown");
-                }
+                reason ??= new("autobrew_brew_abort_unknown");
                 Log.LogInfo($"Brew Aborted: {reason.GetDefText()}");
                 Notification.ShowText(_brewAbort.GetCustText(), reason.GetCustText(), Notification.TextType.EventText);
                 Reset();
