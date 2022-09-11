@@ -10,38 +10,30 @@ namespace AutoBrew.Overseer
 {
     internal class SolventOverseer : BaseOverseer
     {
-        private float _pourTolerance;
-        private float _pourThreshSlow;
-        private float _pourFastAngle;
-        private float _pourSlowAngle;
-        private float _pourSlowSpeed;
-        private float _lerpDuration;
+        private double _tolerance;
+        private Vector3 _pidValues;
+        private double _anglePourStart;
+        private double _anglePourReset;
+        private double _anglePourMax;
 
-        PourStage _pStage;
-        double _pourTarget;
-        double _pouredTotal;
-
-        bool _resetLadle;
-        float _progress;
-        float _startZ;
-        float _currentZ;
+        private PIDController _pidControl;
+        private double _pourTarget;
+        private double _pouredTotal;
+        private double _lastPIDVal;
 
         public override void Reconfigure(Dictionary<string, string> data)
         {
-            ABSettings.GetFloat(nameof(SolventOverseer), data, "PourTolerance", out _pourTolerance, 1.0f, false);
-            ABSettings.GetFloat(nameof(SolventOverseer), data, "PourThreshSlow", out _pourThreshSlow, 1.0f, false);
-            ABSettings.GetFloat(nameof(SolventOverseer), data, "PourFastAngle", out _pourFastAngle, 320f, false);
-            ABSettings.GetFloat(nameof(SolventOverseer), data, "PourSlowAngle", out _pourSlowAngle, 340f, false);
-            ABSettings.GetFloat(nameof(SolventOverseer), data, "PourSlowSpeed", out _pourSlowSpeed, 0.01f, false);
-            ABSettings.GetFloat(nameof(SolventOverseer), data, "LerpDuration", out _lerpDuration, 0.2f, false);
+            ABSettings.GetDouble(nameof(SolventOverseer), data, "Tolerance", out _tolerance, 0.0001, false);
+            ABSettings.GetVector3(nameof(SolventOverseer), data, "PIDValues", out _pidValues, new(50.0f, 0.1f, 0.8f), false);
+            ABSettings.GetDouble(nameof(SolventOverseer), data, "AngleStart", out _anglePourStart, -20.0, false);
+            ABSettings.GetDouble(nameof(SolventOverseer), data, "AngleReset", out _anglePourReset, -16.5, false);
+            ABSettings.GetDouble(nameof(SolventOverseer), data, "AngleMax", out _anglePourMax, -40.0, false);
         }
 
         public override void Reset()
         {
-            _resetLadle = true;
             _pourTarget = 0f;
             _pouredTotal = 0f;
-            _currentZ = 0f;
 
             Stage = OverseerStage.Idle;
         }
@@ -50,6 +42,7 @@ namespace AutoBrew.Overseer
         {
             _pourTarget = order.Target;
             _pouredTotal = 0f;
+            _pidControl = new(_pidValues);
             base.Setup(order);
         }
         
@@ -62,33 +55,18 @@ namespace AutoBrew.Overseer
 
             float distance = Managers.RecipeMap.GetDistanceToBase();
             float rotation = Managers.RecipeMap.currentMap.potionBaseMapItem.thisTransform.eulerAngles.z - Managers.RecipeMap.indicatorRotation.VisualValue;
+            rotation = rotation.RecalculateEulerAngle(FloatExtension.AngleType.MinusPiToPi);
             if (distance.Is(0f) && rotation.Is(0f))
             {
-                _pStage = PourStage.Reset;
+                Stage = OverseerStage.Complete;
                 return;
             }
 
             double diff = _pourTarget - _pouredTotal;
-            if (diff <= _pourTolerance)
+            if (diff <= _tolerance)
             {
-                _pStage = PourStage.Reset;
+                Stage = Stage = OverseerStage.Complete;
                 return;
-            }
-            else if (diff <= _pourThreshSlow)
-            {
-                if (_pStage != PourStage.Slow)
-                {
-                    _resetLadle = true;
-                }
-                _pStage = PourStage.Slow;
-            }
-            else
-            {
-                if (_pStage != PourStage.Fast)
-                {
-                    _resetLadle = true;
-                }
-                _pStage = PourStage.Fast;
             }
         }
 
@@ -127,14 +105,16 @@ namespace AutoBrew.Overseer
 
         public void AddLadleAmount(float value, float multiplier)
         {
-            if (Stage == OverseerStage.Active)
+            if (Stage != OverseerStage.Active)
             {
-                if (value.Is(0f))
-                {
-                    return;
-                }
-                _pouredTotal += (value / multiplier);
+                return;
             }
+
+            if (value.Is(0f))
+            {
+                return;
+            }
+            _pouredTotal += (value / multiplier);
         }
 
         private void UpdateWaterLevel(WaterStream instance)
@@ -144,67 +124,13 @@ namespace AutoBrew.Overseer
                 return;
             }
 
-            Quaternion target = Quaternion.Euler(0f * Vector3.forward);
-            switch (_pStage)
-            {
-                case PourStage.Fast:
-                {
-                    target = Quaternion.Euler(_pourFastAngle * Vector3.forward);
-                    break;
-                }
-                case PourStage.Slow:
-                {
-                    target = Quaternion.Euler(_pourSlowAngle * Vector3.forward);
-                    break;
-                }
-                case PourStage.Reset:
-                {
-                    instance.ladle.rotatablePart.localRotation = target;
-                    return;
-                }
-            }
-
-            if (_resetLadle)
-            {
-                _startZ = _currentZ;
-                _progress = 0f;
-                _resetLadle = false;
-            }
-
-            _progress += Mathf.Clamp01(Time.deltaTime / _lerpDuration);
-            if (_progress.Is(1f))
-            {
-                _progress = 1f;
-            }
-            var lerped = Quaternion.Lerp(Quaternion.Euler(_startZ * Vector3.forward), target, _progress);
-            _currentZ = lerped.eulerAngles.z;
-            _currentZ += (_currentZ < 0) ? 360f : 0;
-            instance.ladle.rotatablePart.localRotation = Quaternion.Euler(_currentZ * Vector3.forward);
-        }
-
-        private void MoveIndicatorTowardsBase(WaterStream instance)
-        {
-            if (Stage != OverseerStage.Active)
-            {
-                return;
-            }
-
-            switch (_pStage)
-            {
-                case PourStage.Slow:
-                {
-                    instance.Pouring = _pourSlowSpeed;
-                    instance.isPouring = true;
-                    break;
-                }
-                case PourStage.Reset:
-                {
-                    instance.Pouring = 0f;
-                    instance.isPouring = false;
-                    Stage = OverseerStage.Complete;
-                    break;
-                }
-            }
+            double actualMin = instance.isPouring ? _anglePourReset : _anglePourStart;
+            _lastPIDVal = _pidControl.GetStep(_pourTarget, _pouredTotal, Time.deltaTime);
+            // max and min angles are -ve, so they are in the "wrong" place
+            double target = actualMin - _lastPIDVal;
+            double clamped = target.Clamp(_anglePourMax, actualMin);
+            instance.ladle.rotatablePart.localRotation = Quaternion.Euler((float)clamped * Vector3.forward);
+            Log.LogInfo($"PIDVal: {_lastPIDVal:N4} | TargetAng: {target:N4} | ActualAng: {clamped:N4}");
         }
 
         [HarmonyPrefix, HarmonyPatch(typeof(WaterStream), "UpdateWaterLevel")]
@@ -215,23 +141,6 @@ namespace AutoBrew.Overseer
                 return;
             }
             BrewMaster.Pourer.UpdateWaterLevel(__instance);
-        }
-
-        [HarmonyPrefix, HarmonyPatch(typeof(WaterStream), "MoveIndicatorTowardsBase")]
-        public static void MoveIndicatorTowardsBase_Prefix(WaterStream __instance)
-        {
-            if (!BrewMaster.Brewing)
-            {
-                return;
-            }
-            BrewMaster.Pourer.MoveIndicatorTowardsBase(__instance);
-        }
-
-        enum PourStage
-        {
-            Fast,
-            Slow,
-            Reset
         }
     }
 }
