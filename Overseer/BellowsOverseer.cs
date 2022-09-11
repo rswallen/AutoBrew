@@ -18,9 +18,9 @@ namespace AutoBrew.Overseer
         private float _heatEffectTime;
         
         private float _tolerance;
+        private Vector3 _pidValues;
         private float _heatMin;
         private float _heatMax;
-        private Vector3 _pidValues;
         
         private BrewOrder _mode;
         private PIDController _pidControl;
@@ -43,7 +43,7 @@ namespace AutoBrew.Overseer
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkIntervalOff", out _sparkIntervalOff, 0.4f, false);
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatEffectTime", out _heatEffectTime, 2.0f, false);
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "Tolerance", out _tolerance, 0.5f, false);
-            ABSettings.GetVector3(nameof(BellowsOverseer), data, "PIDValues", out _pidValues, new Vector3(1f, 0f, 0f));
+            ABSettings.GetVector3(nameof(BellowsOverseer), data, "PIDValues", out _pidValues, new Vector3(0.005f, 0.00001f, 0.0005f));
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatMin", out _heatMin, 0.01f);
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatMax", out _heatMax, 0.8f);
         }

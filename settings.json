@@ -30,31 +30,26 @@
     "MinGrindUpdates": "200"
   },
   "Cauldron": {
-    "StirTolerance": "0.0001",
-    "StirThreshSlow": "0.5",
-    "StirFast": "0.2",
-    "StirSlow": "0.01",
-    "StirPID": "0.02,0.001,0.0001",
-    "ClampMin": "0.0",
-    "ClampMax": "0.5",
+    "Tolerance": "0.0001",
+    "PIDValues": "0.075,0.001,0.05",
+    "SpeedMin": "0.001",
+    "SpeedMax": "0.8",
   },
   "Solvent": {
-    "PourTolerance": "0.0001",
-    "PourThreshSlow": "0.2",
-    "PourFastAngle": "320.0",
-    "PourSlowAngle": "340.0",
-    "PourSlowSpeed": "0.01",
-    "LerpDuration": "0.2"
+    "Tolerance": "0.0001",
+    "PIDValues": "50.0,0.1,0.8",
+    "AngleMax": "-40.0",
+    "AngleStart": "-20.0",
+    "AngleReset": "-16.5"
   },
   "Bellows": {
-    "LogVortexMove": "false",
     "SparkAmount": "10",
     "SparkIntervalOn": "1.6",
     "SparkIntervalOff": "0.4",
-    "HeatFast": "0.25",
-    "HeatSlow": "0.05",
-    "HeatThreshSlow": "45.0",
-    "HeatThreshStop": "0.5",
-    "HeatEffectTime": "2.0"
+    "HeatEffectTime": "2.0",
+    "Tolerance": "0.0001",
+    "PIDValues":"0.005,0.00001,0.0005",
+    "HeatMin": "0.01",
+    "HeatMax": "0.4"
   }
 }

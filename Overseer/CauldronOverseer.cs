@@ -25,8 +25,8 @@ namespace AutoBrew.Overseer
         {
             ABSettings.GetFloat(nameof(CauldronOverseer), data, "Tolerance", out _tolerance, 0.0001f, false);
             ABSettings.GetVector3(nameof(CauldronOverseer), data, "PIDValues", out _pidValues, new Vector3(0.075f, 0.001f, 0.05f));
-            ABSettings.GetFloat(nameof(CauldronOverseer), data, "SpeedMin", out _speedMin, 0.5f);
-            ABSettings.GetFloat(nameof(CauldronOverseer), data, "SpeedMax", out _speedMax, 0.5f);
+            ABSettings.GetFloat(nameof(CauldronOverseer), data, "SpeedMin", out _speedMin, 0.001f);
+            ABSettings.GetFloat(nameof(CauldronOverseer), data, "SpeedMax", out _speedMax, 0.8f);
         }
 
         public override void Reset()
