@@ -3,6 +3,7 @@ using HarmonyLib;
 using PotionCraft.Core.Extensions;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ObjectBased.Cauldron;
+using PotionCraft.ObjectBased.Spoon;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,7 +16,11 @@ namespace AutoBrew.Overseer
         private Vector3 _pidValues;
         private float _speedMin;
         private float _speedMax;
-        
+        private Vector2 _stirTotalScalar;
+        private Vector2 _spoonPosScalar;
+        private Vector2 _spoonPosOffset;
+        private Vector3 _spoonRotScalar;
+
         private BrewOrder _order;
         private PIDController _pidControl;
         private float _stirredTotal;
@@ -27,6 +32,10 @@ namespace AutoBrew.Overseer
             ABSettings.GetVector3(nameof(CauldronOverseer), data, "PIDValues", out _pidValues, new Vector3(0.075f, 0.001f, 0.05f));
             ABSettings.GetFloat(nameof(CauldronOverseer), data, "SpeedMin", out _speedMin, 0.001f);
             ABSettings.GetFloat(nameof(CauldronOverseer), data, "SpeedMax", out _speedMax, 0.8f);
+            ABSettings.GetVector2(nameof(CauldronOverseer), data, "StirTotalScalar", out _stirTotalScalar, new Vector2(2.0f, 0.2f));
+            ABSettings.GetVector2(nameof(CauldronOverseer), data, "SpoonPosScalar", out _spoonPosScalar, new Vector2(2.0f, 0.2f));
+            ABSettings.GetVector2(nameof(CauldronOverseer), data, "SpoonPosOffset", out _spoonPosOffset, new Vector2(0.0f, 3.0f));
+            ABSettings.GetVector3(nameof(CauldronOverseer), data, "SpoonRotScalar", out _spoonRotScalar, new Vector3(0.0f, 0.0f, -10.0f));
         }
 
         public override void Reset()
@@ -46,7 +55,11 @@ namespace AutoBrew.Overseer
 
         public override void Process()
         {
-            // nothing happens here, because its all handled through patches
+            if (Stage != OverseerStage.Active)
+            {
+                return;
+            }
+            UpdateSpoonPos();
         }
 
         public override void LogStatus()
@@ -80,6 +93,29 @@ namespace AutoBrew.Overseer
                     return _stirredTotal / _order.Target;
                 }
             }
+        }
+
+        private void UpdateSpoonPos()
+        {
+            Spoon stirrer = Managers.Ingredient.spoon;
+            Cauldron bowl = Managers.Ingredient.cauldron;
+            if ((stirrer == null) || (bowl == null))
+            {
+                return;
+            }
+
+            // we want X and Y to move at different speeds, so scalar * stirtotal
+            var scaledTotal = _stirTotalScalar * _stirredTotal;
+            // x = sin(total), y = cos(total)
+            var trigScaledTotal = new Vector2(Mathf.Sin(scaledTotal.x), Mathf.Cos(scaledTotal.y));
+            // scale to set the bounds of movement
+            var trigOffset = Vector2.Scale(_spoonPosScalar, trigScaledTotal);
+            // final pos = cauldron.pos + origin offset that spoon moves around + movement
+            var spoonOrigin = (Vector2)bowl.transform.position + _spoonPosOffset;
+            var position = spoonOrigin + trigOffset;
+            // we want rotation change to match horizontal movement, so rotScalar * trigscalar.x
+            var rotation = trigScaledTotal.x * _spoonRotScalar;
+            stirrer.MoveToInstantly(position, rotation);
         }
 
         public void UpdateStirringValue()
