@@ -386,6 +386,7 @@ namespace AutoBrew
         public static void LogFailedOrder(BrewOrder order)
         {
             Log.LogError($"Brew Cancelled - {order.Stage} failed");
+            Log.LogError(order);
         }
 
         public static void PrintRecipeMapMessage(string message, Vector2 offset)
