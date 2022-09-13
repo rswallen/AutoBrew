@@ -1,4 +1,5 @@
-﻿using AutoBrew.JsonObjects;
+﻿using AutoBrew.Extensions;
+using AutoBrew.JsonObjects;
 using BepInEx.Logging;
 using Newtonsoft.Json;
 using PotionCraft.ScriptableObjects;
@@ -68,7 +69,10 @@ namespace AutoBrew
                             break;
                         }
                         method.AddOrder(ingOrder);
-                        method.AddOrder(order.GetBrewOrder(BrewStage.GrindPercent));
+                        if (!ingOrder.Target.Is(0.0))
+                        {
+                            method.AddOrder(order.GetBrewOrder(BrewStage.GrindPercent));
+                        }
                         break;
                     }
                     case BrewStage.StirCauldron:
