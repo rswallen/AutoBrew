@@ -4,6 +4,7 @@ using HarmonyLib;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ManagersSystem.RecipeMap;
 using PotionCraft.ObjectBased.Bellows;
+using PotionCraft.TutorialSystem;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,19 +14,21 @@ namespace AutoBrew.Overseer
     internal class BellowsOverseer : BaseOverseer
     {
         private float _sparkAmount;
-        private float _sparkIntervalOn;
-        private float _sparkIntervalOff;
-        private float _heatEffectTime;
-        
+        private float _vortexBellowsDuration;
+        private float _effectBellowsDuration;
+        private float _bellowsMinMin;
+
+        private float _bellowsMin = 331.5f;
+        private float _bellowsMax = 352.5f;
+        private float _bellowsRange;
+
         private float _tolerance;
         private Vector3 _pidValues;
         private float _heatMin;
         private float _heatMax;
         
-        private BrewOrder _mode;
+        private BrewOrder _order;
         private PIDController _pidControl;
-        private double _gtLastSparkChange;
-        private bool _sparksActive;
         private double _heatedTotal;
         private double _heatTarget;
         private Vector2 _vortexPos;
@@ -35,22 +38,27 @@ namespace AutoBrew.Overseer
         private float _gtEffectStart;
         private int _effectTier;
         private double _lastPIDVal;
+        private float _lastHeat;
+
+        private bool _bellowsActive;
+        private float _bellowsMinMax;
+        private float _bellowsProgress;
 
         public override void Reconfigure(Dictionary<string, string> data)
         {
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkAmount", out _sparkAmount, 10f, false);
-            ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkIntervalOn", out _sparkIntervalOn, 1.6f, false);
-            ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkIntervalOff", out _sparkIntervalOff, 0.4f, false);
-            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatEffectTime", out _heatEffectTime, 2.0f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkIntervalOn", out _vortexBellowsDuration, 1.6f, false);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatEffectTime", out _effectBellowsDuration, 2.0f, false);
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "Tolerance", out _tolerance, 0.5f, false);
             ABSettings.GetVector3(nameof(BellowsOverseer), data, "PIDValues", out _pidValues, new Vector3(0.005f, 0.00001f, 0.0005f));
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatMin", out _heatMin, 0.01f);
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "HeatMax", out _heatMax, 0.8f);
+            ABSettings.GetFloat(nameof(BellowsOverseer), data, "BellowsMinMin", out _bellowsMinMin, 335f);
         }
 
         public override void Reset()
         {
-            _mode = null;
+            _order = null;
             _heatedTotal = 0f;
 
             Stage = OverseerStage.Idle;
@@ -58,11 +66,12 @@ namespace AutoBrew.Overseer
 
         public override void Setup(BrewOrder order)
         {
-            _mode = order;
-            _gtLastSparkChange = Time.timeAsDouble;
-            _sparksActive = true;
+            _order = order;
             _heatedTotal = 0f;
             _pidControl = new(_pidValues);
+
+            _bellowsActive = false;
+            _bellowsRange = _bellowsMax - _bellowsMin;
 
             switch (order.Stage)
             {
@@ -114,7 +123,7 @@ namespace AutoBrew.Overseer
                 return;
             }
 
-            switch (_mode.Stage)
+            switch (_order.Stage)
             {
                 case BrewStage.HeatVortex:
                 {
@@ -135,10 +144,11 @@ namespace AutoBrew.Overseer
         {
             get
             {
-                switch(_mode.Stage)
+                switch(_order.Stage)
                 {
                     case BrewStage.HeatVortex:
                     {
+                        // degree (unicode): \u00B0
                         if (_heatTarget == 0f)
                         {
                             return 1.0;
@@ -150,11 +160,11 @@ namespace AutoBrew.Overseer
                     }
                     case BrewStage.AddEffect:
                     {
-                        if (_mode.Target == 0f)
+                        if (_order.Target == 0f)
                         {
                             return 1.0;
                         }
-                        return _effectTier / _mode.Target;
+                        return _effectTier / _order.Target;
                     }
                 }
                 return 0.0;
@@ -168,7 +178,8 @@ namespace AutoBrew.Overseer
                 return;
             }
 
-            switch (_mode.Stage)
+            UpdateBellowsRotation();
+            switch (_order.Stage)
             {
                 case BrewStage.HeatVortex:
                 {
@@ -181,7 +192,8 @@ namespace AutoBrew.Overseer
                     }
 
                     _lastPIDVal = Math.Abs(_pidControl.GetStep(_heatTarget, _heatedTotal, Time.deltaTime));
-                    Managers.Ingredient.coals.Heat = (float)_lastPIDVal.Clamp(_heatMin, _heatMax);
+                    _lastHeat = (float)_lastPIDVal.Clamp(_heatMin, _heatMax);
+                    Managers.Ingredient.coals.Heat = _lastHeat;
                     return;
                 }
                 case BrewStage.AddEffect:
@@ -191,7 +203,7 @@ namespace AutoBrew.Overseer
                         Stage = OverseerStage.Failed;
                         return;
                     }
-                    _heatedTotal = (Time.time - _gtEffectStart) / _heatEffectTime;
+                    _heatedTotal = (Time.time - _gtEffectStart) / _effectBellowsDuration;
                     Managers.Ingredient.coals.Heat = Mathf.Clamp01((float)_heatedTotal);
                     return;
                 }
@@ -205,6 +217,11 @@ namespace AutoBrew.Overseer
                 return;
             }
 
+            if (_bellowsActive)
+            {
+                dAngle = _sparkAmount;
+            }
+            /*
             switch (_mode.Stage)
             {
                 case BrewStage.HeatVortex:
@@ -225,6 +242,7 @@ namespace AutoBrew.Overseer
                     return;
                 }
             }
+            */
         }
 
         public void MoveIndicatorTowardsVortex()
@@ -261,7 +279,7 @@ namespace AutoBrew.Overseer
 
         public void CollectEffect(int tier)
         {
-            if ((Stage != OverseerStage.Active) || (_mode.Stage != BrewStage.AddEffect))
+            if ((Stage != OverseerStage.Active) || (_order.Stage != BrewStage.AddEffect))
             {
                 return;
             }
@@ -269,6 +287,62 @@ namespace AutoBrew.Overseer
             _effectTier = tier;
             Stage = OverseerStage.Complete;
             Managers.Ingredient.coals.Heat = 0f;
+        }
+
+        public void UpdateBellowsRotation()
+        {
+            var z = Managers.Ingredient.coals.top.transform.rotation.eulerAngles.z;
+
+            if (!_bellowsActive)
+            {
+                if (z <= _bellowsMin)
+                {
+                    _bellowsActive = true;
+                    _bellowsProgress = 0f;
+                }
+            }
+            else
+            {
+                float newZ;
+                switch (_order.Stage)
+                {
+                    case BrewStage.HeatVortex:
+                    {
+                        // we want uniform speed, so lerp between min and max bellows angles
+                        _bellowsProgress += Time.deltaTime / _vortexBellowsDuration;
+                        newZ = Mathf.Lerp(_bellowsMin, _bellowsMax, _bellowsProgress);
+
+                        // how far the arm rotates should be based on the heat (less heat -> more precision -> smaller movements),
+                        // so use the last heat value to get the upper limit (minmax) of the bellows arm rotation
+                        float rotCoef = _lastHeat / _heatMax;
+                        _bellowsMinMax = _bellowsMin + (rotCoef * _bellowsRange);
+
+                        // raise the floor of the minmax (don't want it to be too low),
+                        // then clamp the calculated rotation between the min and minmax
+                        _bellowsMinMax = Mathf.Clamp(_bellowsMinMax, _bellowsMinMin, _bellowsMax);
+                        newZ = Mathf.Clamp(newZ, _bellowsMin, _bellowsMinMax);
+                        break;
+                    }
+                    case BrewStage.AddEffect:
+                    {
+                        _bellowsProgress += Time.deltaTime / (_effectBellowsDuration * 0.2f);
+                        _bellowsMinMax = _bellowsMax;
+                        newZ = Mathf.Lerp(_bellowsMin, _bellowsMax, _bellowsProgress);
+                        break;
+                    }
+                    default:
+                    {
+                        return;
+                    }
+                }
+
+                //Managers.Ingredient.coals.top.transform.rotation = Quaternion.Euler(Vector3.forward * newZ);
+                Managers.Ingredient.coals.top.transform.eulerAngles = Vector3.forward * newZ;
+                if (newZ == _bellowsMinMax)
+                {
+                    _bellowsActive = false;
+                }
+            }
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(BellowsCoals), "Heat_Update")]
