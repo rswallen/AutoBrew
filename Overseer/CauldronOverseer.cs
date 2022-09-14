@@ -12,10 +12,10 @@ namespace AutoBrew.Overseer
 {
     internal class CauldronOverseer : BaseOverseer
     {
-        private float _tolerance;
+        private double _tolerance;
         private Vector3 _pidValues;
-        private float _speedMin;
-        private float _speedMax;
+        private double _speedMin;
+        private double _speedMax;
         private Vector2 _stirTotalScalar;
         private Vector2 _spoonPosScalar;
         private Vector2 _spoonPosOffset;
