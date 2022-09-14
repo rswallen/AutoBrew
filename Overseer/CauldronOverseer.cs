@@ -23,15 +23,15 @@ namespace AutoBrew.Overseer
 
         private BrewOrder _order;
         private PIDController _pidControl;
-        private float _stirredTotal;
+        private double _stirredTotal;
         private double _lastPIDVal;
 
         public override void Reconfigure(Dictionary<string, string> data)
         {
-            ABSettings.GetFloat(nameof(CauldronOverseer), data, "Tolerance", out _tolerance, 0.0001f, false);
+            ABSettings.GetDouble(nameof(CauldronOverseer), data, "Tolerance", out _tolerance, 0.0001f, false);
             ABSettings.GetVector3(nameof(CauldronOverseer), data, "PIDValues", out _pidValues, new Vector3(0.075f, 0.001f, 0.05f));
-            ABSettings.GetFloat(nameof(CauldronOverseer), data, "SpeedMin", out _speedMin, 0.001f);
-            ABSettings.GetFloat(nameof(CauldronOverseer), data, "SpeedMax", out _speedMax, 0.8f);
+            ABSettings.GetDouble(nameof(CauldronOverseer), data, "SpeedMin", out _speedMin, 0.001f);
+            ABSettings.GetDouble(nameof(CauldronOverseer), data, "SpeedMax", out _speedMax, 0.8f);
             ABSettings.GetVector2(nameof(CauldronOverseer), data, "StirTotalScalar", out _stirTotalScalar, new Vector2(2.0f, 0.2f));
             ABSettings.GetVector2(nameof(CauldronOverseer), data, "SpoonPosScalar", out _spoonPosScalar, new Vector2(2.0f, 0.2f));
             ABSettings.GetVector2(nameof(CauldronOverseer), data, "SpoonPosOffset", out _spoonPosOffset, new Vector2(0.0f, 3.0f));
@@ -48,7 +48,7 @@ namespace AutoBrew.Overseer
         public override void Setup(BrewOrder order)
         {
             _order = order;
-            _stirredTotal = 0f;
+            _stirredTotal = 0;
             _pidControl = new(_pidValues);
             base.Setup(order);
         }
@@ -70,7 +70,7 @@ namespace AutoBrew.Overseer
                 return;
             }
 
-            if (_order.Target.Is(0f))
+            if (_order.Target.Is(0.0))
             {
                 Log.LogInfo($"StirStatus: NaN | {_stirredTotal}/0");
                 return;
@@ -84,7 +84,7 @@ namespace AutoBrew.Overseer
         {
             get
             {
-                if (_order.Target == 0f)
+                if (_order.Target == 0.0)
                 {
                     return 1.0;
                 }
@@ -105,7 +105,7 @@ namespace AutoBrew.Overseer
             }
 
             // we want X and Y to move at different speeds, so scalar * stirtotal
-            var scaledTotal = _stirTotalScalar * _stirredTotal;
+            var scaledTotal = _stirTotalScalar * (float)_stirredTotal;
             // x = sin(total), y = cos(total)
             var trigScaledTotal = new Vector2(Mathf.Sin(scaledTotal.x), Mathf.Cos(scaledTotal.y));
             // scale to set the bounds of movement
@@ -132,7 +132,7 @@ namespace AutoBrew.Overseer
             }
 
             Cauldron bowl = Managers.Ingredient.cauldron;
-            float diff = (float)_order.Target - _stirredTotal;
+            double diff = _order.Target - _stirredTotal;
             if (diff <= _tolerance)
             {
                 Stage = OverseerStage.Complete;
@@ -154,8 +154,6 @@ namespace AutoBrew.Overseer
                 }
                 float delta = (value / multiplier);
                 _stirredTotal += delta;
-                double clampPID = _lastPIDVal.Clamp(_speedMin, _speedMax);
-                Log.LogDebug($"StirUpdate: PIDVal - {_lastPIDVal:N5} | ClampPID - {clampPID:N5} | Delta - {delta:N5}");
             }
         }
 
