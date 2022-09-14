@@ -129,8 +129,8 @@ namespace AutoBrew.Overseer
             // max and min angles are -ve, so they are in the "wrong" place
             double target = actualMin - _lastPIDVal;
             double clamped = target.Clamp(_anglePourMax, actualMin);
-            instance.ladle.rotatablePart.localRotation = Quaternion.Euler((float)clamped * Vector3.forward);
-            Log.LogInfo($"PIDVal: {_lastPIDVal:N4} | TargetAng: {target:N4} | ActualAng: {clamped:N4}");
+            //instance.ladle.rotatablePart.localRotation = Quaternion.Euler((float)clamped * Vector3.forward);
+            instance.ladle.rotatablePart.localEulerAngles = (float)clamped * Vector3.forward;
         }
 
         [HarmonyPrefix, HarmonyPatch(typeof(WaterStream), "UpdateWaterLevel")]
