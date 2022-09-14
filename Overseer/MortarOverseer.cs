@@ -1,5 +1,6 @@
 ﻿using PotionCraft.LocalizationSystem;
 using PotionCraft.ManagersSystem;
+using PotionCraft.ObjectBased.Mortar;
 using PotionCraft.ObjectBased.Pestle;
 using PotionCraft.ObjectBased.Stack;
 using PotionCraft.ObjectBased.Stack.StackItem;
@@ -17,6 +18,11 @@ namespace AutoBrew.Overseer
         private int _flourishMax;
         private int _minUpdates;
         private Vector2 _mortarOffset;
+
+        private Vector2 _grindTotalScalar;
+        private Vector2 _pestlePosScalar;
+        private Vector2 _pestlePosOffset;
+        private Vector2 _pestleRotScalar;
 
         private GrindStage _gStage;
         private float _grindTarget;
@@ -39,6 +45,10 @@ namespace AutoBrew.Overseer
             ABSettings.GetVector2(nameof(MortarOverseer), data, "MortarOffset", out _mortarOffset, Vector2.zero, false);
             ABSettings.GetInt(nameof(MortarOverseer), data, "FlourishMax", out _flourishMax, 1, false);
             ABSettings.GetInt(nameof(MortarOverseer), data, "MinGrindUpdates", out _minUpdates, 200, false);
+            ABSettings.GetVector2(nameof(CauldronOverseer), data, "GrindTotalScalar", out _grindTotalScalar, new Vector2(2.0f, 0.2f));
+            ABSettings.GetVector2(nameof(CauldronOverseer), data, "PestlePosScalar", out _pestlePosScalar, new Vector2(2.0f, 0.2f));
+            ABSettings.GetVector2(nameof(CauldronOverseer), data, "PestlePosOffset", out _pestlePosOffset, new Vector2(0.0f, 3.0f));
+            ABSettings.GetVector2(nameof(CauldronOverseer), data, "PestleRotScalar", out _pestleRotScalar, new Vector2(0.0f, 0.0f));
         }
 
         public override void Reset()
@@ -87,13 +97,14 @@ namespace AutoBrew.Overseer
                     _gStage = GrindStage.Flourish;
                     return;
                 }
-
+                
                 if (!Grind(item, 1, out _))
                 {
                     Stage = OverseerStage.Failed;
                     return;
                 }
                 UpdateGrindStatus(item);
+                UpdatePestlePos();
 
                 if (_showPath)
                 {
@@ -155,6 +166,30 @@ namespace AutoBrew.Overseer
             {
                 return 1.0;
             }
+        }
+
+        private void UpdatePestlePos()
+        {
+            Pestle crusher = Managers.Ingredient.pestle;
+            Mortar bowl = Managers.Ingredient.mortar;
+            if ((crusher == null) || (bowl == null))
+            {
+                return;
+            }
+
+            // we want X and Y to move at different speeds, so scalar * grindtotal
+            var scaledTotal = _grindTotalScalar * _grindTotal;
+            // x = sin(total), y = cos(total)
+            var trigScaledTotal = new Vector2(Mathf.Sin(scaledTotal.x), Mathf.Cos(scaledTotal.y));
+            // scale to set the bounds of movement
+            var trigOffset = Vector2.Scale(_pestlePosScalar, trigScaledTotal);
+            // final pos = mortar.pos + origin offset that pestle moves around + movement
+            var origin = (Vector2)bowl.transform.position + _pestlePosOffset;
+            var position = origin + trigOffset;
+            // update rotation
+            var rotComponents = Vector2.Scale(_pestleRotScalar, trigScaledTotal);
+            var rotation = (rotComponents.x + rotComponents.y) * Vector3.forward;
+            crusher.MoveToInstantly(position, rotation);
         }
 
         public void AddIngredientMark(Ingredient item, float grindStatus)
