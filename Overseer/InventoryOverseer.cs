@@ -271,7 +271,7 @@ namespace AutoBrew.Overseer
         {
             Vector2 cauldronPos = Managers.Ingredient.cauldron.transform.localPosition;
             Vector2 spawnPos = cauldronPos + _cauldronOffset;
-            float randAngle = Random.Range(-150f, -30f);
+            float randAngle = UnityEngine.Random.Range(-150f, -30f);
             Vector2 impulse = item.GetSpawnVelocity(randAngle, 1f);
             PhysicalParticle.SpawnSaltParticle((Salt)item.inventoryItem, spawnPos, impulse);
             return true;
