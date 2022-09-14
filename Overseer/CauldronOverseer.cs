@@ -125,7 +125,8 @@ namespace AutoBrew.Overseer
                 return;
             }
 
-            if (Managers.RecipeMap.path.GetFixedPathLength().Is(0f))
+            float pathLeft = Managers.RecipeMap.path.GetFixedPathLength();
+            if (pathLeft.Is(0f))
             {
                 Stage = OverseerStage.Complete;
                 return;
