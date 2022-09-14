@@ -4,7 +4,6 @@ using HarmonyLib;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ManagersSystem.RecipeMap;
 using PotionCraft.ObjectBased.Bellows;
-using PotionCraft.TutorialSystem;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -168,6 +167,18 @@ namespace AutoBrew.Overseer
                     }
                 }
                 return 0.0;
+            }
+        }
+
+        public override double Precision
+        {
+            get
+            {
+                switch (_order.Stage)
+                {
+                    case BrewStage.HeatVortex: { return _heatTarget - _heatedTotal; }
+                    default: { return 0; }
+                }
             }
         }
 

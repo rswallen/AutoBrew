@@ -95,6 +95,11 @@ namespace AutoBrew.Overseer
             }
         }
 
+        public override double Precision
+        {
+            get { return Math.Abs(_order.Target - _stirredTotal); }
+        }
+
         private void UpdateSpoonPos()
         {
             Spoon stirrer = Managers.Ingredient.spoon;

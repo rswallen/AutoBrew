@@ -34,11 +34,12 @@ namespace AutoBrew.Overseer
 
         public override double Accuracy
         {
-            get
-            {
-                return 9.001;
-            }
+            get { return 9.001; }
         }
 
+        public override double Precision
+        {
+            get { return 0.0; }
+        }
     }
 }

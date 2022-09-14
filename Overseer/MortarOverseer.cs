@@ -168,6 +168,11 @@ namespace AutoBrew.Overseer
             }
         }
 
+        public override double Precision
+        {
+            get { return 0; }
+        }
+
         private void UpdatePestlePos()
         {
             Pestle crusher = Managers.Ingredient.pestle;

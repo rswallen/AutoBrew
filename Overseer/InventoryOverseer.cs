@@ -8,6 +8,7 @@ using PotionCraft.ObjectBased.Stack;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Ingredient;
 using PotionCraft.ScriptableObjects.Salts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -172,6 +173,29 @@ namespace AutoBrew.Overseer
                             return 1.0;
                         }
                         return _saltAdded / _order.Target;
+                    }
+                }
+                return 0.0;
+            }
+        }
+
+        public override double Precision
+        {
+            get
+            {
+                switch (_order.Stage)
+                {
+                    case BrewStage.AddIngredient:
+                    {
+                        return 0.0;
+                    }
+                    case BrewStage.AddSalt:
+                    {
+                        if (_order.Target == 0f)
+                        {
+                            return 0.0;
+                        }
+                        return Math.Abs(_order.Target - _saltAdded);
                     }
                 }
                 return 0.0;

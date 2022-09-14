@@ -35,6 +35,8 @@ namespace AutoBrew.Overseer
 
         public abstract double Accuracy { get; }
 
+        public abstract double Precision { get; }
+
         public OverseerStage Stage
         {
             get { return _stage; }
@@ -76,7 +78,7 @@ namespace AutoBrew.Overseer
             Process();
             if (_stage == OverseerStage.Complete)
             {
-                Log.LogInfo($"Order '{order.Stage}' completed in {Duration:N2}s, {Accuracy:P4} of target");
+                Log.LogInfo($"Order '{order.Stage}' completed in {Duration:N2}s, {Accuracy:P4} of target, error of {Precision:N4}u");
                 BrewMaster.PrintRecipeMapMessage($"Order '{order.Stage}' completed", BrewMaster.OrderCompleteOffset);
                 Reset();
                 BrewMaster.AdvanceOrder();

@@ -3,6 +3,7 @@ using HarmonyLib;
 using PotionCraft.Core.Extensions;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ObjectBased.Ladle;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -101,6 +102,11 @@ namespace AutoBrew.Overseer
                     return _pouredTotal / _pourTarget;
                 }
             }
+        }
+
+        public override double Precision
+        {
+            get { return Math.Abs(_pouredTotal - _pourTarget); }
         }
 
         public void AddLadleAmount(float value, float multiplier)
