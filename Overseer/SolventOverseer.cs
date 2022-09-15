@@ -11,18 +11,18 @@ namespace AutoBrew.Overseer
 {
     internal class SolventOverseer : BaseOverseer
     {
-        private double _tolerance;
-        private Vector3 _pidValues;
-        private double _anglePourStart;
-        private double _anglePourReset;
-        private double _anglePourMax;
+        private static double _tolerance;
+        private static Vector3 _pidValues;
+        private static double _anglePourStart;
+        private static double _anglePourReset;
+        private static double _anglePourMax;
 
         private PIDController _pidControl;
         private double _pourTarget;
         private double _pouredTotal;
         private double _lastPIDVal;
 
-        public override void Reconfigure(Dictionary<string, string> data)
+        public static void Reconfigure(Dictionary<string, string> data)
         {
             ABSettings.GetDouble(nameof(SolventOverseer), data, "Tolerance", out _tolerance, 0.0001, false);
             ABSettings.GetVector3(nameof(SolventOverseer), data, "PIDValues", out _pidValues, new(50.0f, 0.1f, 0.8f), false);

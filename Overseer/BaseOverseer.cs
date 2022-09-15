@@ -90,8 +90,6 @@ namespace AutoBrew.Overseer
             }
         }
 
-        public abstract void Reconfigure(Dictionary<string, string> data);
-
         public abstract void Reset();
 
         public virtual void Setup(BrewOrder order)

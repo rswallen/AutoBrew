@@ -20,16 +20,16 @@ namespace AutoBrew.Overseer
         private static readonly Key _abortBadOrder = new("autobrew_brew_abort_invovsr_badorder");
         private static readonly Key _abortExtraIngAdded = new("autobrew_brew_abort_extraingadded");
 
-        private Vector2 _ingredientSpawnPos;
-        private Vector2 _saltItemSpawnPos;
-        private Vector2 _cauldronOffset;
-        private bool _alwaysDissolve;
+        private static Vector2 _ingredientSpawnPos;
+        private static Vector2 _saltItemSpawnPos;
+        private static Vector2 _cauldronOffset;
+        private static bool _alwaysDissolve;
 
         private BrewOrder _order;
         private bool _thingThrown;
         private int _saltAdded;
 
-        public override void Reconfigure(Dictionary<string, string> data)
+        public static void Reconfigure(Dictionary<string, string> data)
         {
             ABSettings.GetVector2(nameof(InventoryOverseer), data, "IngSpawnPos", out _ingredientSpawnPos, new Vector2(7.275f, 2.375f), false);
             ABSettings.GetVector2(nameof(InventoryOverseer), data, "SaltSpawnPos", out _saltItemSpawnPos, new Vector2(5.7f, -5.3f), false);

@@ -12,21 +12,21 @@ namespace AutoBrew.Overseer
 {
     internal class CauldronOverseer : BaseOverseer
     {
-        private double _tolerance;
-        private Vector3 _pidValues;
-        private double _speedMin;
-        private double _speedMax;
-        private Vector2 _stirTotalScalar;
-        private Vector2 _spoonPosScalar;
-        private Vector2 _spoonPosOffset;
-        private Vector3 _spoonRotScalar;
+        private static double _tolerance;
+        private static Vector3 _pidValues;
+        private static double _speedMin;
+        private static double _speedMax;
+        private static Vector2 _stirTotalScalar;
+        private static Vector2 _spoonPosScalar;
+        private static Vector2 _spoonPosOffset;
+        private static Vector3 _spoonRotScalar;
 
         private BrewOrder _order;
         private PIDController _pidControl;
         private double _stirredTotal;
         private double _lastPIDVal;
 
-        public override void Reconfigure(Dictionary<string, string> data)
+        public static void Reconfigure(Dictionary<string, string> data)
         {
             ABSettings.GetDouble(nameof(CauldronOverseer), data, "Tolerance", out _tolerance, 0.0001f, false);
             ABSettings.GetVector3(nameof(CauldronOverseer), data, "PIDValues", out _pidValues, new Vector3(0.075f, 0.001f, 0.05f));

@@ -14,15 +14,15 @@ namespace AutoBrew.Overseer
     {
         private static readonly Key _abortExtraIngAdded = new("autobrew_brew_abort_extraingadded");
 
-        private bool _showPath;
-        private int _flourishMax;
-        private int _minUpdates;
-        private Vector2 _mortarOffset;
+        private static bool _showPath;
+        private static int _flourishMax;
+        private static int _minUpdates;
+        private static Vector2 _mortarOffset;
 
-        private Vector2 _grindTotalScalar;
-        private Vector2 _pestlePosScalar;
-        private Vector2 _pestlePosOffset;
-        private Vector2 _pestleRotScalar;
+        private static Vector2 _grindTotalScalar;
+        private static Vector2 _pestlePosScalar;
+        private static Vector2 _pestlePosOffset;
+        private static Vector2 _pestleRotScalar;
 
         private GrindStage _gStage;
         private float _grindTarget;
@@ -39,7 +39,7 @@ namespace AutoBrew.Overseer
             WaitingForCauldron
         }
 
-        public override void Reconfigure(Dictionary<string, string> data)
+        public static void Reconfigure(Dictionary<string, string> data)
         {
             ABSettings.GetBool(nameof(MortarOverseer), data, "ShowPath", out _showPath, false, false);
             ABSettings.GetVector2(nameof(MortarOverseer), data, "MortarOffset", out _mortarOffset, Vector2.zero, false);

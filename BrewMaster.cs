@@ -207,17 +207,18 @@ namespace AutoBrew
             Dictionary<string, string> newSettings;
             string basepath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string filepath = Path.Combine(basepath, "settings.json");
+            
             if (!File.Exists(filepath))
             {
                 Log.LogInfo("Settings file not detected. Using plugin defaults");
                 var nullsettings = new Dictionary<string, string>();
                 Reconfigure(nullsettings);
                 BrewOrder.Reconfigure(nullsettings);
-                Boiler.Reconfigure(nullsettings);
-                Stirrer.Reconfigure(nullsettings);
-                Larder.Reconfigure(nullsettings);
-                Grinder.Reconfigure(nullsettings);
-                Pourer.Reconfigure(nullsettings);
+                BellowsOverseer.Reconfigure(nullsettings);
+                CauldronOverseer.Reconfigure(nullsettings);
+                InventoryOverseer.Reconfigure(nullsettings);
+                MortarOverseer.Reconfigure(nullsettings);
+                SolventOverseer.Reconfigure(nullsettings);
                 return false;
             }
 
@@ -232,25 +233,24 @@ namespace AutoBrew
                 BrewOrder.Reconfigure(newSettings);
 
                 newSettings = jsonData["Bellows"].ToObject<Dictionary<string, string>>();
-                Boiler.Reconfigure(newSettings);
+                BellowsOverseer.Reconfigure(newSettings);
                 Boiler.Reset();
 
                 newSettings = jsonData["Cauldron"].ToObject<Dictionary<string, string>>();
-                Stirrer.Reconfigure(newSettings);
+                CauldronOverseer.Reconfigure(newSettings);
                 Stirrer.Reset();
 
                 newSettings = jsonData["Inventory"].ToObject<Dictionary<string, string>>();
-                Larder.Reconfigure(newSettings);
+                InventoryOverseer.Reconfigure(newSettings);
                 Larder.Reset();
 
                 newSettings = jsonData["Mortar"].ToObject<Dictionary<string, string>>();
-                Grinder.Reconfigure(newSettings);
+                MortarOverseer.Reconfigure(newSettings);
                 Grinder.Reset();
 
                 newSettings = jsonData["Solvent"].ToObject<Dictionary<string, string>>();
-                Pourer.Reconfigure(newSettings);
+                SolventOverseer.Reconfigure(newSettings);
                 Pourer.Reset();
-
             }
             catch (JsonReaderException e)
             {

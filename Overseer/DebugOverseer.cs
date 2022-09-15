@@ -6,8 +6,6 @@ namespace AutoBrew.Overseer
     {
         private BrewOrder _order;
         
-        public override void Reconfigure(Dictionary<string, string> data) { }
-
         public override void Reset()
         {
             _order = null;

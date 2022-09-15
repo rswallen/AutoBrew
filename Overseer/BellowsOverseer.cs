@@ -12,19 +12,19 @@ namespace AutoBrew.Overseer
 {
     internal class BellowsOverseer : BaseOverseer
     {
-        private float _sparkAmount;
-        private float _vortexBellowsDuration;
-        private float _effectBellowsDuration;
-        private float _bellowsMinMin;
+        private static float _sparkAmount;
+        private static float _vortexBellowsDuration;
+        private static float _effectBellowsDuration;
+        private static float _bellowsMinMin;
 
-        private float _bellowsMin = 331.5f;
-        private float _bellowsMax = 352.5f;
-        private float _bellowsRange;
+        private static float _bellowsMin = 331.5f;
+        private static float _bellowsMax = 352.5f;
+        private static float _bellowsRange;
 
-        private float _tolerance;
-        private Vector3 _pidValues;
-        private float _heatMin;
-        private float _heatMax;
+        private static float _tolerance;
+        private static Vector3 _pidValues;
+        private static float _heatMin;
+        private static float _heatMax;
         
         private BrewOrder _order;
         private PIDController _pidControl;
@@ -43,7 +43,7 @@ namespace AutoBrew.Overseer
         private float _bellowsMinMax;
         private float _bellowsProgress;
 
-        public override void Reconfigure(Dictionary<string, string> data)
+        public static void Reconfigure(Dictionary<string, string> data)
         {
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkAmount", out _sparkAmount, 10f, false);
             ABSettings.GetFloat(nameof(BellowsOverseer), data, "SparkIntervalOn", out _vortexBellowsDuration, 1.6f, false);
