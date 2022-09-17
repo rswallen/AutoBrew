@@ -60,6 +60,7 @@ namespace AutoBrew.Overseer
             _stirredTotal = 0;
             _pidControl = new(_pidValues);
             _gtLastUpdate = Time.timeAsDouble;
+            _inSwamp = false;
             base.Setup(order);
         }
 
@@ -178,7 +179,7 @@ namespace AutoBrew.Overseer
                 }
 
                 float delta = (value / multiplier);
-                delta *= Settings<RecipeMapManagerIndicatorSettings>.Asset.indicatorInSwampSpeed;
+                delta *= _inSwamp ? Settings<RecipeMapManagerIndicatorSettings>.Asset.indicatorInSwampSpeed : 1f;
                 _stirredTotal += delta;
                 _gtLastUpdate = Time.timeAsDouble;
             }
