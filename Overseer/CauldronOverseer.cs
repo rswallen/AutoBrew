@@ -16,6 +16,7 @@ namespace AutoBrew.Overseer
         private static Vector3 _pidValues;
         private static double _speedMin;
         private static double _speedMax;
+        private static double _intervalMaxUpdate;
         private static Vector2 _stirTotalScalar;
         private static Vector2 _spoonPosScalar;
         private static Vector2 _spoonPosOffset;
@@ -25,6 +26,7 @@ namespace AutoBrew.Overseer
         private PIDController _pidControl;
         private double _stirredTotal;
         private double _lastPIDVal;
+        private double _gtLastUpdate;
 
         public static void Reconfigure(Dictionary<string, string> data)
         {
@@ -32,6 +34,7 @@ namespace AutoBrew.Overseer
             ABSettings.GetVector3(nameof(CauldronOverseer), data, "PIDValues", out _pidValues, new Vector3(0.075f, 0.001f, 0.05f));
             ABSettings.GetDouble(nameof(CauldronOverseer), data, "SpeedMin", out _speedMin, 0.001f);
             ABSettings.GetDouble(nameof(CauldronOverseer), data, "SpeedMax", out _speedMax, 0.8f);
+            ABSettings.GetDouble(nameof(CauldronOverseer), data, "MaxUpdateInterval", out _intervalMaxUpdate, 1.0f);
             ABSettings.GetVector2(nameof(CauldronOverseer), data, "StirTotalScalar", out _stirTotalScalar, new Vector2(2.0f, 0.2f));
             ABSettings.GetVector2(nameof(CauldronOverseer), data, "SpoonPosScalar", out _spoonPosScalar, new Vector2(2.0f, 0.2f));
             ABSettings.GetVector2(nameof(CauldronOverseer), data, "SpoonPosOffset", out _spoonPosOffset, new Vector2(0.0f, 3.0f));
@@ -50,6 +53,7 @@ namespace AutoBrew.Overseer
             _order = order;
             _stirredTotal = 0;
             _pidControl = new(_pidValues);
+            _gtLastUpdate = Time.timeAsDouble;
             base.Setup(order);
         }
 
@@ -60,6 +64,13 @@ namespace AutoBrew.Overseer
                 return;
             }
             UpdateSpoonPos();
+
+            double interval = Time.timeAsDouble - _gtLastUpdate;
+            if (interval >= _intervalMaxUpdate)
+            {
+                Stage = OverseerStage.Complete;
+                return;
+            }
         }
 
         public override void LogStatus()
@@ -160,6 +171,7 @@ namespace AutoBrew.Overseer
                 }
                 float delta = (value / multiplier);
                 _stirredTotal += delta;
+                _gtLastUpdate = Time.timeAsDouble;
             }
         }
 
