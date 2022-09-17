@@ -2,8 +2,11 @@
 using HarmonyLib;
 using PotionCraft.Core.Extensions;
 using PotionCraft.ManagersSystem;
+using PotionCraft.ManagersSystem.RecipeMap;
 using PotionCraft.ObjectBased.Cauldron;
+using PotionCraft.ObjectBased.RecipeMap.RecipeMapItem.Zones;
 using PotionCraft.ObjectBased.Spoon;
+using PotionCraft.Settings;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +19,7 @@ namespace AutoBrew.Overseer
         private static Vector3 _pidValues;
         private static double _speedMin;
         private static double _speedMax;
+        private static double _swampSpeedScalar;
         private static double _intervalMaxUpdate;
         private static Vector2 _stirTotalScalar;
         private static Vector2 _spoonPosScalar;
@@ -27,6 +31,7 @@ namespace AutoBrew.Overseer
         private double _stirredTotal;
         private double _lastPIDVal;
         private double _gtLastUpdate;
+        private bool _inSwamp;
 
         public static void Reconfigure(Dictionary<string, string> data)
         {
@@ -34,6 +39,7 @@ namespace AutoBrew.Overseer
             ABSettings.GetVector3(nameof(CauldronOverseer), data, "PIDValues", out _pidValues, new Vector3(0.075f, 0.001f, 0.05f));
             ABSettings.GetDouble(nameof(CauldronOverseer), data, "SpeedMin", out _speedMin, 0.001f);
             ABSettings.GetDouble(nameof(CauldronOverseer), data, "SpeedMax", out _speedMax, 0.8f);
+            ABSettings.GetDouble(nameof(CauldronOverseer), data, "SwampSpeedScalar", out _swampSpeedScalar, 0.6f);
             ABSettings.GetDouble(nameof(CauldronOverseer), data, "MaxUpdateInterval", out _intervalMaxUpdate, 1.0f);
             ABSettings.GetVector2(nameof(CauldronOverseer), data, "StirTotalScalar", out _stirTotalScalar, new Vector2(2.0f, 0.2f));
             ABSettings.GetVector2(nameof(CauldronOverseer), data, "SpoonPosScalar", out _spoonPosScalar, new Vector2(2.0f, 0.2f));
@@ -156,9 +162,10 @@ namespace AutoBrew.Overseer
                 bowl.StirringValue = 0f;
                 return;
             }
-
+            _inSwamp = (ZonePart.GetZonesActivePartsCount(typeof(SwampZonePart)) > 0);
             _lastPIDVal = _pidControl.GetStep(_order.Target, _stirredTotal, Time.deltaTime);
-            bowl.StirringValue = (float)_lastPIDVal.Clamp(_speedMin, _speedMax);
+            double max = _speedMax * (_inSwamp ? _swampSpeedScalar : 1.0);
+            bowl.StirringValue = (float)_lastPIDVal.Clamp(_speedMin, max);
         }
 
         public void AddSpoonAmount(float value, float multiplier)
@@ -169,7 +176,9 @@ namespace AutoBrew.Overseer
                 {
                     return;
                 }
+
                 float delta = (value / multiplier);
+                delta *= Settings<RecipeMapManagerIndicatorSettings>.Asset.indicatorInSwampSpeed;
                 _stirredTotal += delta;
                 _gtLastUpdate = Time.timeAsDouble;
             }
