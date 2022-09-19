@@ -203,22 +203,6 @@ namespace AutoBrew.Overseer
                     return;
                 }
 
-                int fixedCount = Managers.RecipeMap.path.fixedPathHints?.Count ?? 0;
-                if (fixedCount > 0)
-                {
-                    var hint = Managers.RecipeMap.path.fixedPathHints[0];
-                    if (hint is TeleportationFixedHint teleHint)
-                    {
-                        if (teleHint.isIndicatorMovingAlongPath)
-                        {
-                            // we only get one mark added at the start of using a crystal path
-                            // but as we do the tracking elsewhere, ignore it
-                            Log.LogInfo("Ignoring teleport mark");
-                            return;
-                        }
-                    }
-                }
-
                 float delta = (value / multiplier);
                 delta *= _inSwamp ? (1 - Settings<RecipeMapManagerIndicatorSettings>.Asset.indicatorInSwampPathDeletion) : 1f;
                 _stirredTotal += delta;
