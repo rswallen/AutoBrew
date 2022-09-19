@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using PotionCraft.LocalizationSystem;
 using PotionCraft.ManagersSystem;
+using PotionCraft.ObjectBased.InteractiveItem;
 using PotionCraft.ObjectBased.PhysicalParticle;
 using PotionCraft.ObjectBased.Potion;
 using PotionCraft.ObjectBased.Salt;
@@ -22,7 +23,9 @@ namespace AutoBrew.Overseer
 
         private static Vector2 _ingredientSpawnPos;
         private static Vector2 _saltItemSpawnPos;
-        private static Vector2 _cauldronOffset;
+        private static Vector2 _cauldronSaltOffset;
+        private static Vector2 _cauldronThrowPos;
+        private static Vector2 _mortarThrowPos;
         private static bool _alwaysDissolve;
 
         private BrewOrder _order;
@@ -33,7 +36,9 @@ namespace AutoBrew.Overseer
         {
             ABSettings.GetVector2(nameof(InventoryOverseer), data, "IngSpawnPos", out _ingredientSpawnPos, new Vector2(7.275f, 2.375f), false);
             ABSettings.GetVector2(nameof(InventoryOverseer), data, "SaltSpawnPos", out _saltItemSpawnPos, new Vector2(5.7f, -5.3f), false);
-            ABSettings.GetVector2(nameof(InventoryOverseer), data, "CauldronOffset", out _cauldronOffset, new Vector2(0f, 5f), false);
+            ABSettings.GetVector2(nameof(InventoryOverseer), data, "CauldronSaltOffset", out _cauldronSaltOffset, new Vector2(0f, 5f), false);
+            ABSettings.GetVector2(nameof(InventoryOverseer), data, "CauldronThrowPos", out _cauldronThrowPos, new Vector2(0f, 0f), false);
+            ABSettings.GetVector2(nameof(InventoryOverseer), data, "MortarThrowPos", out _mortarThrowPos, new Vector2(0f, 0f), false);
             ABSettings.GetBool(nameof(InventoryOverseer), data, "AlwaysDissolve", out _alwaysDissolve, true, false);
         }
 
@@ -228,16 +233,18 @@ namespace AutoBrew.Overseer
             switch (target)
             {
                 case StackThrowerTarget.ToMortar:
-                    {
-                        StackThrower.TryThrowToMortar(null, _ingredientSpawnPos, item, Managers.Player.inventoryPanel);
-                        break;
-                    }
+                {
+                    Vector2 throwPos = _mortarThrowPos + (Vector2)Managers.Ingredient.mortar.transform.position;
+                    StackThrower.TryThrowTo(null, item, throwPos, _ingredientSpawnPos, Managers.Player.inventoryPanel, true, true);
+                    break;
+                }
                 case StackThrowerTarget.ToCauldron:
-                    {
-                        StackThrower.TryThrowToCauldron(null, _ingredientSpawnPos, item, Managers.Player.inventoryPanel);
-                        break;
-                    }
-                default: break;
+                {
+                    Vector2 throwPos = _cauldronThrowPos + (Vector2)Managers.Ingredient.cauldron.transform.position;
+                    StackThrower.TryThrowTo(null, item, throwPos, _ingredientSpawnPos, Managers.Player.inventoryPanel, true, true);
+                    break;
+                }
+                default: return false;
             }
             
             Managers.Player.inventory.RemoveItem(item, 1);
@@ -270,7 +277,7 @@ namespace AutoBrew.Overseer
         private bool SpawnSaltParticle(SaltItem item)
         {
             Vector2 cauldronPos = Managers.Ingredient.cauldron.transform.localPosition;
-            Vector2 spawnPos = cauldronPos + _cauldronOffset;
+            Vector2 spawnPos = cauldronPos + _cauldronSaltOffset;
             float randAngle = UnityEngine.Random.Range(-150f, -30f);
             Vector2 impulse = item.GetSpawnVelocity(randAngle, 1f);
             PhysicalParticle.SpawnSaltParticle((Salt)item.inventoryItem, spawnPos, impulse);
