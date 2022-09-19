@@ -232,29 +232,7 @@ namespace AutoBrew.Overseer
             {
                 dAngle = _sparkAmount;
             }
-            /*
-            switch (_mode.Stage)
-            {
-                case BrewStage.HeatVortex:
-                {
-                    float interval = _sparksActive ? _sparkIntervalOn : _sparkIntervalOff;
-                    double gtNextChange = _gtLastSparkChange + interval;
-                    if (gtNextChange < Time.timeAsDouble)
-                    {
-                        _sparksActive = !_sparksActive;
-                        _gtLastSparkChange = Time.timeAsDouble;
                     }
-                    dAngle = _sparksActive ? _sparkAmount : 0f;
-                    return;
-                }
-                case BrewStage.AddEffect:
-                {
-                    dAngle = _sparkAmount;
-                    return;
-                }
-            }
-            */
-        }
 
         public void MoveIndicatorTowardsVortex()
         {
