@@ -39,7 +39,6 @@ namespace AutoBrew.PlotterConverter
 
         public double ConvertHeatVortexLengthToDegrees(double target, out int counter)
         {
-            bool teleport = false;
             double length = 0.0f;
             float lastAngle = 0f;
             int fullRotCount = 0;
@@ -49,7 +48,8 @@ namespace AutoBrew.PlotterConverter
             {
                 if (!GetNextPos(out Vector2 nextPos))
                 {
-                    teleport = true;
+                    // if simulation teleported, bump this by a couple of rotations to make sure autobrew teleports
+                    fullRotCount += 2;
                     break;
                 }
                 float angle = Vector2.SignedAngle(_startOffset, nextPos);
@@ -63,10 +63,6 @@ namespace AutoBrew.PlotterConverter
                 lastAngle = angle;
             }
 
-            if (teleport)
-            {
-                return -800f * Mathf.Sign(_asset.vortexSpiralStep);
-            }
             return fullRotCount * -360.0 * Mathf.Sign(_asset.vortexSpiralStep) + lastAngle;
         }
 
