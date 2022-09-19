@@ -179,7 +179,7 @@ namespace AutoBrew.Overseer
                 }
 
                 float delta = (value / multiplier);
-                delta *= _inSwamp ? Settings<RecipeMapManagerIndicatorSettings>.Asset.indicatorInSwampSpeed : 1f;
+                delta *= _inSwamp ? (1 - Settings<RecipeMapManagerIndicatorSettings>.Asset.indicatorInSwampPathDeletion) : 1f;
                 _stirredTotal += delta;
                 _gtLastUpdate = Time.timeAsDouble;
             }
