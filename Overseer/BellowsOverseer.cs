@@ -38,6 +38,7 @@ namespace AutoBrew.Overseer
         private int _effectTier;
         private double _lastPIDVal;
         private float _lastHeat;
+        private bool _wasTeleporting;
 
         private bool _bellowsActive;
         private float _bellowsMinMax;
@@ -68,7 +69,7 @@ namespace AutoBrew.Overseer
             _order = order;
             _heatedTotal = 0f;
             _pidControl = new(_pidValues);
-
+            _wasTeleporting = false;
             _bellowsActive = false;
             _bellowsRange = _bellowsMax - _bellowsMin;
 
@@ -197,7 +198,10 @@ namespace AutoBrew.Overseer
                     double diff = Math.Abs(_heatTarget) - Math.Abs(_heatedTotal);
                     if (diff <= _tolerance)
                     {
-                        Stage = OverseerStage.Complete;
+                        if (_wasTeleporting && !Managers.RecipeMap.indicator.IsIndicatorTeleporting())
+                        {
+                            Stage = OverseerStage.Complete;
+                        }
                         Managers.Ingredient.coals.Heat = 0f;
                         return;
                     }
@@ -232,7 +236,7 @@ namespace AutoBrew.Overseer
             {
                 dAngle = _sparkAmount;
             }
-                    }
+        }
 
         public void MoveIndicatorTowardsVortex()
         {
@@ -245,7 +249,11 @@ namespace AutoBrew.Overseer
             {
                 // if potion teleports, assume 100% accuracy
                 _heatedTotal = _heatTarget;
-                Stage = OverseerStage.Complete;
+                _wasTeleporting = true;
+                return;
+            }
+            else if (_wasTeleporting)
+            {
                 return;
             }
 
@@ -281,6 +289,11 @@ namespace AutoBrew.Overseer
         public void UpdateBellowsRotation()
         {
             var z = Managers.Ingredient.coals.top.transform.rotation.eulerAngles.z;
+            if (_wasTeleporting == false)
+            {
+                _bellowsActive = false;
+                return;
+            }
 
             if (!_bellowsActive)
             {
