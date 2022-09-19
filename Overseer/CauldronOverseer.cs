@@ -81,11 +81,15 @@ namespace AutoBrew.Overseer
                     if (teleHint.isIndicatorMovingAlongPath)
                     {
                         // 1 - movingalongpathstatus = percent remaining
-                        // percent remaining * total length of path = max
-                        float progress = 1f - teleHint.MovingAlongPathStatus;
-                        float maxDistance = progress * teleHint.graphicsPathLengthOnTeleportationAnimationStart;
+                        // percent remaining * total length of path = distance remaining
+                        // teleport speed * deltaTime = (speed * time = distance) = distance moved in deltatime interval
+                        // clamp frameDistance between 0 and distance remaining and add it to stirred total
+                        // record that we made an update
+
+                        float percentLeft = 1f - teleHint.MovingAlongPathStatus;
+                        float distanceLeft = percentLeft * teleHint.graphicsPathLengthOnTeleportationAnimationStart;
                         float frameDistance = Managers.RecipeMap.indicator.teleportationAnimator.GetMovingSpeed() * Time.deltaTime;
-                        _stirredTotal += Mathf.Clamp(frameDistance, 0f, maxDistance);
+                        _stirredTotal += Mathf.Clamp(frameDistance, 0f, distanceLeft);
                         _gtLastUpdate = Time.timeAsDouble;
                     }
                 }
