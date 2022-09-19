@@ -4,6 +4,7 @@ using PotionCraft.Core.Extensions;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ManagersSystem.RecipeMap;
 using PotionCraft.ObjectBased.Cauldron;
+using PotionCraft.ObjectBased.RecipeMap.Path;
 using PotionCraft.ObjectBased.RecipeMap.RecipeMapItem.Zones;
 using PotionCraft.ObjectBased.Spoon;
 using PotionCraft.Settings;
@@ -70,8 +71,28 @@ namespace AutoBrew.Overseer
             {
                 return;
             }
-            UpdateSpoonPos();
 
+            int fixedCount = Managers.RecipeMap.path.fixedPathHints?.Count ?? 0;
+            if (fixedCount > 0)
+            {
+                var hint = Managers.RecipeMap.path.fixedPathHints[0];
+                if (hint is TeleportationFixedHint teleHint)
+                {
+                    if (teleHint.isIndicatorMovingAlongPath)
+                    {
+                        // 1 - movingalongpathstatus = percent remaining
+                        // percent remaining * total length of path = max
+                        float progress = 1f - teleHint.MovingAlongPathStatus;
+                        float maxDistance = progress * teleHint.graphicsPathLengthOnTeleportationAnimationStart;
+                        float frameDistance = Managers.RecipeMap.indicator.teleportationAnimator.GetMovingSpeed() * Time.deltaTime;
+                        _stirredTotal += Mathf.Clamp(frameDistance, 0f, maxDistance);
+                        _gtLastUpdate = Time.timeAsDouble;
+                    }
+                }
+            }
+
+            UpdateSpoonPos();
+            
             double interval = Time.timeAsDouble - _gtLastUpdate;
             if (interval >= _intervalMaxUpdate)
             {
@@ -176,6 +197,22 @@ namespace AutoBrew.Overseer
                 if (value.Is(0f))
                 {
                     return;
+                }
+
+                int fixedCount = Managers.RecipeMap.path.fixedPathHints?.Count ?? 0;
+                if (fixedCount > 0)
+                {
+                    var hint = Managers.RecipeMap.path.fixedPathHints[0];
+                    if (hint is TeleportationFixedHint teleHint)
+                    {
+                        if (teleHint.isIndicatorMovingAlongPath)
+                        {
+                            // we only get one mark added at the start of using a crystal path
+                            // but as we do the tracking elsewhere, ignore it
+                            Log.LogInfo("Ignoring teleport mark");
+                            return;
+                        }
+                    }
                 }
 
                 float delta = (value / multiplier);
