@@ -24,7 +24,7 @@ namespace AutoBrew.JsonObjects
             {
                 switch (order.Order)
                 {
-                    case BrewStage.AddIngredient:
+                    case BrewOrderType.AddIngredient:
                         {
                             var ingOrder = order.GetBrewOrder();
                             if (ingOrder == null)
@@ -33,14 +33,14 @@ namespace AutoBrew.JsonObjects
                                 break;
                             }
                             method.AddOrder(ingOrder);
-                            method.AddOrder(order.GetBrewOrder(BrewStage.GrindPercent));
+                            method.AddOrder(order.GetBrewOrder(BrewOrderType.GrindPercent));
                             break;
                         }
-                    case BrewStage.StirCauldron:
-                    case BrewStage.PourSolvent:
-                    case BrewStage.HeatVortex:
-                    case BrewStage.AddSalt:
-                    case BrewStage.AddEffect:
+                    case BrewOrderType.StirCauldron:
+                    case BrewOrderType.PourSolvent:
+                    case BrewOrderType.HeatVortex:
+                    case BrewOrderType.AddSalt:
+                    case BrewOrderType.AddEffect:
                         {
                             var bOrder = order.GetBrewOrder();
                             if (bOrder == null)

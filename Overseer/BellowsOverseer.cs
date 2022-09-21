@@ -75,7 +75,7 @@ namespace AutoBrew.Overseer
 
             switch (order.Stage)
             {
-                case BrewStage.HeatVortex:
+                case BrewOrderType.HeatVortex:
                 {
                     if (Managers.RecipeMap.currentVortexMapItem == null)
                     {
@@ -101,7 +101,7 @@ namespace AutoBrew.Overseer
                     }
                     break;
                 }
-                case BrewStage.AddEffect:
+                case BrewOrderType.AddEffect:
                 {
                     _gtEffectStart = Time.time;
                     break;
@@ -125,14 +125,14 @@ namespace AutoBrew.Overseer
 
             switch (_order.Stage)
             {
-                case BrewStage.HeatVortex:
+                case BrewOrderType.HeatVortex:
                 {
                     Vector2 indicCurrentPos = Managers.RecipeMap.recipeMapObject.indicatorContainer.localPosition;
                     Vector2 indicOffset = indicCurrentPos - _vortexPos;
                     Log.LogInfo($"HeatStatus: Rotation - {_heatedTotal} | StartPos - {_indicStartOffset} | EndPos - {indicOffset} | Magnitude - {indicOffset.magnitude}");
                     return;
                 }
-                case BrewStage.AddEffect:
+                case BrewOrderType.AddEffect:
                 {
                     Log.LogInfo($"HeatStatus: {Managers.Ingredient.coals.Heat:P2}");
                     return;
@@ -146,7 +146,7 @@ namespace AutoBrew.Overseer
             {
                 switch(_order.Stage)
                 {
-                    case BrewStage.HeatVortex:
+                    case BrewOrderType.HeatVortex:
                     {
                         // degree (unicode): \u00B0
                         if (_heatTarget == 0f)
@@ -158,7 +158,7 @@ namespace AutoBrew.Overseer
                             return _heatedTotal / _heatTarget;
                         }
                     }
-                    case BrewStage.AddEffect:
+                    case BrewOrderType.AddEffect:
                     {
                         if (_order.Target == 0f)
                         {
@@ -177,7 +177,7 @@ namespace AutoBrew.Overseer
             {
                 switch (_order.Stage)
                 {
-                    case BrewStage.HeatVortex: { return _heatTarget - _heatedTotal; }
+                    case BrewOrderType.HeatVortex: { return _heatTarget - _heatedTotal; }
                     default: { return 0; }
                 }
             }
@@ -193,7 +193,7 @@ namespace AutoBrew.Overseer
             UpdateBellowsRotation();
             switch (_order.Stage)
             {
-                case BrewStage.HeatVortex:
+                case BrewOrderType.HeatVortex:
                 {
                     double diff = Math.Abs(_heatTarget) - Math.Abs(_heatedTotal);
                     if (diff <= _tolerance)
@@ -211,7 +211,7 @@ namespace AutoBrew.Overseer
                     Managers.Ingredient.coals.Heat = _lastHeat;
                     return;
                 }
-                case BrewStage.AddEffect:
+                case BrewOrderType.AddEffect:
                 {
                     if (_heatedTotal >= 1.5f)
                     {
@@ -276,7 +276,7 @@ namespace AutoBrew.Overseer
 
         public void CollectEffect(int tier)
         {
-            if ((Stage != OverseerStage.Active) || (_order.Stage != BrewStage.AddEffect))
+            if ((Stage != OverseerStage.Active) || (_order.Stage != BrewOrderType.AddEffect))
             {
                 return;
             }
@@ -308,7 +308,7 @@ namespace AutoBrew.Overseer
                 float newZ;
                 switch (_order.Stage)
                 {
-                    case BrewStage.HeatVortex:
+                    case BrewOrderType.HeatVortex:
                     {
                         // we want uniform speed, so lerp between min and max bellows angles
                         _bellowsProgress += Time.deltaTime / _vortexBellowsDuration;
@@ -325,7 +325,7 @@ namespace AutoBrew.Overseer
                         newZ = Mathf.Clamp(newZ, _bellowsMin, _bellowsMinMax);
                         break;
                     }
-                    case BrewStage.AddEffect:
+                    case BrewOrderType.AddEffect:
                     {
                         _bellowsProgress += Time.deltaTime / (_effectBellowsDuration * 0.2f);
                         _bellowsMinMax = _bellowsMax;

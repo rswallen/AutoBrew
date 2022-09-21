@@ -45,12 +45,12 @@ namespace AutoBrew
             ABSettings.GetFloat("BrewOrder", data, "SaltSaltMult", out _saltSaltMult, 0.1f, false);
         }
 
-        public readonly BrewStage Stage;
+        public readonly BrewOrderType Stage;
         public readonly double Target;
         public readonly InventoryItem Item;
         public readonly int Version;
 
-        public BrewOrder(BrewStage stage, double target = 0f, int version = -1, InventoryItem item = null)
+        public BrewOrder(BrewOrderType stage, double target = 0f, int version = -1, InventoryItem item = null)
         {
             Stage = stage;
             Target = target;
@@ -64,31 +64,31 @@ namespace AutoBrew
         {
             switch (Stage)
             {
-                case BrewStage.AddIngredient:
+                case BrewOrderType.AddIngredient:
                 {
                     return _ingSaltBase;
                 }
-                case BrewStage.GrindPercent:
+                case BrewOrderType.GrindPercent:
                 {
                     return _grindSaltBase + (int)Math.Ceiling(_grindSaltMult * Target);
                 }
-                case BrewStage.StirCauldron:
+                case BrewOrderType.StirCauldron:
                 {
                     return _stirSaltBase + (int)Math.Ceiling(_stirSaltMult * Target);
                 }
-                case BrewStage.PourSolvent:
+                case BrewOrderType.PourSolvent:
                 {
                     return _pourSaltBase + (int)Math.Ceiling(_pourSaltMult * Target);
                 }
-                case BrewStage.HeatVortex:
+                case BrewOrderType.HeatVortex:
                 {
                     return _heatSaltBase + (int)Math.Ceiling(_heatSaltMult * Target);
                 }
-                case BrewStage.AddSalt:
+                case BrewOrderType.AddSalt:
                 {
                     return _saltSaltBase + (int)Math.Ceiling(_saltSaltMult * Target);
                 }
-                case BrewStage.AddEffect:
+                case BrewOrderType.AddEffect:
                 {
                     return _effectSaltBase;
                 }
@@ -100,31 +100,31 @@ namespace AutoBrew
         {
             switch (Stage)
             {
-                case BrewStage.AddIngredient:
+                case BrewOrderType.AddIngredient:
                 {
                     return _brewOrderFailAddIng;
                 }
-                case BrewStage.GrindPercent:
+                case BrewOrderType.GrindPercent:
                 {
                     return _brewOrderFailGrind;
                 }
-                case BrewStage.StirCauldron:
+                case BrewOrderType.StirCauldron:
                 {
                     return _brewOrderFailStir;
                 }
-                case BrewStage.PourSolvent:
+                case BrewOrderType.PourSolvent:
                 {
                     return _brewOrderFailPour;
                 }
-                case BrewStage.HeatVortex:
+                case BrewOrderType.HeatVortex:
                 {
                     return _brewOrderFailHeat;
                 }
-                case BrewStage.AddSalt:
+                case BrewOrderType.AddSalt:
                 {
                     return _brewOrderFailAddSalt;
                 }
-                case BrewStage.AddEffect:
+                case BrewOrderType.AddEffect:
                 {
                     return _brewOrderFailEffect;
                 }

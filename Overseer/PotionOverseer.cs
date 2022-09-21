@@ -71,12 +71,12 @@ namespace AutoBrew.Overseer
             BrewMaster.GetCurrentInstruction(out var order);
             switch (order.Stage)
             {
-                case BrewStage.AddIngredient:
+                case BrewOrderType.AddIngredient:
                 {
                     BrewMaster.Larder.AddIngredientMark(ingredient, grindStatus);
                     break;
                 }
-                case BrewStage.GrindPercent:
+                case BrewOrderType.GrindPercent:
                 {
                     BrewMaster.Grinder.AddIngredientMark(ingredient, grindStatus);
                     break;

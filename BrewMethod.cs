@@ -103,7 +103,7 @@ namespace AutoBrew
             {
                 switch (order.Order)
                 {
-                    case BrewStage.AddIngredient:
+                    case BrewOrderType.AddIngredient:
                     {
                         var ingOrder = order.GetBrewOrder();
                         if (ingOrder == null)
@@ -114,15 +114,15 @@ namespace AutoBrew
                         AddOrder(ingOrder);
                         if (!ingOrder.Target.Is(0.0))
                         {
-                            AddOrder(order.GetBrewOrder(BrewStage.GrindPercent));
+                            AddOrder(order.GetBrewOrder(BrewOrderType.GrindPercent));
                         }
                         break;
                     }
-                    case BrewStage.StirCauldron:
-                    case BrewStage.PourSolvent:
-                    case BrewStage.HeatVortex:
-                    case BrewStage.AddSalt:
-                    case BrewStage.AddEffect:
+                    case BrewOrderType.StirCauldron:
+                    case BrewOrderType.PourSolvent:
+                    case BrewOrderType.HeatVortex:
+                    case BrewOrderType.AddSalt:
+                    case BrewOrderType.AddEffect:
                     {
                         var bOrder = order.GetBrewOrder();
                         if (bOrder == null)
@@ -173,8 +173,8 @@ namespace AutoBrew
             {
                 switch (order.Stage)
                 {
-                    case BrewStage.AddIngredient:
-                    case BrewStage.AddSalt:
+                    case BrewOrderType.AddIngredient:
+                    case BrewOrderType.AddSalt:
                     {
                         items.TryGetValue(order.Item, out int current);
                         items[order.Item] = current + 1;

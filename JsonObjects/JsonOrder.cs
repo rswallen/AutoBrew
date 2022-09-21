@@ -10,7 +10,7 @@ namespace AutoBrew.JsonObjects
 {
     internal class JsonOrder
     {
-        public BrewStage Order = BrewStage.Idle;
+        public BrewOrderType Order = BrewOrderType.Idle;
         public InventoryItem InvItem = null;
 
         [JsonProperty("order")]
@@ -38,14 +38,14 @@ namespace AutoBrew.JsonObjects
             return GetBrewOrder(Order);
         }
 
-        public BrewOrder GetBrewOrder(BrewStage type)
+        public BrewOrder GetBrewOrder(BrewOrderType type)
         {
             if (Target < 0.0) return null;
 
             switch (type)
             {
-                case BrewStage.AddIngredient:
-                case BrewStage.GrindPercent:
+                case BrewOrderType.AddIngredient:
+                case BrewOrderType.GrindPercent:
                 {
                     if (InvItem is not Ingredient)
                     {
@@ -53,7 +53,7 @@ namespace AutoBrew.JsonObjects
                     }
                     return new BrewOrder(type, Target.Clamp01(), Version, InvItem);
                 }
-                case BrewStage.AddSalt:
+                case BrewOrderType.AddSalt:
                 {
                     if ((InvItem is not Salt) || (Target < 1.0))
                     {
@@ -61,13 +61,13 @@ namespace AutoBrew.JsonObjects
                     }
                     return new BrewOrder(type, Target, Version, InvItem);
                 }
-                case BrewStage.HeatVortex:
+                case BrewOrderType.HeatVortex:
                 {
                     return !PlotterVortex.IsValidVersion(Version) ? null : new BrewOrder(type, Target, Version, null);
                 }
-                case BrewStage.StirCauldron:
-                case BrewStage.PourSolvent:
-                case BrewStage.AddEffect:
+                case BrewOrderType.StirCauldron:
+                case BrewOrderType.PourSolvent:
+                case BrewOrderType.AddEffect:
                 {
                     return new BrewOrder(type, Target, Version, null);
                 }

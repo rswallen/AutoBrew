@@ -416,25 +416,25 @@ namespace AutoBrew
         {
             switch (order.Stage)
             {
-                case BrewStage.AddIngredient:
-                case BrewStage.AddSalt:
+                case BrewOrderType.AddIngredient:
+                case BrewOrderType.AddSalt:
                 {
                     return Larder;
                 }
-                case BrewStage.GrindPercent:
+                case BrewOrderType.GrindPercent:
                 {
                     return Grinder;
                 }
-                case BrewStage.StirCauldron:
+                case BrewOrderType.StirCauldron:
                 {
                     return Stirrer;
                 }
-                case BrewStage.PourSolvent:
+                case BrewOrderType.PourSolvent:
                 {
                     return Pourer;
                 }
-                case BrewStage.HeatVortex:
-                case BrewStage.AddEffect:
+                case BrewOrderType.HeatVortex:
+                case BrewOrderType.AddEffect:
                 {
                     return Boiler;
                 }
@@ -485,7 +485,7 @@ namespace AutoBrew
         }
     }
 
-    public enum BrewStage
+    public enum BrewOrderType
     {
         Idle,
         AddIngredient,

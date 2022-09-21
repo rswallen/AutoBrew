@@ -55,8 +55,8 @@ namespace AutoBrew.Overseer
         {
             switch (order.Stage)
             {
-                case BrewStage.AddIngredient:
-                case BrewStage.AddSalt:
+                case BrewOrderType.AddIngredient:
+                case BrewOrderType.AddSalt:
                 {
                     break;
                 }
@@ -79,7 +79,7 @@ namespace AutoBrew.Overseer
 
             switch (_order.Stage)
             {
-                case BrewStage.AddIngredient:
+                case BrewOrderType.AddIngredient:
                 {
                     if (!_thingThrown)
                     {
@@ -120,7 +120,7 @@ namespace AutoBrew.Overseer
                     }
                     return;
                 }
-                case BrewStage.AddSalt:
+                case BrewOrderType.AddSalt:
                 {
                     int remaining = (int)_order.Target - _saltAdded;
                     if (remaining <= 0)
@@ -167,11 +167,11 @@ namespace AutoBrew.Overseer
             {
                 switch (_order.Stage)
                 {
-                    case BrewStage.AddIngredient:
+                    case BrewOrderType.AddIngredient:
                     {
                         return 1.0;
                     }
-                    case BrewStage.AddSalt:
+                    case BrewOrderType.AddSalt:
                     {
                         if (_order.Target == 0f)
                         {
@@ -190,11 +190,11 @@ namespace AutoBrew.Overseer
             {
                 switch (_order.Stage)
                 {
-                    case BrewStage.AddIngredient:
+                    case BrewOrderType.AddIngredient:
                     {
                         return 0.0;
                     }
-                    case BrewStage.AddSalt:
+                    case BrewOrderType.AddSalt:
                     {
                         if (_order.Target == 0f)
                         {
@@ -346,7 +346,7 @@ namespace AutoBrew.Overseer
                 return;
             }
 
-            if ((Stage != OverseerStage.Active) || (_order.Stage != BrewStage.AddSalt))
+            if ((Stage != OverseerStage.Active) || (_order.Stage != BrewOrderType.AddSalt))
             {
                 // should probably abort here
                 return;
