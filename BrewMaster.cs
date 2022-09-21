@@ -151,6 +151,19 @@ namespace AutoBrew
             }
         }
 
+        public static void InitBrew()
+        {
+            PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
+            if (PlotterUrlDecoder.IsPlotterURL(customizer.currentDescriptionText))
+            {
+                InitBrewFromPlotterURL();
+            }
+            else
+            {
+                InitBrewFromJson();
+            }
+        }
+
         public static void InitBrewFromJson()
         {
             if (Managers.SaveLoad.SystemState != SaveLoadManager.SystemStateEnum.Idle)

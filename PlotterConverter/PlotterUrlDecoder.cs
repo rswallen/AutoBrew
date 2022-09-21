@@ -8,6 +8,19 @@ namespace AutoBrew
     internal static class PlotterUrlDecoder
     {
         private static ManualLogSource Log => AutoBrewPlugin.Log;
+        private static readonly string _plotterUrl = "https://potionous.app/plotter?";
+
+        public static bool IsPlotterURL(string data)
+        {
+            int length = _plotterUrl.Length;
+            if (data.Length <= length)
+            {
+                return false;
+            }
+
+            string sub = data.Substring(0, length);
+            return sub.Equals(_plotterUrl);
+        }
 
         public static string ConvertUrlSafeBase64ToBase64(string urlsafebase64)
         {

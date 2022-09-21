@@ -16,7 +16,8 @@ namespace AutoBrew.UI
         {
             _callbacks = new()
             {
-                { "AutoBrew", BrewMaster.InitBrewFromJson },
+                { "AutoBrew", BrewMaster.InitBrew },
+                { "AutoBrew-Json", BrewMaster.InitBrewFromJson },
                 { "AutoBrew-Plotter", BrewMaster.InitBrewFromPlotterURL }
             };
 
