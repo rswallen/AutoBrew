@@ -32,7 +32,10 @@ namespace AutoBrew
                 Log.LogError("Deserialised to null");
                 return null;
             }
-            return ProcessJsonOrders(buffer);
+
+            BrewMethod method = new();
+            method.ProcessJsonOrders(buffer);
+            return method;
         }
         
         public static BrewMethod FromPlotterUrl(string url)
@@ -50,59 +53,31 @@ namespace AutoBrew
                 return null;
             }
             var buffer2 = buffer.PlotItems.Cast<JsonOrder>().ToList();
-            return ProcessJsonOrders(buffer2);
-        }
 
-        public static BrewMethod ProcessJsonOrders(List<JsonOrder> data)
-        {
-            BrewMethod method = new();
-            foreach (var order in data)
+            PotionBase potionbase = null;
+            if (!string.IsNullOrEmpty(buffer.PotionBaseId))
             {
-                switch (order.Order)
-                {
-                    case BrewStage.AddIngredient:
-                    {
-                        var ingOrder = order.GetBrewOrder();
-                        if (ingOrder == null)
-                        {
-                            Log.LogError($"Error detected in order '{order}'");
-                            break;
-                        }
-                        method.AddOrder(ingOrder);
-                        if (!ingOrder.Target.Is(0.0))
-                        {
-                            method.AddOrder(order.GetBrewOrder(BrewStage.GrindPercent));
-                        }
-                        break;
-                    }
-                    case BrewStage.StirCauldron:
-                    case BrewStage.PourSolvent:
-                    case BrewStage.HeatVortex:
-                    case BrewStage.AddSalt:
-                    case BrewStage.AddEffect:
-                    {
-                        var bOrder = order.GetBrewOrder();
-                        if (bOrder == null)
-                        {
-                            Log.LogError($"Error detected in order '{order}'");
-                            break;
-                        }
-                        method.AddOrder(bOrder);
-                        break;
-                    }
-                }
+                potionbase = PotionBase.GetByName(buffer.PotionBaseId, false, false);
             }
+            
+            BrewMethod method = new(potionbase, true);
+            method.ProcessJsonOrders(buffer2);
             return method;
         }
 
         private readonly List<BrewOrder> _data;
         private int currentIndex;
 
+        public readonly PotionBase Base;
+        public readonly bool ResetAtStart;
+
         public bool Complete { get { return currentIndex >= _data.Count; } }
         public int Length { get { return _data.Count; } }
 
-        public BrewMethod()
+        public BrewMethod(PotionBase potionbase = null, bool reset = false)
         {
+            Base = potionbase;
+            ResetAtStart = reset;
             _data = new();
         }
 
@@ -120,6 +95,46 @@ namespace AutoBrew
             }
             _data.Add(order);
             Log.LogDebug($"Method: Parsed order '{order}'");
+        }
+
+        public void ProcessJsonOrders(List<JsonOrder> data)
+        {
+            foreach (var order in data)
+            {
+                switch (order.Order)
+                {
+                    case BrewStage.AddIngredient:
+                    {
+                        var ingOrder = order.GetBrewOrder();
+                        if (ingOrder == null)
+                        {
+                            Log.LogError($"Error detected in order '{order}'");
+                            break;
+                        }
+                        AddOrder(ingOrder);
+                        if (!ingOrder.Target.Is(0.0))
+                        {
+                            AddOrder(order.GetBrewOrder(BrewStage.GrindPercent));
+                        }
+                        break;
+                    }
+                    case BrewStage.StirCauldron:
+                    case BrewStage.PourSolvent:
+                    case BrewStage.HeatVortex:
+                    case BrewStage.AddSalt:
+                    case BrewStage.AddEffect:
+                    {
+                        var bOrder = order.GetBrewOrder();
+                        if (bOrder == null)
+                        {
+                            Log.LogError($"Error detected in order '{order}'");
+                            break;
+                        }
+                        AddOrder(bOrder);
+                        break;
+                    }
+                }
+            }
         }
 
         public bool GetOrder(int idx, out BrewOrder order)

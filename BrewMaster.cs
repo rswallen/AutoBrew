@@ -8,6 +8,7 @@ using PotionCraft.ManagersSystem;
 using PotionCraft.ManagersSystem.Potion;
 using PotionCraft.ManagersSystem.SaveLoad;
 using PotionCraft.NotificationSystem;
+using PotionCraft.ObjectBased.RecipeMap;
 using PotionCraft.ObjectBased.RecipeMap.RecipeMapObject;
 using PotionCraft.ObjectBased.UIElements.FloatingText;
 using PotionCraft.ObjectBased.UIElements.PotionCustomizationPanel;
@@ -38,7 +39,8 @@ namespace AutoBrew
         private static readonly Key _brewFalseStartJsonErr = new("autobrew_brew_falsestart_jsonerror");
         private static readonly Key _brewFalseStartUrlErr = new("autobrew_brew_falsestart_urlerror");
         private static readonly Key _brewFalseStartNotEnough = new("autobrew_brew_falsestart_notenough");
-        
+        private static readonly Key _brewFalseStartBaseIssue = new("autobrew_brew_falsestart_baseissue");
+
         private static bool _init;
         private static bool _brewing;
         private static double _orderInterval;
@@ -161,6 +163,12 @@ namespace AutoBrew
                 return;
             }
 
+            if (!CheckMapAndPotion())
+            {
+                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartBaseIssue.GetCustText(), Notification.TextType.EventText);
+                return;
+            }
+
             if (CheckInventoryStock())
             {
                 Notification.ShowText(_brewStart.GetCustText(), _brewStartDesc.GetCustText(), Notification.TextType.EventText);
@@ -188,6 +196,12 @@ namespace AutoBrew
             if (!LoadPlotterUrlFromDesc())
             {
                 Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartUrlErr.GetCustText(), Notification.TextType.EventText);
+                return;
+            }
+
+            if (!CheckMapAndPotion())
+            {
+                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartBaseIssue.GetCustText(), Notification.TextType.EventText);
                 return;
             }
 
@@ -300,6 +314,42 @@ namespace AutoBrew
 
             _recipe = BrewMethod.FromPlotterUrl(customizer.currentDescriptionText);
             return ((_recipe != null) && (_recipe.Length != 0));
+        }
+
+        public static bool CheckMapAndPotion()
+        {
+            if (_recipe.ResetAtStart)
+            {
+                Managers.Potion.ResetPotion();
+            }
+
+            // if base is not null, try to change the map
+            if (_recipe.Base != null)
+            {
+                // if recipe base is the same as the base of the current map, lock it
+                if (_recipe.Base.name.Equals(Managers.RecipeMap.currentMap.potionBase.name))
+                {
+                    MapLoader.MapChangeLock = true;
+                    return true;
+                }
+
+                if (!Managers.RecipeMap.potionBaseSubManager.IsBaseUnlocked(_recipe.Base))
+                {
+                    // if base is not unlocked, fail
+                    return false;
+                }
+
+                if (MapLoader.MapChangeLock || Managers.Potion.potionCraftPanel.IsPotionBrewingStarted())
+                {
+                    // if map lock is active, or if (manual) brewing was already started, fail
+                    // (can't change map if either are true)
+                    return false;
+                }
+
+                // if all other checks have passed, change the map and lock it
+                PotionOverseer.SelectMapAndLock(_recipe.Base, true);
+            }
+            return true;
         }
 
         public static bool CheckInventoryStock()

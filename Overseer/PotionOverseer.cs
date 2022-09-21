@@ -1,10 +1,14 @@
 ﻿using HarmonyLib;
 using PotionCraft.LocalizationSystem;
+using PotionCraft.ManagersSystem;
 using PotionCraft.ManagersSystem.Potion;
 using PotionCraft.ObjectBased.Potion;
+using PotionCraft.ObjectBased.RecipeMap;
+using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Ingredient;
 using PotionCraft.ScriptableObjects.Salts;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace AutoBrew.Overseer
 {
@@ -12,7 +16,18 @@ namespace AutoBrew.Overseer
     {
         private static readonly Key _potionFailed = new("autobrew_brew_abort_potionfail");
 
-		[HarmonyPostfix, HarmonyPatch(typeof(PotionManager), "ResetPotion")]
+        // MapLoader.SelectMapIfNotSelected does not use forced, so made a version that does
+        public static void SelectMapAndLock(PotionBase potionBase, bool forced = false)
+        {
+            int num = Mathf.Max(0, MapLoader.loadedMaps.FindIndex((MapState mapState) => mapState.potionBase.name.Equals(potionBase.name)));
+            if (Managers.RecipeMap.currentMap.index != num)
+            {
+                MapLoader.SelectMap(num, forced);
+            }
+            MapLoader.MapChangeLock = true;
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(PotionManager), "ResetPotion")]
         public static void ResetPotion_Postfix(bool resetEffectMapItems = true)
         {
             if (!BrewMaster.Initialised || !BrewMaster.Brewing)

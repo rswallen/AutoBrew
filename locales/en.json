@@ -15,6 +15,7 @@
   "autobrew_brew_falsestart_jsonerror": "Error detected in JSON. See BepInEx log for details",
   "autobrew_brew_falsestart_urlerror": "Error detected in PlotterURL. See BepInEx log for details",
   "autobrew_brew_falsestart_notenough": "Not enough ingredients",
+  "autobrew_brew_falsestart_baseissue": "Could not switch to the required PotionBase",
   "autobrew_orderfail_addingredient": "Brew cancelled - AddIngredient failed",
   "autobrew_orderfail_grindpercent": "Brew cancelled - GrindPercent failed",
   "autobrew_orderfail_stircauldron": "Brew cancelled - StirCauldron failed",
