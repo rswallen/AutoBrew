@@ -8,6 +8,7 @@ using PotionCraft.ObjectBased.Pestle;
 using PotionCraft.ObjectBased.Salt;
 using PotionCraft.ObjectBased.Spoon;
 using PotionCraft.ObjectBased.Stack;
+using PotionCraft.ObjectBased.Stack.StackItem;
 using UnityEngine;
 
 namespace AutoBrew
@@ -39,16 +40,15 @@ namespace AutoBrew
                 case Spoon:
                 {
                     __result = !BrewMaster.Brewing;
-                    // DoNotTouch("Don't touch the equipment!");
                     DoNotTouch(_noTouchEquip);
                     return;
                 }
                 case InventoryObject:
                 case SaltItem:
                 case Stack:
+                case StackItem:
                 {
                     __result = !BrewMaster.Brewing;
-                    // DoNotTouch("Don't touch the ingredients!");
                     DoNotTouch(_noTouchIngred);
                     return;
                 }
