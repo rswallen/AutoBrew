@@ -10,6 +10,7 @@
   "autobrew_brew_abort_extraingadded": "Ingredient added without authorisation",
   "autobrew_brew_abort_invovsr_badorder": "InventoryOverseer was asked to handle the wrong order",
   "autobrew_brew_abort_potionfail": "Potion failed",
+  "autobrew_brew_abort_notinlab": "You must not leave the lab while a brew is in progress",
   "autobrew_brew_falsestart": "AutoBrew: Can't start",
   "autobrew_brew_falsestart_brewing": "Already brewing",
   "autobrew_brew_falsestart_jsonerror": "Error detected in JSON. See BepInEx log for details",

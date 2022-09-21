@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using PotionCraft.LocalizationSystem;
 using PotionCraft.ManagersSystem;
 using PotionCraft.ManagersSystem.Potion;
+using PotionCraft.ManagersSystem.Room;
 using PotionCraft.ManagersSystem.SaveLoad;
 using PotionCraft.NotificationSystem;
 using PotionCraft.ObjectBased.RecipeMap;
@@ -33,6 +34,7 @@ namespace AutoBrew
         private static readonly Key _brewCompleteDesc = new("autobrew_brew_complete_desc");
         private static readonly Key _brewAbort = new("autobrew_brew_abort");
         private static readonly Key _brewAbortDef = new("autobrew_brew_abort_unknown");
+        private static readonly Key _brewAbortNotInLab = new("autobrew_brew_abort_notinlab");
         private static readonly Key _brewAbortAdvFail = new("autobrew_brew_abort_advancefail");
         private static readonly Key _brewFalseStart = new("autobrew_brew_falsestart");
         private static readonly Key _brewFalseStartBrewing = new("autobrew_brew_falsestart_brewing");
@@ -99,6 +101,12 @@ namespace AutoBrew
                 //Notification.ShowText("AutoBrew: Brew succeeded", "Brew complete", Notification.TextType.EventText);
                 Notification.ShowText(_brewComplete.GetCustText(), _brewCompleteDesc.GetCustText(), Notification.TextType.EventText);
                 Reset();
+                return;
+            }
+
+            if (!VerifyInLab())
+            {
+                Abort(_brewAbortNotInLab);
                 return;
             }
 
@@ -419,6 +427,11 @@ namespace AutoBrew
                 }
             }
             return Debug;
+        }
+
+        public static bool VerifyInLab()
+        {
+            return Managers.Room.currentRoom == RoomManager.RoomIndex.Laboratory && !Managers.Room.CameraMover.IsMoving();
         }
 
         public static void LogCurrentStageProgress()
