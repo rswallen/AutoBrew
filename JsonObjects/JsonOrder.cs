@@ -2,6 +2,8 @@
 using AutoBrew.PlotterConverter;
 using Newtonsoft.Json;
 using PotionCraft.ScriptableObjects;
+using PotionCraft.ScriptableObjects.Ingredient;
+using PotionCraft.ScriptableObjects.Salts;
 using System;
 
 namespace AutoBrew.JsonObjects
@@ -45,11 +47,19 @@ namespace AutoBrew.JsonObjects
                 case BrewStage.AddIngredient:
                 case BrewStage.GrindPercent:
                 {
+                    if (InvItem is not Ingredient)
+                    {
+                        return null;
+                    }
                     return new BrewOrder(type, Target.Clamp01(), Version, InvItem);
                 }
                 case BrewStage.AddSalt:
                 {
-                    return (Target < 1.0) ? null : new BrewOrder(type, Target, Version, InvItem);
+                    if ((InvItem is not Salt) || (Target < 1.0))
+                    {
+                        return null;
+                    }
+                    return new BrewOrder(type, Target, Version, InvItem);
                 }
                 case BrewStage.HeatVortex:
                 {
