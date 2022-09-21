@@ -129,7 +129,7 @@ namespace AutoBrew.Overseer
 
         private protected bool ConsumeVoidSalt(int amount)
         {
-            Salt voidSalt = Salt.GetByName("Void Salt", true, true);
+            Salt voidSalt = Salt.GetByName("Void Salt", false, false);
             if (voidSalt == null)
             {
                 // if salt don't exist, we can't do anything

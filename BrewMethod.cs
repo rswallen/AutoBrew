@@ -185,7 +185,7 @@ namespace AutoBrew
                 saltCost += order.SaltCost;
             }
 
-            Salt saltType = Salt.GetByName("Void Salt", true, true);
+            Salt saltType = Salt.GetByName("Void Salt", false, false);
             if (saltType == null)
             {
                 Log.LogError("Could not find salt 'Void Salt', so this one is free");
