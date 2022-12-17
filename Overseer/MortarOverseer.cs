@@ -45,10 +45,10 @@ namespace AutoBrew.Overseer
             ABSettings.GetVector2(nameof(MortarOverseer), data, "MortarOffset", out _mortarOffset, Vector2.zero, false);
             ABSettings.GetInt(nameof(MortarOverseer), data, "FlourishMax", out _flourishMax, 1, false);
             ABSettings.GetInt(nameof(MortarOverseer), data, "MinGrindUpdates", out _minUpdates, 200, false);
-            ABSettings.GetVector2(nameof(CauldronOverseer), data, "GrindTotalScalar", out _grindTotalScalar, new Vector2(2.0f, 0.2f));
-            ABSettings.GetVector2(nameof(CauldronOverseer), data, "PestlePosScalar", out _pestlePosScalar, new Vector2(2.0f, 0.2f));
-            ABSettings.GetVector2(nameof(CauldronOverseer), data, "PestlePosOffset", out _pestlePosOffset, new Vector2(0.0f, 3.0f));
-            ABSettings.GetVector2(nameof(CauldronOverseer), data, "PestleRotScalar", out _pestleRotScalar, new Vector2(0.0f, 0.0f));
+            ABSettings.GetVector2(nameof(MortarOverseer), data, "GrindTotalScalar", out _grindTotalScalar, new Vector2(2.0f, 0.2f));
+            ABSettings.GetVector2(nameof(MortarOverseer), data, "PestlePosScalar", out _pestlePosScalar, new Vector2(2.0f, 0.2f));
+            ABSettings.GetVector2(nameof(MortarOverseer), data, "PestlePosOffset", out _pestlePosOffset, new Vector2(0.0f, 3.0f));
+            ABSettings.GetVector2(nameof(MortarOverseer), data, "PestleRotScalar", out _pestleRotScalar, new Vector2(0.0f, 0.0f));
         }
 
         public override void Reset()

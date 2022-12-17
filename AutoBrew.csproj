@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>AutoBrew</AssemblyName>
     <Description>My first plugin</Description>
     <Version>1.0.0</Version>
@@ -23,7 +23,7 @@
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="UnityEngine.Modules" Version="2020.2.1" IncludeAssets="compile" />
+    <PackageReference Include="UnityEngine.Modules" Version="2021.3.8" IncludeAssets="compile" />
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
@@ -34,6 +34,14 @@
     <Reference Include="PotionCraft.Core">
       <HintPath>..\PotionCraftLibs\PotionCraft.Core.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="PotionCraft.DataBaseSystem">
+      <HintPath>..\PotionCraftLibs\PotionCraft.DataBaseSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PotionCraft.InputSystem">
+      <HintPath>..\PotionCraftLibs\PotionCraft.InputSystem.dll</HintPath>
+	  <Private>False</Private>
     </Reference>
     <Reference Include="PotionCraft.Scripts">
       <HintPath>..\PotionCraftLibs\PotionCraft.Scripts.dll</HintPath>

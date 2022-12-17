@@ -77,12 +77,12 @@ namespace AutoBrew.Overseer
             {
                 case BrewOrderType.HeatVortex:
                 {
-                    if (Managers.RecipeMap.currentVortexMapItem == null)
+                    if (Managers.RecipeMap.CurrentVortexMapItem == null)
                     {
                         Stage = OverseerStage.Failed;
                         return;
                     }
-                    _vortexPos = Managers.RecipeMap.currentVortexMapItem.transform.localPosition;
+                    _vortexPos = Managers.RecipeMap.CurrentVortexMapItem.transform.localPosition;
                     Vector2 indicPos = Managers.RecipeMap.recipeMapObject.indicatorContainer.localPosition;
                     _indicStartOffset = indicPos - _vortexPos;
                     _lastAngle = 0f;
@@ -209,6 +209,7 @@ namespace AutoBrew.Overseer
                     _lastPIDVal = Math.Abs(_pidControl.GetStep(_heatTarget, _heatedTotal, Time.deltaTime));
                     _lastHeat = (float)_lastPIDVal.Clamp(_heatMin, _heatMax);
                     Managers.Ingredient.coals.Heat = _lastHeat;
+                    Log.LogDebug($"Bellows Heat: {_lastHeat}");
                     return;
                 }
                 case BrewOrderType.AddEffect:
@@ -271,7 +272,7 @@ namespace AutoBrew.Overseer
             _lastAngle = angle;
 
             double clampPID = _lastPIDVal.Clamp(_heatMin, _heatMax);
-            Log.LogDebug($"StirUpdate: PIDVal - {_lastPIDVal:N5} | ClampPID - {clampPID:N5} | Delta - {delta:N5}");
+            //Log.LogDebug($"StirUpdate: PIDVal - {_lastPIDVal:N5} | ClampPID - {clampPID:N5} | Delta - {delta:N5}");
         }
 
         public void CollectEffect(int tier)
@@ -288,12 +289,14 @@ namespace AutoBrew.Overseer
 
         public void UpdateBellowsRotation()
         {
-            var z = Managers.Ingredient.coals.top.transform.rotation.eulerAngles.z;
-            if (_wasTeleporting == false)
+            if (_wasTeleporting == true)
             {
                 _bellowsActive = false;
                 return;
             }
+
+            var z = Managers.Ingredient.coals.top.rotation.eulerAngles.z;
+            Log.LogDebug($"Bellows z: {z}");
 
             if (!_bellowsActive)
             {
@@ -339,6 +342,7 @@ namespace AutoBrew.Overseer
                 }
 
                 //Managers.Ingredient.coals.top.transform.rotation = Quaternion.Euler(Vector3.forward * newZ);
+                Log.LogDebug($"Bellows NewZ: {newZ}");
                 Managers.Ingredient.coals.top.transform.eulerAngles = Vector3.forward * newZ;
                 if (newZ == _bellowsMinMax)
                 {

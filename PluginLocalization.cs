@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using HarmonyLib;
 using Newtonsoft.Json;
+using PotionCraft.Assemblies.DataBaseSystem.PreparedObjects;
 using PotionCraft.LocalizationSystem;
 using System;
 using System.Collections.Generic;
@@ -16,16 +17,18 @@ namespace AutoBrew
     {
         // change this to point to the plugin's ManualLogSource
         static ManualLogSource Log => AutoBrewPlugin.Log;
-        static Dictionary<LocalizationManager.Locale, LocalizationManager.TextData> _textData;
+
         static bool _initialised;
 
         public static readonly LocalizationManager.Locale DefaultLocale = LocalizationManager.Locale.en;
+        public static LocalizationData library;
         public static readonly bool _parseLoose = true;
         public static readonly bool _parseDirectory = false;
 
-        [HarmonyPostfix, HarmonyPatch(typeof(LocalizationManager), "ParseLocalizationData")]
-        public static void ParseLocalizationData_Postfix()
+        [HarmonyPostfix, HarmonyPatch(typeof(LocalizationManager), "LoadLocalizationData")]
+        public static void LoadLocalizationData_Postfix(ref LocalizationData __result)
         {
+            library = __result;
             ParseLocalizationData(true);
         }
 
@@ -33,17 +36,6 @@ namespace AutoBrew
         {
             if (_initialised && !forceInit)
             {
-                return;
-            }
-
-            // grab LocalizationManager.textData
-            var fieldInfo = typeof(LocalizationManager).GetField("textData", BindingFlags.NonPublic | BindingFlags.Static);
-            _textData = fieldInfo.GetValue(null) as Dictionary<LocalizationManager.Locale, LocalizationManager.TextData>;
-            
-            // if textData was null, nothing more to do
-            if (_textData == null)
-            {
-                Log.LogError("ParseLocales: Localization.textData was null, so we're done");
                 return;
             }
 
@@ -143,12 +135,12 @@ namespace AutoBrew
 
             foreach ((string key, string text) in data.Select(kvp => (kvp.Key, kvp.Value)))
             {
-                if (_textData[lang].ContainsText(key))
+                if (library.Contains(key, (int)lang, (int)lang))
                 {
                     Log.LogWarning($"Skipping '{key}' as it already exists for Locale.{lang}");
                     continue;
                 }
-                _textData[lang].AddText(key, text);
+                library.Add((int)lang, key, text);
                 counter++;
             }
 
@@ -157,11 +149,11 @@ namespace AutoBrew
 
         public static bool KeyExists(string key, LocalizationManager.Locale lang)
         {
-            if ((_textData == null) || !_textData.ContainsKey(lang) || (_textData[lang] == null))
+            if (library == null)
             {
                 return false;
             }
-            return _textData[lang].ContainsText(key);
+            return library.Contains(key, (int)lang, (int)DefaultLocale);
         }
 
         public static string GetCustText(Key source)

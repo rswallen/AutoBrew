@@ -350,7 +350,7 @@ namespace AutoBrew
                 // if recipe base is the same as the base of the current map, lock it
                 if (_recipe.Base.name.Equals(Managers.RecipeMap.currentMap.potionBase.name))
                 {
-                    MapLoader.MapChangeLock = true;
+                    MapStatesManager.MapChangeLock = true;
                     return true;
                 }
 
@@ -360,7 +360,7 @@ namespace AutoBrew
                     return false;
                 }
 
-                if (MapLoader.MapChangeLock || Managers.Potion.potionCraftPanel.IsPotionBrewingStarted())
+                if (MapStatesManager.MapChangeLock || Managers.Potion.potionCraftPanel.IsPotionBrewingStarted())
                 {
                     // if map lock is active, or if (manual) brewing was already started, fail
                     // (can't change map if either are true)

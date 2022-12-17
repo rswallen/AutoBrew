@@ -1,13 +1,16 @@
 ﻿using AutoBrew.Overseer;
+using AutoBrew.Toolbar;
 using AutoBrew.UI;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using PotionCraft.LocalizationSystem;
 using QFSW.QC;
+using Toolbar;
 
 namespace AutoBrew
 {
+    [BepInDependency("com.github.rswallen.potioncraft.toolbar", BepInDependency.DependencyFlags.HardDependency)]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, "0.2.1")]
     public class AutoBrewPlugin : BaseUnityPlugin
     {
@@ -32,6 +35,8 @@ namespace AutoBrew
             Harmony.CreateAndPatchAll(typeof(BrewMaster));
             Harmony.CreateAndPatchAll(typeof(PluginLocalization));
             Harmony.CreateAndPatchAll(typeof(UserInput));
+
+            ToolbarAPI.RegisterInit(ToolbarInterface.Setup);
         }
 
         public void Start()

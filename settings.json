@@ -4,52 +4,65 @@
     "OrderCompleteOffset": "0.5,2.5"
   },
   "BrewOrder": {
-    "SaltIngBase": "50",
-    "SaltGrindBase": "5",
+    "SaltIngBase": "10",
+    "SaltGrindBase": "1",
     "SaltStirBase": "5",
     "SaltPourBase": "5",
-    "SaltHeatBase": "50",
-    "SaltSaltBase": "5",
-    "SaltEffectBase": "50",
-    "SaltGrindMult": "10",
-    "SaltStirMult": "10",
-    "SaltPourMult": "10",
-    "SaltHeatMult": "0",
+    "SaltHeatBase": "10",
+    "SaltSaltBase": "10",
+    "SaltEffectBase": "10",
+    "SaltGrindMult": "0",
+    "SaltStirMult": "2",
+    "SaltPourMult": "2",
+    "SaltHeatMult": "",
     "SaltSaltMult": "0.1"
   },
   "Inventory": {
     "IngSpawnPos": "7.275,2.375",
     "SaltSpawnPos": "5.7,-5.3",
-    "CauldronOffset": "0.0,5.0",
+    "CauldronSaltOffset": "0.0,5.0",
+    "CauldronThrowPos": "0.5,4.0",
+    "MortarThrowPos": "0.0,0.0",
     "AlwaysDissolve": "true"
   },
   "Mortar": {
     "ShowPath": "false",
     "MortarOffset" : "0.0,0.0",
     "FlourishMax": "1",
-    "MinGrindUpdates": "200"
+    "MinGrindUpdates": "200",
+    "CauldronThrowPos": "0.5,4.0",
+    "GrindTotalScalar": "50.0,50.0",
+    "PestlePosScalar": "0.6,0.0",
+    "PestlePosOffset": "0.0,1.0",
+    "PestleRotScalar": "0.0,30.0"
   },
   "Cauldron": {
     "Tolerance": "0.0001",
-    "PIDValues": "0.075,0.001,0.05",
-    "SpeedMin": "0.001",
-    "SpeedMax": "0.8",
+    "PIDValues": "0.5,0.00001,0.2",
+    "SpeedMin": "0.01",
+    "SpeedMax": "0.5",
+    "SwampSpeedScalar": "0.6",
+    "MaxUpdateInterval": "1.0",
+    "StirTotalScalar": "3.0,1.0",
+    "SpoonPosScalar": "0.8,0.2",
+    "SpoonPosOffset": "0.0,1.0",
+    "SpoonRotScalar": "0.0,0.0,5.0"
   },
   "Solvent": {
     "Tolerance": "0.0001",
-    "PIDValues": "50.0,0.1,0.8",
+    "PIDValues": "50.0,0.00001,0.05",
     "AngleMax": "-40.0",
     "AngleStart": "-20.0",
-    "AngleReset": "-16.5"
+    "AngleReset": "-16.275"
   },
   "Bellows": {
     "SparkAmount": "10",
-    "SparkIntervalOn": "1.6",
-    "SparkIntervalOff": "0.4",
+    "SparkIntervalOn": "0.6",
     "HeatEffectTime": "2.0",
     "Tolerance": "0.0001",
-    "PIDValues":"0.005,0.00001,0.0005",
+    "PIDValues":"0.01,0.00001,0.005",
     "HeatMin": "0.01",
-    "HeatMax": "0.4"
+    "HeatMax": "0.4",
+    "BellowsMinMin" : "334.5"
   }
 }

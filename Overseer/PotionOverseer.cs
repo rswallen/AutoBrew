@@ -7,6 +7,7 @@ using PotionCraft.ObjectBased.RecipeMap;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Ingredient;
 using PotionCraft.ScriptableObjects.Salts;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,12 +20,12 @@ namespace AutoBrew.Overseer
         // MapLoader.SelectMapIfNotSelected does not use forced, so made a version that does
         public static void SelectMapAndLock(PotionBase potionBase, bool forced = false)
         {
-            int num = Mathf.Max(0, MapLoader.loadedMaps.FindIndex((MapState mapState) => mapState.potionBase.name.Equals(potionBase.name)));
+            int num = Mathf.Max(Array.FindIndex(MapStatesManager.MapStates, (MapState mapState) => mapState.potionBase.name.Equals(potionBase.name)));
             if (Managers.RecipeMap.currentMap.index != num)
             {
-                MapLoader.SelectMap(num, forced);
+                MapStatesManager.SelectMap(num, forced);
             }
-            MapLoader.MapChangeLock = true;
+            MapStatesManager.MapChangeLock = true;
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(PotionManager), "ResetPotion")]

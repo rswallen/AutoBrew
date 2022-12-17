@@ -1,7 +1,7 @@
 ﻿using BepInEx.Logging;
 using PotionCraft.ManagersSystem.Potion;
 using PotionCraft.ManagersSystem;
-using PotionCraft.ScriptableObjects;
+using PotionCraft.ScriptableObjects.Potion;
 using PotionCraft.ScriptableObjects.Salts;
 using System.Collections.Generic;
 using UnityEngine;
@@ -145,10 +145,10 @@ namespace AutoBrew.Overseer
 
             for (int i = 0; i < amount; i++)
             {
-                Potion.UsedComponent.AddToList(Managers.Potion.usedComponents, voidSalt, true);
+                PotionUsedComponent.AddToList(Managers.Potion.usedComponents, voidSalt, true);
             }
             PotionManager.RecipeMarksSubManager.AddSaltMark(Managers.Potion.recipeMarks.GetMarksList(), voidSalt, amount);
-            Managers.Potion.potionCraftPanel.onPotionUpdated?.Invoke();
+            Managers.Potion.potionCraftPanel.onPotionUpdated?.Invoke(true);
             Managers.Player.inventory.RemoveItem(voidSalt, amount);
             return true;
         }
