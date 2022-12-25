@@ -296,7 +296,6 @@ namespace AutoBrew.Overseer
             }
 
             var z = Managers.Ingredient.coals.top.rotation.eulerAngles.z;
-            Log.LogDebug($"Bellows z: {z}");
 
             if (!_bellowsActive)
             {
@@ -341,8 +340,6 @@ namespace AutoBrew.Overseer
                     }
                 }
 
-                //Managers.Ingredient.coals.top.transform.rotation = Quaternion.Euler(Vector3.forward * newZ);
-                Log.LogDebug($"Bellows NewZ: {newZ}");
                 Managers.Ingredient.coals.top.transform.eulerAngles = Vector3.forward * newZ;
                 if (newZ == _bellowsMinMax)
                 {

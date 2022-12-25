@@ -1,6 +1,7 @@
 ﻿using AutoBrew.Overseer;
 using AutoBrew.Toolbar;
 using AutoBrew.UI;
+using AutoBrew.UIElements;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -35,6 +36,8 @@ namespace AutoBrew
             Harmony.CreateAndPatchAll(typeof(BrewMaster));
             Harmony.CreateAndPatchAll(typeof(PluginLocalization));
             Harmony.CreateAndPatchAll(typeof(UserInput));
+
+            Harmony.CreateAndPatchAll(typeof(UIManager));
 
             ToolbarAPI.RegisterInit(ToolbarInterface.Setup);
         }

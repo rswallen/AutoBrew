@@ -1,5 +1,6 @@
 ﻿using AutoBrew.Extensions;
 using AutoBrew.Overseer;
+using AutoBrew.UIElements;
 using BepInEx.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -153,8 +154,9 @@ namespace AutoBrew
 
         public static void InitBrew()
         {
-            PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
-            if (PlotterUrlDecoder.IsPlotterURL(customizer.currentDescriptionText))
+            //PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
+            //if (PlotterUrlDecoder.IsPlotterURL(customizer.currentDescriptionText))
+            if (PlotterUrlDecoder.IsPlotterURL(UIManager.Importer.Data))
             {
                 InitBrewFromPlotterURL();
             }
@@ -308,14 +310,17 @@ namespace AutoBrew
                 return false;
             }
 
-            PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
-            if (customizer.currentDescriptionText == string.Empty)
+            //PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
+            //if (customizer.currentDescriptionText == string.Empty)
+            string data = UIManager.Importer.Data;
+            if (string.IsNullOrEmpty(data))
             {
                 Log.LogError("Please paste json data into the custom description of the potion customizer panel");
                 return false;
             }
 
-            _recipe = BrewMethod.FromJson(customizer.currentDescriptionText);
+            //_recipe = BrewMethod.FromJson(customizer.currentDescriptionText);
+            _recipe = BrewMethod.FromJson(data);
             return ((_recipe != null) && (_recipe.Length != 0));
         }
 
@@ -326,14 +331,17 @@ namespace AutoBrew
                 return false;
             }
 
-            PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
-            if (customizer.currentDescriptionText == string.Empty)
+            //PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
+            //if (customizer.currentDescriptionText == string.Empty)
+            string data = UIManager.Importer.Data;
+            if (string.IsNullOrEmpty(data))
             {
-                Log.LogError("Please paste plotter url into the custom description of the potion customizer panel");
+                Log.LogError("Please paste a plotter url into the custom description of the potion customizer panel");
                 return false;
             }
 
-            _recipe = BrewMethod.FromPlotterUrl(customizer.currentDescriptionText);
+            //_recipe = BrewMethod.FromPlotterUrl(customizer.currentDescriptionText);
+            _recipe = BrewMethod.FromPlotterUrl(data);
             return ((_recipe != null) && (_recipe.Length != 0));
         }
 
