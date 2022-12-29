@@ -4,24 +4,14 @@ namespace AutoBrew.Extensions
 {
     internal static class KeyExtensions
     {
-        public static bool Exists(this Key source)
-        {
-            return PluginLocalization.KeyExists(source.key, LocalizationManager.currentLocale);
-        }
-
-        public static bool Exists(this Key source, LocalizationManager.Locale locale)
+        public static bool Exists(this Key source, LocalizationManager.Locale locale = LocalizationManager.Locale.en)
         {
             return PluginLocalization.KeyExists(source.key, locale);
         }
 
-        public static string GetCustText(this Key source)
+        public static string GetAutoBrewText(this Key source, LocalizationManager.Locale locale = LocalizationManager.Locale.en)
         {
-            return PluginLocalization.GetCustText(source);
-        }
-
-        public static string GetDefText(this Key source)
-        {
-            return PluginLocalization.GetDefText(source);
+            return PluginLocalization.GetAutoBrewText(source, locale);
         }
     }
 }

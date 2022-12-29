@@ -10,12 +10,10 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-// change this to the "default" namespace (visible in Project properties) or it won't work
 namespace AutoBrew
 {
     internal static class PluginLocalization
     {
-        // change this to point to the plugin's ManualLogSource
         static ManualLogSource Log => AutoBrewPlugin.Log;
 
         static bool _initialised;
@@ -156,22 +154,22 @@ namespace AutoBrew
             return library.Contains(key, (int)lang, (int)DefaultLocale);
         }
 
-        public static string GetCustText(Key source)
+        public static string GetAutoBrewText(Key source, LocalizationManager.Locale lang)
         {
-            if (KeyExists(source.key, LocalizationManager.currentLocale))
+            if (library == null)
             {
-                return source.GetText(LocalizationManager.currentLocale);
+                return "#LIBRARY_IS_NULL";
             }
-            return GetDefText(source);
-        }
 
-        public static string GetDefText(Key source)
-        {
-            if (!KeyExists(source.key, DefaultLocale))
+            if (library.Contains(source.key, (int)lang, (int)DefaultLocale))
             {
-                Log.LogError($"Key '{source.key} not found");
+                var value = library.Get(source.key, (int)lang, (int)DefaultLocale);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    return value;
+                }
             }
-            return source.GetText(DefaultLocale);
+            return library.Get(source.key, (int)DefaultLocale, (int)DefaultLocale);
         }
     }
 }

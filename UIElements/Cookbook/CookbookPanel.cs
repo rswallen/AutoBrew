@@ -44,13 +44,7 @@ namespace AutoBrew.UIElements.Cookbook
             panel.instructions.transform.SetParent(panel.transform);
             panel.instructions.transform.localPosition = new(0f, -1.7f);
 
-            for (int i = 0; i < 10; i++)
-            {
-                var pane = InstructionDisplay.Create(Random.Range(0, 3));
-                pane.Text.text = "Placeholder instruction";
-                pane.Text.maxVisibleLines = 3;
-                panel.instructions.AddInstruction(pane, false);
-            }
+            InstructionDisplay.UpdateSprites(200);
             panel.instructions.Refill();
 
             // TEMP HANDLES - REMOVE!!
@@ -70,18 +64,6 @@ namespace AutoBrew.UIElements.Cookbook
             instructionsHandle.ReplaceLink(panel, panel.instructions, new(0f, 1f));
             instructionsHandle.IsActive = true;
 
-            /*
-            panel.manualText = UIUtilities.MakeLocalizedTextObj(panel, "Caveat-Bold SDF", 110);
-            panel.manualText.text.alignment = TextAlignmentOptions.Left;
-            panel.manualText.text.fontSizeMin = 1f;
-            panel.manualText.text.fontSizeMax = 18f;
-            panel.manualText.text.fontSize = 3f;
-            
-            panel.manualText.text.text = "ManualText";
-            panel.manualText.text.autoSizeTextContainer = true;
-            panel.manualText.text.autoSizeTextContainer = false;
-            */
-
             panel.IsActive = true;
             return panel;
         }
@@ -99,6 +81,7 @@ namespace AutoBrew.UIElements.Cookbook
         {
             base.Awake();
             UpdateSize(new(8f, 10f));
+            IsActive = false;
         }
 
         public bool IsActive
@@ -126,6 +109,33 @@ namespace AutoBrew.UIElements.Cookbook
         public void Toggle()
         {
             IsActive = !IsActive;
+        }
+
+        public void Reset()
+        {
+            instructions.Clear();
+        }
+
+        public void LoadMethod(BrewMethod recipe)
+        {
+            foreach (var order in recipe.OrderList)
+            {
+                switch (order.Stage)
+                {
+                    case BrewOrderType.GrindPercent:
+                    {
+                        break;
+                    }
+                    default:
+                    {
+                        var item = InstructionDisplay.Create();
+                        item.ApplyOrder(order);
+                        instructions.AddInstruction(item, false);
+                        break;
+                    }
+                }
+            }
+            instructions.Refill();
         }
     }
 }

@@ -1,8 +1,7 @@
-﻿using PotionCraft.ScriptableObjects.Ingredient;
+﻿using AutoBrew.UIElements.Misc;
+using PotionCraft.ScriptableObjects.Ingredient;
 using PotionCraft.ScriptableObjects.Salts;
-using System;
 using System.Collections.Generic;
-using AutoBrew.UIElements.Misc;
 
 namespace AutoBrew.UIElements.Cookbook.Instructions
 {
@@ -16,7 +15,6 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             item.type.transform.SetParent(item.transform, false);
             item.type.transform.localPosition = new(0f, 0.5f);
 
-
             //item.item = UIUtilities.SpawnDropdown();
             //item.type.transform.SetParent(item.transform, false);
             //item.type.transform.localPosition = new(0f, -0.5f);
@@ -25,8 +23,9 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             return item;
         }
 
-        public void Awake()
+        public override void Awake()
         {
+            base.Awake();
             type.AddOptions(new List<string>()
             {
                 BrewOrderType.AddIngredient.ToString(),

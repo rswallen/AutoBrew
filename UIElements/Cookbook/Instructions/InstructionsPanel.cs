@@ -1,7 +1,12 @@
-﻿using PotionCraft.ObjectBased.UIElements;
+﻿using PotionCraft.ObjectBased.Bellows;
+using PotionCraft.ObjectBased.Ladle;
+using PotionCraft.ObjectBased.Mortar;
+using PotionCraft.ObjectBased.Spoon;
+using PotionCraft.ObjectBased.UIElements;
 using PotionCraft.ObjectBased.UIElements.Scroll;
 using PotionCraft.ObjectBased.UIElements.Scroll.Settings;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace AutoBrew.UIElements.Cookbook.Instructions
@@ -108,7 +113,7 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
 
                 var frameTexture = TextureCache.FindTexture("sactx-0-2048x2048-BC7-PotionCustomization Atlas-ee9e517c");
 
-                panel.contentFrame = UIUtilities.MakeRendererObj<SpriteRenderer>(panel, "Frame Renderer", 100);
+                panel.contentFrame = UIUtilities.MakeRendererObj<SpriteRenderer>(panel, "Frame Renderer", 600);
                 panel.contentFrame.sprite = Sprite.Create(frameTexture, new(647, 0, 634, 772), new(0.5f, 0.5f), 100, 0, SpriteMeshType.FullRect, new(8, 20, 8, 20));
                 panel.contentFrame.drawMode = SpriteDrawMode.Sliced;
             }
@@ -137,7 +142,7 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
 
         private float scrollPadding = 0.6f;
 
-        private Vector3 padding = new(0.7f, 0.9f, 0.7f);
+        private Vector3 padding = new(1.0f, 1.4f, 0.7f);
         private float minLength;
         private float maxLength;
         
@@ -166,23 +171,16 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             return true;
         }
 
-        public bool RemoveButton(BaseInstruction pane, bool refill = true)
+        public void Clear()
         {
-            if ((pane == null) || !instructions.Contains(pane))
+            foreach (var item in instructions)
             {
-                return false;
+                if (item != null)
+                {
+                    Destroy(item.gameObject);
+                }
             }
-            instructions.Remove(pane);
-
-            //pane.Anchor.transform.SetParent(null, false);
-            //pane.ScrollView = null;
-            //pane.ParentPanel = null;
-
-            if (refill)
-            {
-                Refill();
-            }
-            return true;
+            instructions.Clear();
         }
         
         private float GetPanelLength(int numButtons)
@@ -248,8 +246,8 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
 
             // update scrollview collider
             scrollview.UpdateSize(newSize);
-            scrollview.SetPositionTo(1f, false);
-            pointer.SetPosition(1f, true, false);
+            scrollview.SetPositionTo(0f, false);
+            pointer.SetPosition(0f, true, false);
         }
     }
 }

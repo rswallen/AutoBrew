@@ -100,7 +100,7 @@ namespace AutoBrew
             {
                 Log.LogInfo("Brew succeeded");
                 //Notification.ShowText("AutoBrew: Brew succeeded", "Brew complete", Notification.TextType.EventText);
-                Notification.ShowText(_brewComplete.GetCustText(), _brewCompleteDesc.GetCustText(), Notification.TextType.EventText);
+                Notification.ShowText(_brewComplete.GetAutoBrewText(), _brewCompleteDesc.GetAutoBrewText(), Notification.TextType.EventText);
                 Reset();
                 return;
             }
@@ -146,95 +146,60 @@ namespace AutoBrew
             if (_brewing)
             {
                 reason ??= new("autobrew_brew_abort_unknown");
-                Log.LogInfo($"Brew Aborted: {reason.GetDefText()}");
-                Notification.ShowText(_brewAbort.GetCustText(), reason.GetCustText(), Notification.TextType.EventText);
+                Log.LogInfo($"Brew Aborted: {reason.GetAutoBrewText(LocalizationManager.Locale.en)}");
+                Notification.ShowText(_brewAbort.GetAutoBrewText(), reason.GetAutoBrewText(), Notification.TextType.EventText);
                 Reset();
             }
         }
 
         public static void InitBrew()
         {
+            if (Managers.SaveLoad.SystemState != SaveLoadManager.SystemStateEnum.Idle)
+            {
+                Log.LogInfo("Can't brew a potion during load or save");
+                return;
+            }
+
+            if (Brewing)
+            {
+                Notification.ShowText(_brewFalseStart.GetAutoBrewText(), _brewFalseStartBrewing.GetAutoBrewText(), Notification.TextType.EventText);
+                return;
+            }
+
             //PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
             //if (PlotterUrlDecoder.IsPlotterURL(customizer.currentDescriptionText))
             if (PlotterUrlDecoder.IsPlotterURL(UIManager.Importer.Data))
             {
-                InitBrewFromPlotterURL();
+                if (!LoadPlotterUrlFromDesc())
+                {
+                    Notification.ShowText(_brewFalseStart.GetAutoBrewText(), _brewFalseStartUrlErr.GetAutoBrewText(), Notification.TextType.EventText);
+                    return;
+                }
             }
             else
             {
-                InitBrewFromJson();
-            }
-        }
-
-        public static void InitBrewFromJson()
-        {
-            if (Managers.SaveLoad.SystemState != SaveLoadManager.SystemStateEnum.Idle)
-            {
-                Log.LogInfo("Can't brew a potion during load or save");
-                return;
+                if (!LoadJsonFromDesc())
+                {
+                    Notification.ShowText(_brewFalseStart.GetAutoBrewText(), _brewFalseStartJsonErr.GetAutoBrewText(), Notification.TextType.EventText);
+                    return;
+                }
             }
 
-            if (Brewing)
-            {
-                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartBrewing.GetCustText(), Notification.TextType.EventText);
-                return;
-            }
-
-            if (!LoadJsonFromDesc())
-            {
-                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartJsonErr.GetCustText(), Notification.TextType.EventText);
-                return;
-            }
+            UIManager.Cookbook.LoadMethod(_recipe);
 
             if (!CheckMapAndPotion())
             {
-                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartBaseIssue.GetCustText(), Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetAutoBrewText(), _brewFalseStartBaseIssue.GetAutoBrewText(), Notification.TextType.EventText);
                 return;
             }
 
             if (CheckInventoryStock())
             {
-                Notification.ShowText(_brewStart.GetCustText(), _brewStartDesc.GetCustText(), Notification.TextType.EventText);
+                Notification.ShowText(_brewStart.GetAutoBrewText(), _brewStartDesc.GetAutoBrewText(), Notification.TextType.EventText);
             }
             else
             {
-                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartNotEnough.GetCustText(), Notification.TextType.EventText);
-            }
-        }
-
-        public static void InitBrewFromPlotterURL()
-        {
-            if (Managers.SaveLoad.SystemState != SaveLoadManager.SystemStateEnum.Idle)
-            {
-                Log.LogInfo("Can't brew a potion during load or save");
-                return;
-            }
-
-            if (Brewing)
-            {
-                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartBrewing.GetCustText(), Notification.TextType.EventText);
-                return;
-            }
-
-            if (!LoadPlotterUrlFromDesc())
-            {
-                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartUrlErr.GetCustText(), Notification.TextType.EventText);
-                return;
-            }
-
-            if (!CheckMapAndPotion())
-            {
-                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartBaseIssue.GetCustText(), Notification.TextType.EventText);
-                return;
-            }
-
-            if (CheckInventoryStock())
-            {
-                Notification.ShowText(_brewStart.GetCustText(), _brewStartDesc.GetCustText(), Notification.TextType.EventText);
-            }
-            else
-            {
-                Notification.ShowText(_brewFalseStart.GetCustText(), _brewFalseStartNotEnough.GetCustText(), Notification.TextType.EventText);
+                Notification.ShowText(_brewFalseStart.GetAutoBrewText(), _brewFalseStartNotEnough.GetAutoBrewText(), Notification.TextType.EventText);
             }
         }
 
@@ -489,7 +454,7 @@ namespace AutoBrew
             RecipeMapObject recipeMapObject = Managers.RecipeMap.recipeMapObject;
             var prefab = Settings<PotionManagerSettings>.Asset.collectedFloatingTextPrefab;
             Vector2 msgPos = recipeMapObject.transmitterWindow.ViewRect.center + offset;
-            CollectedFloatingText.SpawnNewText(prefab, msgPos, new CollectedFloatingText.FloatingTextContent(message.GetCustText(), CollectedFloatingText.FloatingTextContent.Type.Text, 0f), Managers.Game.Cam.transform, false, false);
+            CollectedFloatingText.SpawnNewText(prefab, msgPos, new CollectedFloatingText.FloatingTextContent(message.GetAutoBrewText(), CollectedFloatingText.FloatingTextContent.Type.Text, 0f), Managers.Game.Cam.transform, false, false);
         }
     }
 

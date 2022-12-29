@@ -198,10 +198,13 @@ namespace AutoBrew.Overseer
                     double diff = Math.Abs(_heatTarget) - Math.Abs(_heatedTotal);
                     if (diff <= _tolerance)
                     {
+                        /* ???
                         if (_wasTeleporting && !Managers.RecipeMap.indicator.IsIndicatorTeleporting())
                         {
                             Stage = OverseerStage.Complete;
                         }
+                        */
+                        Stage = OverseerStage.Complete;
                         Managers.Ingredient.coals.Heat = 0f;
                         return;
                     }
