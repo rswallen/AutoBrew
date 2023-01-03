@@ -109,8 +109,9 @@ namespace AutoBrew.UIElements.Cookbook.RecipeChecklist
             isTicked = ticked;
         }
 
-        private void Awake()
+        public override void Awake()
         {
+            base.Awake();
             SetTicked(false);
         }
 
