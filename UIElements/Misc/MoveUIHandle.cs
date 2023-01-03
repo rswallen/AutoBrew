@@ -23,10 +23,8 @@ namespace AutoBrew.UIElements.Misc
             handle.thisCollider.offset = Vector3.zero;
             handle.thisCollider.radius = 0.2f;
 
-            s_symbol ??= MakeSymbolSprite();
-
             handle.symbol = obj.AddComponent<SpriteRenderer>();
-            handle.symbol.sprite = s_symbol;
+            handle.symbol.sprite = SymbolIcon;
             handle.symbol.drawMode = SpriteDrawMode.Sliced;
             handle.symbol.size = new(0.3f, 0.3f);
 
@@ -62,7 +60,16 @@ namespace AutoBrew.UIElements.Misc
             return handle;
         }
 
-        private static Sprite s_symbol;
+        internal static Sprite SymbolIcon
+        {
+            get
+            {
+                symbolIcon ??= MakeSymbolSprite();
+                return symbolIcon;
+            }
+        }
+        private static Sprite symbolIcon;
+
         private static Sprite MakeSymbolSprite()
         {
             var texture = TextureCache.LoadTexture("UI", "move-ui-symbol.png");
@@ -183,6 +190,9 @@ namespace AutoBrew.UIElements.Misc
                 return;
             }
             isActive = value;
+            enabled = value;
+            symbol.enabled = value;
+            thisCollider.enabled = value;
         }
 
         public void SetSortingLayer(string sortingLayer, int sortingOrder)
@@ -193,26 +203,33 @@ namespace AutoBrew.UIElements.Misc
 
         public void ReplaceLink(MonoBehaviour parent, MonoBehaviour child)
         {
-            ReplaceLink(parent.transform, child.transform, new(0f, 0f));
+            ReplaceLink(parent?.transform, child.transform, new(0f, 0f));
         }
 
         public void ReplaceLink(MonoBehaviour parent, MonoBehaviour child, Vector2 childLocPosOffset)
         {
-            ReplaceLink(parent.transform, child.transform, childLocPosOffset);
+            ReplaceLink(parent?.transform, child.transform, childLocPosOffset);
         }
 
         public void ReplaceLink(Transform parent, Transform child, Vector2 childLocPosOffset)
         {
-            if ((parent == null) || (child == null) || (child.parent != parent))
+            if (child == null)
             {
-                AutoBrewPlugin.Log.LogDebug("MoveUIHandle.ReplaceLink: a transform is null or there isn't a link");
+                AutoBrewPlugin.Log.LogDebug("MoveUIHandle.ReplaceLink: child transform is null");
                 return;
             }
 
-            transform.SetParent(parent, true);
+            if (parent == null)
+            {
+                transform.SetParent(null, true);
+                linkParent = null;
+            }
+            else
+            {
+                transform.SetParent(parent, true);
+                linkParent = parent;
+            }
             transform.localPosition = child.transform.localPosition + (Vector3)childLocPosOffset;
-
-            linkParent = parent;
             linkChild = child;
         }
 
@@ -255,7 +272,6 @@ namespace AutoBrew.UIElements.Misc
             if (DevModeToggle)
             {
                 symbol.enabled = devModeOn;
-                //backdrop.enabled = devModeOn;
                 thisCollider.enabled = devModeOn;
             }
         }
