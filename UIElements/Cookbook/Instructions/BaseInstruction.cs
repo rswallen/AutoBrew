@@ -1,5 +1,4 @@
-﻿using PotionCraft.LocalizationSystem;
-using PotionCraft.ObjectBased.InteractiveItem;
+﻿using PotionCraft.ObjectBased.InteractiveItem;
 using TMPro;
 using UnityEngine;
 
@@ -18,6 +17,8 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             
             var item = obj.AddComponent<T>();
 
+
+
             var collider = obj.AddComponent<BoxCollider2D>();
             collider.size = new Vector2(5f, 0.5f);
             item.thisCollider = collider;
@@ -27,7 +28,6 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
 
             obj.SetActive(true);
             return item;
-
         }
 
         public bool IsActive
@@ -39,6 +39,7 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 {
                     isActive = value;
                     gameObject.SetActive(value);
+                    Anchor?.gameObject.SetActive(value);
                 }
             }
         }
@@ -53,7 +54,10 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         private bool isVisible = true;
         private bool canInteract = true;
 
+        public Transform Anchor;
+        public InstructionsPanel Parent;
         public InstructionsScrollView ScrollView;
+        public TMP_Text index; 
 
         private BoxCollider2D thisCollider;
 
@@ -83,6 +87,9 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             isVisible = newValue;
         }
 
+        public virtual void UpdateSize(float contentWidth)
+        {
 
+        }
     }
 }

@@ -58,24 +58,5 @@ namespace AutoBrew.UIElements
             }
             return null;
         }
-
-        public static LocalizedText SpawnLocalizedText(string font, string sortingGroup)
-        {
-            GameObject obj = new()
-            {
-                name = typeof(LocalizedText).Name,
-                layer = LayerMask.NameToLayer("UI"),
-            };
-            obj.SetActive(false);
-            obj.AddComponent<RectTransform>();
-            var mr = obj.AddComponent<MeshRenderer>();
-            mr.sortingLayerID = SortingLayer.NameToID(sortingGroup);
-            
-            obj.AddComponent<TextMeshPro>();
-
-            var lt = obj.AddComponent<LocalizedText>();
-
-            return lt;
-        }
     }
 }

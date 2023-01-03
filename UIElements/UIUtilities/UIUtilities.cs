@@ -73,7 +73,7 @@ namespace AutoBrew.UIElements
 
         private static TMP_FontAsset[] fontAssets;
 
-        public static LocalizedText MakeLocalizedTextObj(MonoBehaviour parent, string font, int sortingOrder)
+        public static TextMeshPro MakeTextMeshProObj(string font)
         {
             fontAssets ??= Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
             var fontAsset = fontAssets.FirstOrDefault(x => x.name.Equals(font, System.StringComparison.OrdinalIgnoreCase));
@@ -84,7 +84,7 @@ namespace AutoBrew.UIElements
 
             GameObject obj = new()
             {
-                name = typeof(LocalizedText).Name,
+                name = typeof(TextMeshPro).Name,
                 layer = LayerMask.NameToLayer("UI"),
             };
             obj.SetActive(true);
@@ -92,13 +92,22 @@ namespace AutoBrew.UIElements
             var tmp = obj.AddComponent<TextMeshPro>();
             tmp.font = fontAsset;
             tmp.color = TextColor;
-            tmp.sortingLayerID = SortingLayerID;
-            tmp.sortingOrder = sortingOrder;
+            return tmp;
+        }
+
+        public static LocalizedText MakeLocalizedTmpObj(string font)
+        {
+            var tmp = MakeTextMeshProObj(font);
+            if (tmp == null)
+            {
+                return null;
+            }
+
+            GameObject obj = tmp.gameObject;
             
             // needed so that the LocalizedText component doesn't freak out when it awakens
             tmp.text = "";
             var lt = obj.AddComponent<LocalizedText>();
-            obj.transform.SetParent(parent.transform, false);
             return lt;
         }
 

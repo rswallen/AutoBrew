@@ -1,6 +1,8 @@
-﻿using PotionCraft.LocalizationSystem;
+﻿using AutoBrew.UIElements.Misc;
+using PotionCraft.LocalizationSystem;
 using PotionCraft.ScriptableObjects.Ingredient;
 using TMPro;
+using Unity.Audio;
 using UnityEngine;
 
 namespace AutoBrew.UIElements.Cookbook.Instructions
@@ -11,52 +13,44 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         {
             var item = Create<InstructionDisplay>();
 
-            item.Locales = UIUtilities.SpawnDescLocalizedText();
+            GameObject obj = new()
+            {
+                name = typeof(MoveUIHandle).Name,
+                layer = LayerMask.NameToLayer("UI"),
+            };
+            obj.SetActive(true);
+            item.Anchor = obj.transform;
+            item.transform.SetParent(item.Anchor, false);
+
+            var symbol = obj.AddComponent<SpriteRenderer>();
+            symbol.sprite = MoveUIHandle.SymbolIcon; ;
+            symbol.drawMode = SpriteDrawMode.Sliced;
+            symbol.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            symbol.size = new(0.3f, 0.3f);
+            symbol.sortingLayerID = SortingLayer.NameToID("DescriptionWindow");
+            symbol.sortingOrder = 5000;
+
+            item.icon = UIUtilities.MakeRendererObj<SpriteRenderer>(item, "Icon Renderer", 150);
+            item.icon.transform.localPosition = new(0.8f, 0f);
+            item.icon.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            item.icon.drawMode = SpriteDrawMode.Sliced;
+
+            item.Locales = UIUtilities.MakeLocalizedTmpObj("Vollkorn-PC Bold SDF");
             item.Locales.transform.SetParent(item.transform, false);
             item.Locales.transform.localPosition = new(0f, 0f);
             //item.localizedText.SetText(localeKey);
 
             item.Text = item.Locales.text as TextMeshPro;
-            item.Text.transform.localPosition = new(0.5f, 0f);
-            item.Text.rectTransform.sizeDelta = new(5f, 0f);
-            item.Text.horizontalAlignment = HorizontalAlignmentOptions.Left;
+            item.Text.transform.localPosition = new(4.2f, 0f);
+            item.Text.rectTransform.sizeDelta = new(5f, 1f);
+            item.Text.alignment = TextAlignmentOptions.Left;
             item.Text.enableWordWrapping = true;
-            item.Locales.text.fontSize = 3f;
-            //option.localizedText.text.overflowMode = TextOverflowModes.Ellipsis;
-
-            item.icon = UIUtilities.MakeRendererObj<SpriteRenderer>(item, "Icon Renderer", 150);
-            item.icon.transform.localPosition = new(-3f, 0f);
-            item.icon.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-            item.icon.drawMode = SpriteDrawMode.Sliced;
-
+            item.Text.fontSize = 3f;
+            item.Text.sortingLayerID = SortingLayer.NameToID("DescriptionWindow");
+            item.Text.sortingOrder = 150;
+            
             item.IsActive = true;
             return item;
-
-            // cauldron 
-            // Haggle ThemeIcon Alchemy 2 Large
-            // Haggle ThemeIcon Alchemy 2 Medium
-
-            // bellows
-            // Haggle ThemeIcon Alchemy 0 Medium
-
-            // mortar
-            // Haggle ThemeIcon Alchemy TabIcon Active
-            // Haggle ThemeIcon Alchemy 1 Medium
-            // Haggle ThemeIcon Alchemy 1 Large
-
-            // upgrades 84 84 270 150
-
-        }
-
-        public LocalizedText Locales;
-        public TextMeshPro Text;
-        public SpriteRenderer icon;
-        public int TestNum;
-
-        public override void UpdateVisibility(bool newValue)
-        {
-            base.UpdateVisibility(newValue);
-            Text.gameObject.SetActive(newValue);
         }
 
         private static Sprite bellows;
@@ -71,14 +65,14 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             {
                 Destroy(bellows);
             }
-            bellows = Sprite.Create(texture, new(84f, 7f, 270f, 270f), new(0.5f, 0.5f), ppu, 0, SpriteMeshType.FullRect, new(0f, 0f, 0f, 0f));
+            bellows = Sprite.Create(texture, new(84f, 10f, 270f, 270f), new(0.5f, 0.5f), 200, 0, SpriteMeshType.FullRect, new(0f, 0f, 0f, 0f));
 
             texture = TextureCache.FindTexture("Shop Upgrades Spoon");
             if (spoon != null)
             {
                 Destroy(spoon);
             }
-            spoon = Sprite.Create(texture, new(84f, 7f, 270f, 270f), new(0.5f, 0.5f), ppu, 0, SpriteMeshType.FullRect, new(0f, 0f, 0f, 0f));
+            spoon = Sprite.Create(texture, new(149f, 72f, 140f, 140f), new(0.5f, 0.5f), 100, 0, SpriteMeshType.FullRect, new(0f, 0f, 0f, 0f));
 
             texture = TextureCache.FindTexture("Shop Upgrades Mortar");
             if (mortar != null)
@@ -93,6 +87,16 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 Destroy(ladle);
             }
             ladle = Sprite.Create(texture, new(84f, 7f, 270f, 270f), new(0.5f, 0.5f), ppu, 0, SpriteMeshType.FullRect, new(0f, 0f, 0f, 0f));
+        }
+
+        public LocalizedText Locales;
+        public TextMeshPro Text;
+        public SpriteRenderer icon;
+
+        public override void UpdateVisibility(bool newValue)
+        {
+            base.UpdateVisibility(newValue);
+            Text.gameObject.SetActive(newValue);
         }
 
         public void ApplyOrder(BrewOrder order)
@@ -140,6 +144,7 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                     break;
                 }
             }
+            icon.size = new(1.35f, 1.35f);
         }
     }
 }

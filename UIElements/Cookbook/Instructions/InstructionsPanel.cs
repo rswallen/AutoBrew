@@ -1,13 +1,9 @@
-﻿using PotionCraft.ObjectBased.Bellows;
-using PotionCraft.ObjectBased.Ladle;
-using PotionCraft.ObjectBased.Mortar;
-using PotionCraft.ObjectBased.Spoon;
-using PotionCraft.ObjectBased.UIElements;
+﻿using PotionCraft.ObjectBased.UIElements;
 using PotionCraft.ObjectBased.UIElements.Scroll;
 using PotionCraft.ObjectBased.UIElements.Scroll.Settings;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace AutoBrew.UIElements.Cookbook.Instructions
 {
@@ -65,13 +61,14 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
 
             // Make ContentAnchor GameObject
             {
-                panel.contentAnchor = new()
+                GameObject caObj = new()
                 {
                     name = "ContentAnchor",
                     layer = LayerMask.NameToLayer("UI"),
                 };
-                panel.contentAnchor.SetActive(true);
-                panel.contentAnchor.transform.SetParent(obj.transform, false);
+                caObj.SetActive(true);
+                caObj.transform.SetParent(obj.transform);
+                panel.contentAnchor = caObj.transform;
 
                 // Make Content GameObject
                 {
@@ -82,7 +79,7 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                     };
                     contentObj.SetActive(true);
                     panel.scrollview.content = contentObj.AddComponent<Content>();
-                    panel.scrollview.content.transform.SetParent(panel.contentAnchor.transform, false);
+                    panel.scrollview.content.transform.SetParent(panel.contentAnchor, false);
                     panel.scrollview.content.transform.localPosition = Vector2.zero;
                 }
             }
@@ -95,6 +92,8 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
 
                 panel.maskOffset = new(-0.2f, -0.3f);
             }
+
+            panel.contentMask2 = obj.AddComponent<RectMask2D>();
 
             // Make ContentFade GameObject
             {
@@ -122,6 +121,13 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             return panel;
         }
 
+        private Transform contentAnchor;
+        private InstructionsScrollView scrollview;
+        private SpriteMask contentMask;
+        private RectMask2D contentMask2;
+        private SpriteRenderer contentFade;
+        private SpriteRenderer contentFrame;
+
         public float ContentLength { get; internal set; } = 1f;
         public Vector2 VisibleArea
         {
@@ -134,35 +140,32 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         }
         private Vector2 visibleArea = new(7.25f, 6f);
 
-        private GameObject contentAnchor;
-        private InstructionsScrollView scrollview;
-        private SpriteMask contentMask;
-        private SpriteRenderer contentFade;
-        private SpriteRenderer contentFrame;
+        public float ContentWidth
+        {
+            get
+            {
+                return visibleArea.x - (padding[0] + padding[2]);
+            }
+        }
 
         private float scrollPadding = 0.6f;
 
-        private Vector3 padding = new(1.0f, 1.4f, 0.7f);
-        private float minLength;
-        private float maxLength;
+        private Vector4 padding = new(0.4f, 1.0f, 0.4f, 1.0f);
+        private Vector3 vertPadding = new(1.0f, 1.4f, 0.7f);
         
         private Vector2 maskOffset = new(-0.2f, -0.3f);
         private Vector2 fadeOffset = new(0f, -0.2f);
 
-        public void Awake()
-        {
-            UpdateMinMaxLength(5);
-        }
-
-        public bool AddInstruction(BaseInstruction pane, bool refill = true)
+        public bool AddInstruction(InstructionDisplay pane, bool refill = true)
         {
             if ((pane == null) || instructions.Contains(pane))
             {
                 return false;
             }
             instructions.Add(pane);
-            pane.transform.SetParent(scrollview.content.transform, false);
+            pane.Anchor.SetParent(scrollview.content.transform, false);
             pane.ScrollView = scrollview;
+            pane.Parent = this;
 
             if (refill)
             {
@@ -177,7 +180,7 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             {
                 if (item != null)
                 {
-                    Destroy(item.gameObject);
+                    Destroy(item.Anchor.gameObject);
                 }
             }
             instructions.Clear();
@@ -186,17 +189,10 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         private float GetPanelLength(int numButtons)
         {
             int gaps = (numButtons < 1) ? 0 : numButtons - 1;
-            return padding[0] + (gaps * padding[1]) + padding[2];
+            return vertPadding[0] + (gaps * vertPadding[1]) + vertPadding[2];
         }
 
-        internal void UpdateMinMaxLength(int maxButtons)
-        {
-            minLength = GetPanelLength(1);
-            maxLength = GetPanelLength(maxButtons);
-            Refill();
-        }
-
-        private readonly List<BaseInstruction> instructions = new();
+        private readonly List<InstructionDisplay> instructions = new();
         private InstructionEditor editor;
 
         public void Refill()
@@ -208,7 +204,7 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             {
                 if (pane != null)
                 {
-                    pane.transform.localPosition = (padding[0] + (position++ * padding[1])) * Vector2.down;
+                    pane.Anchor.localPosition = (vertPadding[0] + (position++ * vertPadding[1])) * Vector2.down;
                     numButtons++;
                 }
             }
@@ -219,7 +215,8 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
 
         public void UpdateSize(Vector2 newSize)
         {
-            contentAnchor.transform.localPosition = new(0.1f, newSize.y / 2f);
+            //contentAnchor.localPosition = new(0.1f, newSize.y / 2f);
+            contentAnchor.localPosition = new((newSize.x / -2f) + 0.2f, newSize.y / 2f);
 
             float scrollX = (newSize.x - 0.45f) / 2;
             scrollview.verticalScroll.transform.localPosition = new(scrollX, 0f);
@@ -239,6 +236,8 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             float maskScaleX = ((newSize.x + maskOffset.x) / contentMask.sprite.rect.width) * contentMask.sprite.pixelsPerUnit;
             float maskScaleY = ((newSize.y + maskOffset.y) / contentMask.sprite.rect.height) * contentMask.sprite.pixelsPerUnit;
             contentMask.transform.localScale = new(maskScaleX, maskScaleY);
+
+            contentMask2.rectTransform.sizeDelta = newSize;
 
             contentFade.size = new(newSize.x + fadeOffset.x, newSize.y + fadeOffset.y);
 
