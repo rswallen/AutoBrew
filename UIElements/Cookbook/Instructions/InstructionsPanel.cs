@@ -166,6 +166,7 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             pane.Anchor.SetParent(scrollview.content.transform, false);
             pane.ScrollView = scrollview;
             pane.Parent = this;
+            pane.SetIndex(instructions.Count);
 
             if (refill)
             {

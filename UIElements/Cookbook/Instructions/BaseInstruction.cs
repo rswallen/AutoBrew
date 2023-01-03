@@ -17,7 +17,18 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             
             var item = obj.AddComponent<T>();
 
-
+            item.index = UIUtilities.MakeTextMeshProObj("Caveat-Bold SDF");
+            item.index.transform.SetParent(item.transform);
+            item.index.transform.localPosition = new(0.2f, 0.5f);
+            item.index.rectTransform.pivot = new(0f, 0.5f);
+            item.index.rectTransform.sizeDelta = new(5f, 1f);
+            item.index.alignment = TextAlignmentOptions.Left;
+            item.index.enableWordWrapping = true;
+            item.index.fontSize = 2.5f;
+            var tmp = item.index as TextMeshPro;
+            tmp.sortingLayerID = SortingLayer.NameToID("DescriptionWindow");
+            tmp.sortingOrder = 200;
+            tmp.text = "N/A";
 
             var collider = obj.AddComponent<BoxCollider2D>();
             collider.size = new Vector2(5f, 0.5f);
@@ -57,8 +68,8 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         public Transform Anchor;
         public InstructionsPanel Parent;
         public InstructionsScrollView ScrollView;
-        public TMP_Text index; 
-
+        
+        private TMP_Text index;
         private BoxCollider2D thisCollider;
 
         public void LateUpdate()
@@ -90,6 +101,11 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         public virtual void UpdateSize(float contentWidth)
         {
 
+        }
+
+        public void SetIndex(int newIndex)
+        {
+            index.text = newIndex.ToString();
         }
     }
 }
