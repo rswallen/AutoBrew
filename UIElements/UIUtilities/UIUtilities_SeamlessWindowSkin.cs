@@ -1,5 +1,4 @@
 ﻿using PotionCraft.ObjectBased.UIElements;
-using PotionCraft.ObjectBased.UIElements.Scroll;
 using UnityEngine;
 
 namespace AutoBrew.UIElements

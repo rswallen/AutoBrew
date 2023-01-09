@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using HarmonyLib;
 using PotionCraft.ObjectBased.UIElements.PotionCustomizationPanel;
+using PotionCraft.ObjectBased.UIElements.Scroll;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
@@ -42,6 +43,12 @@ namespace AutoBrew.UI
                     _callbacks[text].Invoke();
                 });
             }
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(ScrollView), "ScrollByMouseWheel")]
+        public static void ScrollByMouseWheel_Postfix(float mouseScrollDelta)
+        {
+            Log.LogDebug($"ScrollDelta: {mouseScrollDelta}");
         }
     }
 }

@@ -36,7 +36,7 @@ namespace AutoBrew
             }
             return success;
         }
-        
+
         public static bool GetInt(string source, Dictionary<string, string> repo, string key, out int output, int defaultValue = 0, bool logFailure = true)
         {
             output = defaultValue;
@@ -55,7 +55,7 @@ namespace AutoBrew
             }
             return success;
         }
-        
+
         public static bool GetFloat(string source, Dictionary<string, string> repo, string key, out float output, float defaultValue = 0f, bool logFailure = true)
         {
             output = defaultValue;

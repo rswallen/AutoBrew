@@ -13,14 +13,14 @@ namespace AutoBrew.Toolbar.Buttons
 
             var mortarTexture = TextureCache.LoadTexture("ToolbarIcons", "Mortar Foreground Reduced.png");
             button.normalSprite = ToolbarUtils.MakeSprite("AutoBrew MainSubpanel Static", mortarTexture);
-            
+
             button.spriteRenderer = ToolbarUtils.MakeRendererObj<SpriteRenderer>(button.GameObject, "Static Renderer", 110);
             button.spriteRenderer.sprite = button.normalSprite;
             button.spriteRenderer.transform.localPosition = new(0.0f, -0.1f);
 
             var optionTexture = TextureCache.FindTexture("RadialMenu OptionsIcon Active");
             button.normalSpriteIcon = ToolbarUtils.MakeSprite("AutoBrew MainSubpanel Spinner", optionTexture, 0.5f);
-            
+
             button.spriteRendererIcon = ToolbarUtils.MakeRendererObj<SpriteRenderer>(button.GameObject, "Spinner Renderer", 100);
             button.spriteRendererIcon.sprite = button.normalSpriteIcon;
             button.spriteRendererIcon.transform.localPosition = new(0.0f, 0.1f);

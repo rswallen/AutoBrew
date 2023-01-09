@@ -1,5 +1,4 @@
 ﻿using PotionCraft.ObjectBased.UIElements;
-using TMPro;
 using UnityEngine;
 
 
@@ -17,7 +16,7 @@ namespace AutoBrew.UIElements.Misc
                     layer = LayerMask.NameToLayer("UI"),
                 };
                 obj.SetActive(false);
-                
+
                 var option = obj.AddComponent<DropdownOption>();
 
                 var collider = obj.AddComponent<BoxCollider2D>();
@@ -61,7 +60,7 @@ namespace AutoBrew.UIElements.Misc
                 {
                     return;
                 }
-                
+
                 canInteract = (transform.position.y < ScrollView.MaxInteractPos.y) && (transform.position.y > ScrollView.MinInteractPos.y);
                 IsVisible = (transform.position.y < ScrollView.MaxVisiblePos.y) && (transform.position.y > ScrollView.MinVisiblePos.y);
             }

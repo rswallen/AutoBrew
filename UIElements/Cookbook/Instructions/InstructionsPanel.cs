@@ -2,6 +2,7 @@
 using PotionCraft.ObjectBased.UIElements.Scroll;
 using PotionCraft.ObjectBased.UIElements.Scroll.Settings;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +10,7 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
 {
     internal sealed class InstructionsPanel : MonoBehaviour
     {
-        public static InstructionsPanel Create()
+        public static InstructionsPanel Create(CookbookPanel parent)
         {
             GameObject obj = new()
             {
@@ -30,14 +31,14 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 scrollviewObj.SetActive(true);
                 scrollviewObj.transform.SetParent(obj.transform, false);
 
-                panel.scrollview = scrollviewObj.AddComponent<InstructionsScrollView>();
-                panel.scrollview.panel = panel;
-                panel.scrollview.thisCollider = scrollviewObj.AddComponent<BoxCollider2D>();
+                panel.Scrollview = scrollviewObj.AddComponent<InstructionsScrollView>();
+                panel.Scrollview.panel = panel;
+                panel.Scrollview.thisCollider = scrollviewObj.AddComponent<BoxCollider2D>();
 
-                panel.scrollview.settings = ScriptableObject.CreateInstance<ScrollViewSettings>();
-                panel.scrollview.settings.changeByScroll = 1.0f;
-                panel.scrollview.settings.contentMoveAnimTime = 0.1f;
-                panel.scrollview.settings.scrollByMouseWheelDeadZone = 0.1f;
+                panel.Scrollview.settings = ScriptableObject.CreateInstance<ScrollViewSettings>();
+                panel.Scrollview.settings.changeByScroll = 1.0f;
+                panel.Scrollview.settings.contentMoveAnimTime = 0.1f;
+                panel.Scrollview.settings.scrollByMouseWheelDeadZone = 0.1f;
 
                 // make scroll object
                 {
@@ -53,9 +54,9 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                     var scroll = UIUtilities.SpawnScroll();
                     scroll.transform.SetParent(scrollObj.transform, false);
 
-                    panel.scrollview.verticalScroll = scrollObj;
-                    panel.scrollview.verticalScrollPointer = scrollObj.GetComponentInChildren<ScrollPointer>();
-                    panel.scrollview.verticalScrollPointer.scrollView = panel.scrollview;
+                    panel.Scrollview.verticalScroll = scrollObj;
+                    panel.Scrollview.verticalScrollPointer = scrollObj.GetComponentInChildren<ScrollPointer>();
+                    panel.Scrollview.verticalScrollPointer.scrollView = panel.Scrollview;
                 }
             }
 
@@ -68,7 +69,9 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 };
                 caObj.SetActive(true);
                 caObj.transform.SetParent(obj.transform);
-                panel.contentAnchor = caObj.transform;
+                panel.contentMask2 = caObj.AddComponent<RectMask2D>();
+                panel.contentAnchor = caObj.transform as RectTransform;
+                panel.contentAnchor.pivot = new(0f, 1f);
 
                 // Make Content GameObject
                 {
@@ -78,9 +81,9 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                         layer = LayerMask.NameToLayer("UI"),
                     };
                     contentObj.SetActive(true);
-                    panel.scrollview.content = contentObj.AddComponent<Content>();
-                    panel.scrollview.content.transform.SetParent(panel.contentAnchor, false);
-                    panel.scrollview.content.transform.localPosition = Vector2.zero;
+                    panel.Scrollview.content = contentObj.AddComponent<Content>();
+                    panel.Scrollview.content.transform.SetParent(panel.contentAnchor, false);
+                    panel.Scrollview.content.transform.localPosition = Vector2.zero;
                 }
             }
 
@@ -93,14 +96,16 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 panel.maskOffset = new(-0.2f, -0.3f);
             }
 
-            panel.contentMask2 = obj.AddComponent<RectMask2D>();
+
+            panel.canvas = obj.AddComponent<Canvas>();
+            panel.canvas.sortingLayerID = SortingLayer.NameToID("DescriptionWindow");
+            panel.canvas.sortingOrder = 150;
 
             // Make ContentFade GameObject
             {
                 var fadeTexture = TextureCache.FindTexture("RecipeBook Recipe Substrate");
                 panel.contentFade = UIUtilities.MakeRendererObj<SpriteRenderer>(panel.gameObject, "ContentFade", 500);
                 panel.contentFade.drawMode = SpriteDrawMode.Sliced;
-                panel.contentFade.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
                 panel.contentFade.sprite = Sprite.Create(fadeTexture, new(300, 210, 200, 780), new(0.5f, 0.5f), 100, 0, SpriteMeshType.FullRect, new(5, 30, 5, 30));
 
                 panel.contentFade.transform.localPosition = new(0.15f, 0f);
@@ -117,18 +122,30 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 panel.contentFrame.drawMode = SpriteDrawMode.Sliced;
             }
 
+            panel.cookbook = parent;
             obj.SetActive(true);
             return panel;
         }
 
-        private Transform contentAnchor;
-        private InstructionsScrollView scrollview;
+        private CookbookPanel cookbook;
+
+        private Canvas canvas;
+        private RectTransform contentAnchor;
         private SpriteMask contentMask;
         private RectMask2D contentMask2;
         private SpriteRenderer contentFade;
         private SpriteRenderer contentFrame;
 
+        public InstructionsScrollView Scrollview;
+        public Transform Content
+        {
+            get { return Scrollview.content.transform; }
+        }
+
+        public bool ItemOrderLocked { get; private set; }
+
         public float ContentLength { get; internal set; } = 1f;
+
         public Vector2 VisibleArea
         {
             get { return visibleArea; }
@@ -142,19 +159,25 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
 
         public float ContentWidth
         {
-            get
-            {
-                return visibleArea.x - (padding[0] + padding[2]);
-            }
+            get { return visibleArea.x - (padding[0] + padding[2]); }
         }
 
         private float scrollPadding = 0.6f;
 
         private Vector4 padding = new(0.4f, 1.0f, 0.4f, 1.0f);
-        private Vector3 vertPadding = new(1.0f, 1.4f, 0.7f);
-        
+
+        public Vector3 VertPadding
+        {
+            get { return vertPadding; }
+            set
+            {
+                vertPadding = value;
+                Refill(false);
+            }
+        }
+        private Vector3 vertPadding = new(0.9f, 1.4f, 0.9f);
+
         private Vector2 maskOffset = new(-0.2f, -0.3f);
-        private Vector2 fadeOffset = new(0f, -0.2f);
 
         public bool AddInstruction(InstructionDisplay pane, bool refill = true)
         {
@@ -163,16 +186,36 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 return false;
             }
             instructions.Add(pane);
-            pane.Anchor.SetParent(scrollview.content.transform, false);
-            pane.ScrollView = scrollview;
+            pane.Anchor.SetParent(Scrollview.content.transform, false);
+            pane.ScrollView = Scrollview;
             pane.Parent = this;
-            pane.SetIndex(instructions.Count);
+            pane.SetIndex(instructions.Count - 1);
 
             if (refill)
             {
                 Refill();
             }
             return true;
+        }
+
+        public void MoveInstruction(int from, int to)
+        {
+            if ((from >= instructions.Count) || (to >= instructions.Count))
+            {
+                return;
+            }
+            var item = instructions[from];
+            instructions.RemoveAt(from);
+            instructions.Insert(to, item);
+            UpdateIndices();
+        }
+
+        public void UpdateIndices()
+        {
+            for (int i = 0; i < instructions.Count; i++)
+            {
+                instructions[i].SetIndex(i);
+            }
         }
 
         public void Clear()
@@ -185,33 +228,49 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 }
             }
             instructions.Clear();
+            Refill();
         }
-        
+
         private float GetPanelLength(int numButtons)
         {
             int gaps = (numButtons < 1) ? 0 : numButtons - 1;
             return vertPadding[0] + (gaps * vertPadding[1]) + vertPadding[2];
         }
 
+        // return a copy
+        public List<InstructionDisplay> Instructions
+        {
+            get { return instructions.ToList(); }
+        }
         private readonly List<InstructionDisplay> instructions = new();
         private InstructionEditor editor;
 
-        public void Refill()
+        public void Refill(bool resetToStart = true)
         {
+            float scrollPos = Scrollview.verticalScrollPointer.Value;
+
             // start from the end of the list and work backwards
             int numButtons = 0;
-            int position = 0;
-            foreach (var pane in instructions)
+            for (int i = 0; i < instructions.Count; i++)
             {
+                var pane = instructions[i];
                 if (pane != null)
                 {
-                    pane.Anchor.localPosition = (vertPadding[0] + (position++ * vertPadding[1])) * Vector2.down;
+                    if (!pane.Handle.IsPointerPressed)
+                    {
+                        pane.Anchor.localPosition = (vertPadding[0] + (i * vertPadding[1])) * Vector2.down;
+                    }
                     numButtons++;
                 }
             }
 
             ContentLength = GetPanelLength(numButtons);
             UpdateSize(visibleArea);
+
+            if (!resetToStart)
+            {
+                Scrollview.verticalScrollPointer.SetPosition(scrollPos, true, false);
+            }
         }
 
         public void UpdateSize(Vector2 newSize)
@@ -220,17 +279,17 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             contentAnchor.localPosition = new((newSize.x / -2f) + 0.2f, newSize.y / 2f);
 
             float scrollX = (newSize.x - 0.45f) / 2;
-            scrollview.verticalScroll.transform.localPosition = new(scrollX, 0f);
+            Scrollview.verticalScroll.transform.localPosition = new(scrollX, 0f);
 
             float scrollLength = newSize.y - scrollPadding;
 
-            var axis = scrollview.verticalScrollPointer.axis;
+            var axis = Scrollview.verticalScrollPointer.axis;
             axis.spriteRenderer.size = new(0.1f, scrollLength);
             (axis.thisCollider as CapsuleCollider2D).size = new(0.15f, scrollLength);
 
             float scrollHalfLength = scrollLength / 2f;
 
-            var pointer = scrollview.verticalScrollPointer;
+            var pointer = Scrollview.verticalScrollPointer;
             pointer.startPosition = new(0f, scrollHalfLength);
             pointer.endPosition = new(0f, -scrollHalfLength);
 
@@ -239,15 +298,37 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             contentMask.transform.localScale = new(maskScaleX, maskScaleY);
 
             contentMask2.rectTransform.sizeDelta = newSize;
-
-            contentFade.size = new(newSize.x + fadeOffset.x, newSize.y + fadeOffset.y);
-
+            contentFade.size = newSize;
             contentFrame.size = newSize;
 
             // update scrollview collider
-            scrollview.UpdateSize(newSize);
-            scrollview.SetPositionTo(0f, false);
+            Scrollview.UpdateSize(newSize);
+            Scrollview.SetPositionTo(0f, false);
             pointer.SetPosition(0f, true, false);
+        }
+
+        public void Scroll(float delta)
+        {
+            Scrollview.ScrollByMouseWheel(delta);
+        }
+
+        public float ScrollPosition
+        {
+            get { return Scrollview.verticalScrollPointer.Value; }
+        }
+
+        public int GetIndexOfY(float yPos)
+        {
+            for (int i = 0; i < instructions.Count; i++)
+            {
+                float indexPos = -vertPadding[0] - (i * vertPadding[1]);
+                indexPos -= (0.5f * vertPadding[1]);
+                if (indexPos < yPos)
+                {
+                    return i;
+                }
+            }
+            return instructions.Count;
         }
     }
 }

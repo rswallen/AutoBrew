@@ -46,7 +46,7 @@ namespace AutoBrew.Overseer
             _pidControl = new(_pidValues);
             base.Setup(order);
         }
-        
+
         public override void Process()
         {
             if (Stage != OverseerStage.Active)
@@ -88,7 +88,7 @@ namespace AutoBrew.Overseer
             double percent = _pouredTotal / _pourTarget;
             Log.LogInfo($"PourStatus: {percent:P8} | {_pouredTotal:N8}/{_pourTarget:N8}");
         }
-        
+
         public override double Accuracy
         {
             get

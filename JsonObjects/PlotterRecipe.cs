@@ -25,32 +25,32 @@ namespace AutoBrew.JsonObjects
                 switch (order.Order)
                 {
                     case BrewOrderType.AddIngredient:
+                    {
+                        var ingOrder = order.GetBrewOrder();
+                        if (ingOrder == null)
                         {
-                            var ingOrder = order.GetBrewOrder();
-                            if (ingOrder == null)
-                            {
-                                Log.LogError($"Error detected in order '{order}'");
-                                break;
-                            }
-                            method.AddOrder(ingOrder);
-                            method.AddOrder(order.GetBrewOrder(BrewOrderType.GrindPercent));
+                            Log.LogError($"Error detected in order '{order}'");
                             break;
                         }
+                        method.AddOrder(ingOrder);
+                        method.AddOrder(order.GetBrewOrder(BrewOrderType.GrindPercent));
+                        break;
+                    }
                     case BrewOrderType.StirCauldron:
                     case BrewOrderType.PourSolvent:
                     case BrewOrderType.HeatVortex:
                     case BrewOrderType.AddSalt:
                     case BrewOrderType.AddEffect:
+                    {
+                        var bOrder = order.GetBrewOrder();
+                        if (bOrder == null)
                         {
-                            var bOrder = order.GetBrewOrder();
-                            if (bOrder == null)
-                            {
-                                Log.LogError($"Error detected in order '{order}'");
-                                break;
-                            }
-                            method.AddOrder(bOrder);
+                            Log.LogError($"Error detected in order '{order}'");
                             break;
                         }
+                        method.AddOrder(bOrder);
+                        break;
+                    }
                 }
                 method.AddOrder(order.GetBrewOrder());
             }

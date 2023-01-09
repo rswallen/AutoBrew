@@ -96,7 +96,7 @@ namespace AutoBrew.Overseer
             }
 
             UpdateSpoonPos();
-            
+
             double interval = Time.timeAsDouble - _gtLastUpdate;
             if (interval >= _intervalMaxUpdate)
             {

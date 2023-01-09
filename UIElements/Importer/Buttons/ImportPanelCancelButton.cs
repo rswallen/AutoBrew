@@ -1,9 +1,4 @@
-﻿using PotionCraft.ObjectBased.UIElements;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
-using UnityEngine.UIElements;
+﻿using UnityEngine;
 
 namespace AutoBrew.UIElements.Importer.Buttons
 {
@@ -17,7 +12,7 @@ namespace AutoBrew.UIElements.Importer.Buttons
             (button.thisCollider as BoxCollider2D).size = button.spriteRenderer.size;
 
             button.text.text.text = "Cancel";
-            
+
             button.gameObject.SetActive(true);
             return button;
         }

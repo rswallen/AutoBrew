@@ -3,12 +3,9 @@ using BepInEx.Logging;
 using DarkScreenSystem;
 using PotionCraft.InputSystem;
 using PotionCraft.LocalizationSystem;
-using PotionCraft.ManagersSystem;
-using PotionCraft.ObjectBased.InteractiveItem;
 using PotionCraft.ObjectBased.UIElements;
 using PotionCraft.ObjectBased.UIElements.Scroll;
 using PotionCraft.ObjectBased.UIElements.Tooltip;
-using System;
 using TMPro;
 using UnityEngine;
 

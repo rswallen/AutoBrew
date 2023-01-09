@@ -4,8 +4,8 @@ using BepInEx.Logging;
 using Newtonsoft.Json;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.ScriptableObjects.Salts;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AutoBrew
 {
@@ -37,7 +37,7 @@ namespace AutoBrew
             method.ProcessJsonOrders(buffer);
             return method;
         }
-        
+
         public static BrewMethod FromPlotterUrl(string url)
         {
             string json = PlotterUrlDecoder.ProcessURL(url);
@@ -59,7 +59,7 @@ namespace AutoBrew
             {
                 potionbase = PotionBase.GetByName(buffer.PotionBaseId, false, false);
             }
-            
+
             BrewMethod method = new(potionbase, true);
             method.ProcessJsonOrders(buffer2);
             return method;

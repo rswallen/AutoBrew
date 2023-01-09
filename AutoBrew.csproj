@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <None Remove="locales\en.json" />
+    <None Remove="UIElements\Cookbook\RecipeChecklist\Checklist.cs~RF2c0e147.TMP" />
   </ItemGroup>
 
   <ItemGroup>

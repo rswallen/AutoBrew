@@ -1,8 +1,5 @@
 ﻿using AutoBrew.UIElements;
 using PotionCraft.ObjectBased.UIElements.Tooltip;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Toolbar;
 using UnityEngine;
 

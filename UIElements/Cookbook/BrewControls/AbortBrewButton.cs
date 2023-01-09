@@ -1,7 +1,4 @@
 ﻿using PotionCraft.LocalizationSystem;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace AutoBrew.UIElements.Cookbook.BrewControls

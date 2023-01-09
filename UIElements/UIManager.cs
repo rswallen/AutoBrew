@@ -28,7 +28,7 @@ namespace AutoBrew.UIElements
 
             Cookbook = CookbookPanel.Create();
             Cookbook.transform.SetParent(Managers.Game.cam.transform);
-            Cookbook.transform.localPosition = new(8f, 0f);
+            Cookbook.transform.localPosition = new(8f, -0.5f);
 
             var cookbookHandle = MoveUIHandle.Create("DescriptionWindow", 1000);
             cookbookHandle.ReplaceLink(Managers.Game.cam.transform, Cookbook.transform, new(3.7f, 4.7f));

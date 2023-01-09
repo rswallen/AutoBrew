@@ -8,7 +8,7 @@ namespace AutoBrew.UIElements.Cookbook.BrewControls
         public static PauseBrewButton Create(BrewControlsPanel controller)
         {
             var button = Create<PauseBrewButton>(controller);
-            
+
             button.label = UIUtilities.SpawnDescLocalizedText();
             button.label.transform.SetParent(button.transform, false);
             button.label.transform.localPosition = new(0f, 0f);

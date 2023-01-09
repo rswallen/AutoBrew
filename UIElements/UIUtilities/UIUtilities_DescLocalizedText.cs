@@ -1,6 +1,5 @@
 ﻿using PotionCraft.LocalizationSystem;
 using PotionCraft.ObjectBased.UIElements.PotionDescriptionWindow;
-using TMPro;
 using UnityEngine;
 
 namespace AutoBrew.UIElements

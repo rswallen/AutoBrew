@@ -24,7 +24,7 @@ namespace AutoBrew.UIElements.Cookbook.RecipeChecklist
             item.locales.transform.SetParent(item.transform, false);
             item.locales.transform.localPosition = new(0f, 0f);
             item.locales.OnTextUpdate.AddListener(item.OnTextUpdated);
-            
+
             item.label = item.locales.text as TextMeshPro;
             item.label.text = "";
             item.label.alignment = TextAlignmentOptions.Left;

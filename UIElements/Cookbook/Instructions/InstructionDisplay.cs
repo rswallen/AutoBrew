@@ -1,9 +1,8 @@
-﻿using AutoBrew.UIElements.Misc;
-using PotionCraft.LocalizationSystem;
+﻿using PotionCraft.LocalizationSystem;
 using PotionCraft.ScriptableObjects.Ingredient;
 using TMPro;
-using Unity.Audio;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace AutoBrew.UIElements.Cookbook.Instructions
 {
@@ -13,42 +12,31 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         {
             var item = Create<InstructionDisplay>();
 
-            GameObject obj = new()
-            {
-                name = typeof(MoveUIHandle).Name,
-                layer = LayerMask.NameToLayer("UI"),
-            };
-            obj.SetActive(true);
-            item.Anchor = obj.transform;
+            item.Handle = InstructionHandle.Create();
+            item.Handle.Instruction = item;
+            item.Anchor = item.Handle.transform;
             item.transform.SetParent(item.Anchor, false);
 
-            var symbol = obj.AddComponent<SpriteRenderer>();
-            symbol.sprite = MoveUIHandle.SymbolIcon; ;
-            symbol.drawMode = SpriteDrawMode.Sliced;
-            symbol.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-            symbol.size = new(0.3f, 0.3f);
-            symbol.sortingLayerID = SortingLayer.NameToID("DescriptionWindow");
-            symbol.sortingOrder = 5000;
-
-            item.icon = UIUtilities.MakeRendererObj<SpriteRenderer>(item, "Icon Renderer", 150);
+            //item.icon = UIUtilities.MakeRendererObj<SpriteRenderer>(item, "Icon Renderer", idleSO);
+            item.icon = UIUtilities.MakeCanvasSpriteObj(item, "Icon Renderer");
             item.icon.transform.localPosition = new(0.8f, 0f);
-            item.icon.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-            item.icon.drawMode = SpriteDrawMode.Sliced;
+            item.icon.transform.localScale = new(0.0135f, 0.0135f);
 
-            item.Locales = UIUtilities.MakeLocalizedTmpObj("Vollkorn-PC Bold SDF");
-            item.Locales.transform.SetParent(item.transform, false);
-            item.Locales.transform.localPosition = new(0f, 0f);
-            //item.localizedText.SetText(localeKey);
-
-            item.Text = item.Locales.text as TextMeshPro;
+            item.Text = UIUtilities.MakeTMPTextObj<TextMeshProUGUI>("Caveat-Bold SDF");
+            item.Text.transform.SetParent(item.transform, false);
             item.Text.transform.localPosition = new(4.2f, 0f);
-            item.Text.rectTransform.sizeDelta = new(5f, 1f);
+            item.Text.transform.localScale = new(0.1f, 0.1f);
+            item.Text.rectTransform.sizeDelta = new(50f, 10f);
             item.Text.alignment = TextAlignmentOptions.Left;
             item.Text.enableWordWrapping = true;
             item.Text.fontSize = 3f;
-            item.Text.sortingLayerID = SortingLayer.NameToID("DescriptionWindow");
-            item.Text.sortingOrder = 150;
-            
+            item.Text.text = "";
+
+            item.Locales = item.Text.gameObject.AddComponent<LocalizedText>();
+            //item.localizedText.SetText(localeKey);
+
+            item.indexText.transform.SetAsLastSibling();
+            item.Handle.IsActive = true;
             item.IsActive = true;
             return item;
         }
@@ -57,6 +45,8 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         private static Sprite spoon;
         private static Sprite mortar;
         private static Sprite ladle;
+
+
 
         public static void UpdateSprites(int ppu)
         {
@@ -90,16 +80,17 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         }
 
         public LocalizedText Locales;
-        public TextMeshPro Text;
-        public SpriteRenderer icon;
+        public TMP_Text Text;
+        public Image icon;
+        public InstructionHandle Handle;
 
         public override void UpdateVisibility(bool newValue)
         {
             base.UpdateVisibility(newValue);
-            Text.gameObject.SetActive(newValue);
+            //Text.gameObject.SetActive(newValue);
         }
 
-        public void ApplyOrder(BrewOrder order)
+        public override void Apply(BrewOrder order)
         {
             switch (order.Stage)
             {
@@ -144,7 +135,29 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                     break;
                 }
             }
-            icon.size = new(1.35f, 1.35f);
+            //icon.size = new(1.35f, 1.35f);
+        }
+
+        public override bool IsValid()
+        {
+            return true;
+        }
+
+        public override Bounds GetBounds()
+        {
+            var bounds = Text.GetTextBounds();
+            //bounds.Encapsulate(icon.rectTransform.bounds);
+            return bounds;
+        }
+
+        public override void OnAnchorGrabbed()
+        {
+            transform.SetAsLastSibling();
+        }
+
+        public override void OnAnchorReleased()
+        {
+            Parent.Refill(false);
         }
     }
 }

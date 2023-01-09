@@ -25,7 +25,7 @@ namespace AutoBrew.Overseer
         private static Vector3 _pidValues;
         private static float _heatMin;
         private static float _heatMax;
-        
+
         private BrewOrder _order;
         private PIDController _pidControl;
         private double _heatedTotal;
@@ -144,7 +144,7 @@ namespace AutoBrew.Overseer
         {
             get
             {
-                switch(_order.Stage)
+                switch (_order.Stage)
                 {
                     case BrewOrderType.HeatVortex:
                     {

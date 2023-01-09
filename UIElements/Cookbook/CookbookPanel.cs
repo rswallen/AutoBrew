@@ -5,6 +5,8 @@ using AutoBrew.UIElements.Misc;
 using PotionCraft.LocalizationSystem;
 using PotionCraft.ObjectBased.InteractiveItem;
 using PotionCraft.ObjectBased.UIElements;
+using PotionCraft.ScriptableObjects;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AutoBrew.UIElements.Cookbook
@@ -32,20 +34,20 @@ namespace AutoBrew.UIElements.Cookbook
             panel.heading.text.fontSize = 5f;
             panel.heading.text.text = "Recipe Preview";
 
-            panel.controller = BrewControlsPanel.Create();
-            panel.controller.transform.SetParent(panel.transform);
-            panel.controller.transform.localPosition = new(-2.3f, 2.7f);
+            panel.Controls = BrewControlsPanel.Create(panel);
+            panel.Controls.transform.SetParent(panel.transform);
+            panel.Controls.transform.localPosition = new(-2.3f, 2.7f);
 
-            panel.checklist = Checklist.Create();
-            panel.checklist.transform.SetParent(panel.transform);
-            panel.checklist.transform.localPosition = new(-0.7f, 3.5f);
+            panel.Requirements = Checklist.Create(panel);
+            panel.Requirements.transform.SetParent(panel.transform);
+            panel.Requirements.transform.localPosition = new(-0.7f, 3.5f);
 
-            panel.instructions = InstructionsPanel.Create();
-            panel.instructions.transform.SetParent(panel.transform);
-            panel.instructions.transform.localPosition = new(0f, -1.7f);
+            panel.Instructions = InstructionsPanel.Create(panel);
+            panel.Instructions.transform.SetParent(panel.transform);
+            panel.Instructions.transform.localPosition = new(0f, -1.7f);
 
             InstructionDisplay.UpdateSprites(200);
-            panel.instructions.Refill();
+            panel.Instructions.Refill();
 
             // TEMP HANDLES - REMOVE!!
             var headingHandle = MoveUIHandle.Create("DescriptionWindow", 1000);
@@ -53,15 +55,15 @@ namespace AutoBrew.UIElements.Cookbook
             headingHandle.IsActive = true;
 
             var controllerHandle = MoveUIHandle.Create("DescriptionWindow", 1000);
-            controllerHandle.ReplaceLink(panel, panel.controller, new(0f, 1f));
+            controllerHandle.ReplaceLink(panel, panel.Controls, new(0f, 1f));
             controllerHandle.IsActive = true;
 
             var checklistHandle = MoveUIHandle.Create("DescriptionWindow", 1000);
-            checklistHandle.ReplaceLink(panel, panel.checklist, new(0.25f, -0.75f));
+            checklistHandle.ReplaceLink(panel, panel.Requirements, new(0.25f, -0.75f));
             checklistHandle.IsActive = true;
 
             var instructionsHandle = MoveUIHandle.Create("DescriptionWindow", 1000);
-            instructionsHandle.ReplaceLink(panel, panel.instructions, new(0f, 1f));
+            instructionsHandle.ReplaceLink(panel, panel.Instructions, new(0f, 1f));
             instructionsHandle.IsActive = true;
 
             panel.IsActive = true;
@@ -69,11 +71,13 @@ namespace AutoBrew.UIElements.Cookbook
         }
 
         private SeamlessWindowSkin skin;
-
         private LocalizedText heading;
-        private Checklist checklist;
-        private BrewControlsPanel controller;
-        private InstructionsPanel instructions;
+
+        public Checklist Requirements { get; private set; }
+        public BrewControlsPanel Controls { get; private set; }
+        public InstructionsPanel Instructions { get; private set; }
+
+        public BrewMethod Recipe { get; private set; }
 
         //private LocalizedText manualText;
 
@@ -96,7 +100,7 @@ namespace AutoBrew.UIElements.Cookbook
                 }
             }
         }
-        
+
         private bool isActive = false;
         private BoxCollider2D thisCollider;
 
@@ -113,11 +117,14 @@ namespace AutoBrew.UIElements.Cookbook
 
         public void Reset()
         {
-            instructions.Clear();
+            Requirements.Clear();
+            Instructions.Clear();
         }
 
         public void LoadMethod(BrewMethod recipe)
         {
+            Recipe = recipe;
+
             foreach (var order in recipe.OrderList)
             {
                 switch (order.Stage)
@@ -129,13 +136,15 @@ namespace AutoBrew.UIElements.Cookbook
                     default:
                     {
                         var item = InstructionDisplay.Create();
-                        item.ApplyOrder(order);
-                        instructions.AddInstruction(item, false);
+                        item.Apply(order);
+                        Instructions.AddInstruction(item, false);
                         break;
                     }
                 }
             }
-            instructions.Refill();
+
+            Instructions.Refill();
+            Requirements.VerifyAll();
         }
     }
 }

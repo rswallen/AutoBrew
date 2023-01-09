@@ -59,7 +59,7 @@ namespace AutoBrew
         }
 
         public int SaltCost => GetSaltCost();
-        
+
         public int GetSaltCost()
         {
             switch (Stage)

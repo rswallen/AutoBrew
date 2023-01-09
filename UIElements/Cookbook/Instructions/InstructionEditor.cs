@@ -2,6 +2,7 @@
 using PotionCraft.ScriptableObjects.Ingredient;
 using PotionCraft.ScriptableObjects.Salts;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace AutoBrew.UIElements.Cookbook.Instructions
 {
@@ -69,8 +70,18 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             foreach (var item in Salt.allSalts)
             {
                 //drop.options.Add(new(item.GetLocalizedTitle()));
-               // drop.options.Add(new(item.GetLocalizedTitle()));
+                // drop.options.Add(new(item.GetLocalizedTitle()));
             }
+        }
+
+        public override bool IsValid()
+        {
+            return true;
+        }
+
+        public override Bounds GetBounds()
+        {
+            throw new System.NotImplementedException();
         }
 
         private Dropdown type;

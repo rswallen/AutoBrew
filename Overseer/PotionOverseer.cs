@@ -36,38 +36,38 @@ namespace AutoBrew.Overseer
                 return;
             }
             BrewMaster.Abort(_potionFailed);
-		}
+        }
 
         [HarmonyPostfix, HarmonyPatch(typeof(PotionManager.RecipeMarksSubManager), "AddFloatMark")]
         public static void AddFloatMark_Postfix(List<SerializedRecipeMark> recipeMarksList, SerializedRecipeMark.Type type, float value, float multiplier, float maxValue)
-		{
+        {
             if (!BrewMaster.Initialised || !BrewMaster.Brewing)
             {
                 return;
             }
             switch (type)
-			{
-				case SerializedRecipeMark.Type.Spoon:
-				{
-					BrewMaster.Stirrer.AddSpoonAmount(value, multiplier);
-					return;
-				}
+            {
+                case SerializedRecipeMark.Type.Spoon:
+                {
+                    BrewMaster.Stirrer.AddSpoonAmount(value, multiplier);
+                    return;
+                }
                 case SerializedRecipeMark.Type.Ladle:
-				{
+                {
                     BrewMaster.Pourer.AddLadleAmount(value, multiplier);
                     return;
-				}
+                }
                 default: return;
-			}
-		}
+            }
+        }
 
         [HarmonyPostfix, HarmonyPatch(typeof(PotionManager.RecipeMarksSubManager), "AddIngredientMark")]
         public static void AddIngredientMark_Postfix(List<SerializedRecipeMark> recipeMarksList, Ingredient ingredient, float grindStatus)
         {
             if (!BrewMaster.Initialised || !BrewMaster.Brewing)
-			{
-				return;
-			}
+            {
+                return;
+            }
 
             BrewMaster.GetCurrentInstruction(out var order);
             switch (order.Stage)

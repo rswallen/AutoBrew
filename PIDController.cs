@@ -33,7 +33,7 @@ namespace AutoBrew
             Propotional = setpoint - actual;
             Integral += Propotional * deltaTime;
             Derivative = (Propotional - LastError) / deltaTime;
-            
+
             return (Propotional * _Kp) + (Integral * _Ki) + (Derivative * _Kd);
         }
     }

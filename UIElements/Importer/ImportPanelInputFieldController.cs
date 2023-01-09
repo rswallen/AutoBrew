@@ -1,7 +1,5 @@
 ﻿using DarkScreenSystem;
-using PotionCraft.ManagersSystem;
 using PotionCraft.ObjectBased.UIElements;
-using PotionCraft.ObjectBased.UIElements.PotionDescriptionWindow;
 using System.Linq;
 
 namespace AutoBrew.UIElements.Importer

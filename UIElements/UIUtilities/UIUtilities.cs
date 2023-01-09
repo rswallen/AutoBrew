@@ -3,6 +3,7 @@ using PotionCraft.LocalizationSystem;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace AutoBrew.UIElements
 {
@@ -71,9 +72,23 @@ namespace AutoBrew.UIElements
             return sr;
         }
 
+        public static Image MakeCanvasSpriteObj(MonoBehaviour parent, string objName)
+        {
+            GameObject obj = new()
+            {
+                name = objName,
+                layer = LayerMask.NameToLayer("UI"),
+            };
+            obj.SetActive(true);
+            obj.transform.SetParent(parent.transform, false);
+            obj.AddComponent<CanvasRenderer>();
+            var i = obj.AddComponent<Image>();
+            return i;
+        }
+
         private static TMP_FontAsset[] fontAssets;
 
-        public static TextMeshPro MakeTextMeshProObj(string font)
+        public static T MakeTMPTextObj<T>(string font) where T : TMP_Text
         {
             fontAssets ??= Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
             var fontAsset = fontAssets.FirstOrDefault(x => x.name.Equals(font, System.StringComparison.OrdinalIgnoreCase));
@@ -84,29 +99,30 @@ namespace AutoBrew.UIElements
 
             GameObject obj = new()
             {
-                name = typeof(TextMeshPro).Name,
+                name = typeof(T).Name,
                 layer = LayerMask.NameToLayer("UI"),
             };
             obj.SetActive(true);
 
-            var tmp = obj.AddComponent<TextMeshPro>();
+            var tmp = obj.AddComponent<T>();
             tmp.font = fontAsset;
+            tmp.fontSizeMin = 1f;
             tmp.color = TextColor;
             return tmp;
         }
 
-        public static LocalizedText MakeLocalizedTmpObj(string font)
+
+
+        public static LocalizedText MakeLocalizedTextObj<T>(string font) where T : TMP_Text
         {
-            var tmp = MakeTextMeshProObj(font);
+            var tmp = MakeTMPTextObj<T>(font);
             if (tmp == null)
             {
                 return null;
             }
 
             GameObject obj = tmp.gameObject;
-            
-            // needed so that the LocalizedText component doesn't freak out when it awakens
-            tmp.text = "";
+
             var lt = obj.AddComponent<LocalizedText>();
             return lt;
         }

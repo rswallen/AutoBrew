@@ -1,5 +1,4 @@
 ﻿using PotionCraft.ObjectBased.UIElements;
-using System.Drawing;
 using UnityEngine;
 
 namespace AutoBrew.UIElements.Misc

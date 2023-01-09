@@ -47,7 +47,7 @@ namespace AutoBrew
                     return null;
                 }
             }
-            
+
             return urlsafebase64.Replace('_', '/').Replace('-', '+').Replace('.', '=');
         }
 
@@ -74,7 +74,7 @@ namespace AutoBrew
                 Log.LogError("PlotterDecoder: Potionous link has no data");
                 return null;
             }
-            
+
             Log.LogDebug($"PlotterDecoder: Site - {pieces[0]}");
             Log.LogDebug($"PlotterDecoder: Data - {lumps[1]}");
 

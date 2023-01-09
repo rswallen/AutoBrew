@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using PotionCraft.LocalizationSystem;
 using PotionCraft.ManagersSystem;
-using PotionCraft.ObjectBased.InteractiveItem;
 using PotionCraft.ObjectBased.PhysicalParticle;
 using PotionCraft.ObjectBased.Potion;
 using PotionCraft.ObjectBased.Salt;
@@ -207,7 +206,7 @@ namespace AutoBrew.Overseer
             }
         }
 
-        public bool CheckItemStock(ref Dictionary<InventoryItem, int> checklist)
+        public static bool CheckItemStock(ref Dictionary<InventoryItem, int> checklist)
         {
             bool haveEnough = true;
             foreach ((InventoryItem item, int count) in checklist.ToArray().Select(kvp => (kvp.Key, kvp.Value)))
@@ -246,11 +245,11 @@ namespace AutoBrew.Overseer
                 }
                 default: return false;
             }
-            
+
             Managers.Player.inventory.RemoveItem(item, 1);
             return true;
         }
-        
+
         public SaltItem GetSaltShaker(Salt salt, Vector2 position)
         {
             SaltItem item = (SaltItem)Managers.Game.GetUniqueItemFromInventory(salt);
@@ -305,7 +304,7 @@ namespace AutoBrew.Overseer
                 BrewMaster.Abort(_abortExtraIngAdded);
                 return;
             }
-            
+
             Stage = OverseerStage.Complete;
         }
 
@@ -321,7 +320,7 @@ namespace AutoBrew.Overseer
             {
                 return;
             }
-            
+
             int value = mark.GetValueToDisplay();
             if (value > (int)_order.Target)
             {
@@ -330,7 +329,7 @@ namespace AutoBrew.Overseer
                 PutSaltItemAway();
                 return;
             }
-            
+
             if (value == (int)_order.Target)
             {
                 Stage = OverseerStage.Complete;

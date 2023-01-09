@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace AutoBrew.Overseer
+﻿namespace AutoBrew.Overseer
 {
     internal class DebugOverseer : BaseOverseer
     {
         private BrewOrder _order;
-        
+
         public override void Reset()
         {
             _order = null;

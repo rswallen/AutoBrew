@@ -97,7 +97,7 @@ namespace AutoBrew.Overseer
                     _gStage = GrindStage.Flourish;
                     return;
                 }
-                
+
                 if (!Grind(item, 1, out _))
                 {
                     Stage = OverseerStage.Failed;
@@ -230,7 +230,7 @@ namespace AutoBrew.Overseer
             {
                 return false;
             }
-            
+
             if (!objPestle.PestleInMortar)
             {
                 objPestle.MoveToSpawnPosition();

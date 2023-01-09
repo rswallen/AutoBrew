@@ -42,7 +42,7 @@ namespace AutoBrew.UIElements.Misc
                     tooltipCorner = PositioningSettings.TooltipCorner.LeftTop,
                 }
             };
-            
+
             handle.raycastPriorityLevel = -20000;
             handle.IgnoreRotationForPivot = true;
 
@@ -75,7 +75,7 @@ namespace AutoBrew.UIElements.Misc
             var texture = TextureCache.LoadTexture("UI", "move-ui-symbol.png");
             var rect = new Rect(0f, 0f, texture.width, texture.height);
             var pivot = new Vector2(0.5f, 0.5f);
-            return Sprite.Create(texture, rect, pivot, 100, 0, SpriteMeshType.FullRect, new(0f,0f,0f,0f));
+            return Sprite.Create(texture, rect, pivot, 100, 0, SpriteMeshType.FullRect, new(0f, 0f, 0f, 0f));
         }
 
         private bool IsPointerPressed { get; set; }
@@ -93,7 +93,7 @@ namespace AutoBrew.UIElements.Misc
                 return;
             }
             Vector2 vector = transform.localPosition;
-            
+
             if (IsPointerPressed && !Commands.cursorPrimary.InUse())
             {
                 IsPointerPressed = false;
@@ -124,7 +124,7 @@ namespace AutoBrew.UIElements.Misc
                 Unlink();
                 linked = false;
             }
-            
+
             base.OnReleasePrimary();
         }
 
@@ -151,7 +151,7 @@ namespace AutoBrew.UIElements.Misc
                     textBelowHeader = $"Handle:\n - Offset: {hPos}",
                     description1 = $"Parent:\n - Name: {linkParent.name}\n - LocalPos: {pPos}",
                     description2 = $"Child:\n - Name: {linkChild.name}\n - LocalPos: {cPos}",
-                    
+
                 };
             }
             else

@@ -13,7 +13,6 @@ using PotionCraft.NotificationSystem;
 using PotionCraft.ObjectBased.RecipeMap;
 using PotionCraft.ObjectBased.RecipeMap.RecipeMapObject;
 using PotionCraft.ObjectBased.UIElements.FloatingText;
-using PotionCraft.ObjectBased.UIElements.PotionCustomizationPanel;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.Settings;
 using System;
@@ -209,7 +208,7 @@ namespace AutoBrew
             Dictionary<string, string> newSettings;
             string basepath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string filepath = Path.Combine(basepath, "settings.json");
-            
+
             if (!File.Exists(filepath))
             {
                 Log.LogInfo("Settings file not detected. Using plugin defaults");
@@ -349,7 +348,7 @@ namespace AutoBrew
         public static bool CheckInventoryStock()
         {
             var items = _recipe.GetItemsRequired();
-            if (!Larder.CheckItemStock(ref items))
+            if (!InventoryOverseer.CheckItemStock(ref items))
             {
                 // not enough of something or typo
                 foreach ((InventoryItem item, int count) in items.Select(kvp => (kvp.Key, kvp.Value)))
@@ -364,7 +363,7 @@ namespace AutoBrew
             }
             Log.LogInfo("We have enough ingredients. Proceeding to brew.");
 
-            _brewing = true;
+            //_brewing = true;
             return true;
         }
 
@@ -444,7 +443,7 @@ namespace AutoBrew
 
             //var prefab = Settings<RecipeMapManagerPotionBasesSettings>.Asset.floatingTextSelectBase;
             var prefab = Settings<PotionManagerSettings>.Asset.collectedFloatingTextPrefab;
-            
+
             Vector2 msgPos = recipeMapObject.transmitterWindow.ViewRect.center + offset;
             CollectedFloatingText.SpawnNewText(prefab, msgPos, new CollectedFloatingText.FloatingTextContent(message, CollectedFloatingText.FloatingTextContent.Type.Text, 0f), Managers.Game.Cam.transform, false, false);
         }

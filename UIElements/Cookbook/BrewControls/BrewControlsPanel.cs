@@ -7,7 +7,7 @@ namespace AutoBrew.UIElements.Cookbook.BrewControls
     {
         private static ManualLogSource Log => AutoBrewPlugin.Log;
 
-        public static BrewControlsPanel Create()
+        public static BrewControlsPanel Create(CookbookPanel parent)
         {
             GameObject obj = new()
             {
@@ -30,10 +30,12 @@ namespace AutoBrew.UIElements.Cookbook.BrewControls
             panel.abort = AbortBrewButton.Create(panel);
             panel.abort.transform.localPosition = new(0.625f, -0.625f);
 
+            panel.cookbook = parent;
             obj.SetActive(true);
             return panel;
         }
 
+        private CookbookPanel cookbook;
         private StartBrewButton start;
         private PauseBrewButton pause;
         private StepBrewButton step;

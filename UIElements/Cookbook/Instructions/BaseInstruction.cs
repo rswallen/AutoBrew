@@ -1,6 +1,7 @@
 ﻿using PotionCraft.ObjectBased.InteractiveItem;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace AutoBrew.UIElements.Cookbook.Instructions
 {
@@ -14,21 +15,19 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 layer = LayerMask.NameToLayer("UI"),
             };
             obj.SetActive(false);
-            
+
             var item = obj.AddComponent<T>();
 
-            item.index = UIUtilities.MakeTextMeshProObj("Caveat-Bold SDF");
-            item.index.transform.SetParent(item.transform);
-            item.index.transform.localPosition = new(0.2f, 0.5f);
-            item.index.rectTransform.pivot = new(0f, 0.5f);
-            item.index.rectTransform.sizeDelta = new(5f, 1f);
-            item.index.alignment = TextAlignmentOptions.Left;
-            item.index.enableWordWrapping = true;
-            item.index.fontSize = 2.5f;
-            var tmp = item.index as TextMeshPro;
-            tmp.sortingLayerID = SortingLayer.NameToID("DescriptionWindow");
-            tmp.sortingOrder = 200;
-            tmp.text = "N/A";
+            item.indexText = UIUtilities.MakeTMPTextObj<TextMeshProUGUI>("Caveat-Bold SDF");
+            item.indexText.transform.SetParent(item.transform);
+            item.indexText.transform.localPosition = new(0.2f, 0.5f);
+            item.indexText.transform.localScale = new(0.1f, 0.1f);
+            item.indexText.rectTransform.pivot = new(0f, 0.5f);
+            item.indexText.rectTransform.sizeDelta = new(5f, 1f);
+            item.indexText.alignment = TextAlignmentOptions.Left;
+            item.indexText.enableWordWrapping = true;
+            item.indexText.fontSize = 2.5f;
+            item.indexText.text = "N/A";
 
             var collider = obj.AddComponent<BoxCollider2D>();
             collider.size = new Vector2(5f, 0.5f);
@@ -37,7 +36,6 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             item.showOnlyFingerWhenInteracting = true;
             item.raycastPriorityLevel = -13500;
 
-            obj.SetActive(true);
             return item;
         }
 
@@ -54,23 +52,50 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 }
             }
         }
+        private bool isActive = false;
 
         public bool IsVisible
         {
             get { return isVisible; }
-            internal set { UpdateVisibility(value); }
+            internal set
+            {
+                if (isVisible != value)
+                {
+                    isVisible = value;
+                    UpdateVisibility(value);
+                }
+            }
         }
-
-        private bool isActive = false;
         private bool isVisible = true;
+
+        public bool CanInteract
+        {
+            get { return canInteract; }
+            internal set
+            {
+                if (canInteract != value)
+                {
+                    canInteract = value;
+                    UpdateInteractive(value);
+                }
+            }
+        }
         private bool canInteract = true;
 
         public Transform Anchor;
         public InstructionsPanel Parent;
         public InstructionsScrollView ScrollView;
-        
-        private TMP_Text index;
-        private BoxCollider2D thisCollider;
+
+        public BrewOrder Order
+        {
+            get { return order; }
+            set { Apply(value); }
+        }
+        private BrewOrder order;
+
+        public int IndexNum { get; private set; }
+        private protected TMP_Text indexText;
+        private protected BoxCollider2D thisCollider;
 
         public void LateUpdate()
         {
@@ -98,14 +123,34 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             isVisible = newValue;
         }
 
+        public virtual void UpdateInteractive(bool newValue)
+        {
+
+        }
+
         public virtual void UpdateSize(float contentWidth)
         {
 
         }
 
-        public void SetIndex(int newIndex)
+        public void SetIndex(int index)
         {
-            index.text = newIndex.ToString();
+            name = $"{GetType().Name}-{index}";
+            IndexNum = index;
+            indexText.text = (index + 1).ToString();
         }
+
+
+        public abstract bool IsValid();
+
+        public abstract Bounds GetBounds();
+
+        public virtual void Apply(BrewOrder order)
+        {
+            this.order = order;
+        }
+
+        public virtual void OnAnchorGrabbed() { }
+        public virtual void OnAnchorReleased() { }
     }
 }

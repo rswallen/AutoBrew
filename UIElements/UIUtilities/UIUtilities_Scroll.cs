@@ -1,8 +1,6 @@
 ﻿using PotionCraft.Core.Extensions;
-using PotionCraft.ObjectBased.UIElements;
 using PotionCraft.ObjectBased.UIElements.Scroll;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace AutoBrew.UIElements
 {
@@ -24,7 +22,7 @@ namespace AutoBrew.UIElements
             {
                 return null;
             }
-            
+
             var pointer = clone.GetComponentInChildren<ScrollPointer>();
             pointer.spriteRenderer.sortingLayerID = SortingLayerID;
             pointer.spriteRenderer.sortingOrder = 540;
