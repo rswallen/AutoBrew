@@ -212,7 +212,7 @@ namespace AutoBrew.Overseer
                     _lastPIDVal = Math.Abs(_pidControl.GetStep(_heatTarget, _heatedTotal, Time.deltaTime));
                     _lastHeat = (float)_lastPIDVal.Clamp(_heatMin, _heatMax);
                     Managers.Ingredient.coals.Heat = _lastHeat;
-                    Log.LogDebug($"Bellows Heat: {_lastHeat}");
+                    //Log.LogDebug($"Bellows Heat: {_lastHeat}");
                     return;
                 }
                 case BrewOrderType.AddEffect:

@@ -1,4 +1,7 @@
-﻿using PotionCraft.ObjectBased.UIElements;
+﻿using DG.Tweening;
+using PotionCraft.ManagersSystem;
+using PotionCraft.ObjectBased.InteractiveItem;
+using PotionCraft.ObjectBased.UIElements;
 using PotionCraft.ObjectBased.UIElements.Scroll;
 using PotionCraft.ObjectBased.UIElements.Scroll.Settings;
 using System.Collections.Generic;
@@ -142,6 +145,8 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             get { return Scrollview.content.transform; }
         }
 
+        public Image instructSubstrate = null;
+
         public bool ItemOrderLocked { get; private set; }
 
         public float ContentLength { get; internal set; } = 1f;
@@ -178,6 +183,12 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         private Vector3 vertPadding = new(0.9f, 1.4f, 0.9f);
 
         private Vector2 maskOffset = new(-0.2f, -0.3f);
+
+        public void Start()
+        {
+            BrewMaster.OnOrderStarted.AddListener(OnOrderStarted);
+            BrewMaster.OnStateChanged.AddListener(OnBrewStateChanged);
+        }
 
         public bool AddInstruction(InstructionDisplay pane, bool refill = true)
         {
@@ -234,7 +245,8 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
         private float GetPanelLength(int numButtons)
         {
             int gaps = (numButtons < 1) ? 0 : numButtons - 1;
-            return vertPadding[0] + (gaps * vertPadding[1]) + vertPadding[2];
+            //return vertPadding[0] + (gaps * vertPadding[1]) + vertPadding[2];
+            return (gaps * vertPadding[1]);
         }
 
         // return a copy
@@ -264,6 +276,7 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 }
             }
 
+            Scrollview.content.increaseBy = new(0f, vertPadding[0] + vertPadding[2]);
             ContentLength = GetPanelLength(numButtons);
             UpdateSize(visibleArea);
 
@@ -312,11 +325,6 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
             Scrollview.ScrollByMouseWheel(delta);
         }
 
-        public float ScrollPosition
-        {
-            get { return Scrollview.verticalScrollPointer.Value; }
-        }
-
         public int GetIndexOfY(float yPos)
         {
             for (int i = 0; i < instructions.Count; i++)
@@ -329,6 +337,104 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
                 }
             }
             return instructions.Count;
+        }
+
+        public void ScrollToIndex(int index)
+        {
+            if (!Scrollview.activeVertical)
+            {
+                return;
+            }
+
+            if ((index < 0) || (index >= instructions.Count))
+            {
+                return;
+            }
+
+            var item = instructions[index];
+            if (item.Handle.IsPointerPressed)
+            {
+                return;
+            }
+
+            float yPos = index * vertPadding[1];
+            float newPos = yPos / ContentLength;
+            Scrollview.verticalScrollPointer.SetPosition(newPos, true);
+        }
+
+        private void OnOrderStarted(int index, BrewOrder order)
+        {
+            // if pointer is grabbed, don't move it
+            var item = Managers.Cursor.grabbedInteractiveItem;
+            if ((item != null) && (item == Scrollview.verticalScrollPointer))
+            {
+                return;
+            }
+            ScrollToIndex(index);
+            AddOrMoveSubstrate(index);
+            AutoBrewPlugin.Log.LogDebug("Order started: " + index);
+        }
+
+        private void OnBrewStateChanged(BrewState newMode)
+        {
+            int index = cookbook.Recipe.CurrentVisibleIndex;
+            AddOrMoveSubstrate(index);
+
+        }
+
+        private void AddOrMoveSubstrate(int index)
+        {
+            bool animate = true;
+            if (instructSubstrate == null)
+            {
+                instructSubstrate = CreateSubstrate();
+                animate = false;
+            }
+            else
+            {
+                instructSubstrate.transform.DOKill(false);
+            }
+            
+            instructSubstrate.transform.SetParent(instructions[index].Anchor, false);
+            instructSubstrate.transform.SetAsFirstSibling();
+
+            if (animate)
+            {
+                instructSubstrate.transform.DOLocalMove(new(3.5f, 0f), 0.2f);
+            }
+            else
+            {
+                instructSubstrate.transform.localPosition = new(3.5f, 0f);
+            }
+
+            switch (BrewMaster.State)
+            {
+                case BrewState.Paused:
+                {
+                    // pause = 1 1 0 0.4
+                    instructSubstrate.color = new(1f, 1f, 0f, 0.4f);
+                    break;
+                }
+                default:
+                {
+                    instructSubstrate.color = new(0.3f, 0.4f, 0.5f, 0.25f);
+                    break;
+                }
+            }
+
+            // error = 1 0 0 0.35
+            instructSubstrate.gameObject.SetActive(true);
+        }
+
+        private Image CreateSubstrate()
+        {
+            var image = UIUtilities.MakeCanvasSpriteObj(this, "Instruction Substrate");
+            image.sprite = UIUtilities.GetSpriteByName("MainMenu HoverSlot Large 5");
+            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 7f);
+            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 1.2f);
+
+            
+            return image;
         }
     }
 }

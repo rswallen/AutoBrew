@@ -14,7 +14,7 @@ namespace AutoBrew.UIElements.Cookbook.BrewControls
             button.label.transform.localPosition = new(0f, 0f);
             button.label.text.text = "Abort";
 
-            button.spriteRenderer.sprite = UIUtilities.GetSpriteByName("Confirmation No Button");
+            button.SetSprites(UIUtilities.GetSpriteByName("Confirmation No Button"));
             button.spriteRenderer.size = new(1.2f, 1.2f);
 
             (button.thisCollider as BoxCollider2D).size = button.spriteRenderer.size;
@@ -30,7 +30,8 @@ namespace AutoBrew.UIElements.Cookbook.BrewControls
         public override void OnButtonReleasedPointerInside()
         {
             base.OnButtonReleasedPointerInside();
-            controller.AbortBrew();
+            controller.ShowButtons(false);
+            BrewMaster.Abort(null);
         }
     }
 }

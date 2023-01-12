@@ -1,4 +1,5 @@
-﻿using PotionCraft.ObjectBased.UIElements;
+﻿using DG.Tweening;
+using PotionCraft.ObjectBased.UIElements;
 using PotionCraft.ObjectBased.UIElements.Scroll;
 using PotionCraft.ObjectBased.UIElements.Scroll.Settings;
 using UnityEngine;
@@ -32,14 +33,15 @@ namespace AutoBrew.UIElements.Cookbook.Instructions
 
         public override void SetPositionTo(float value, bool animated = false)
         {
-            if (activeVertical)
+            // source: InventoryScrollView.SetPositionTo
+            content.transform.DOKill(false);
+            if (animated)
             {
-                content.transform.localPosition = new Vector2(0f, value * oversize.y);
+                content.transform.DOLocalMove(new(0f, value * oversize.y), 0.2f, false);
+                return;
             }
-            if (activeHorizontal)
-            {
-                content.transform.localPosition = new Vector2(value * -oversize.x, 0f);
-            }
+            content.transform.localPosition = new(0f, value * oversize.y);
+
         }
 
         public override float GetContentHeight(bool withCustomIncrease = true)

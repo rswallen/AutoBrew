@@ -50,6 +50,7 @@ namespace AutoBrew.UIElements.Cookbook
             panel.Instructions.Refill();
 
             // TEMP HANDLES - REMOVE!!
+            /*
             var headingHandle = MoveUIHandle.Create("DescriptionWindow", 1000);
             headingHandle.ReplaceLink(panel, panel.heading, new(0f, 0f));
             headingHandle.IsActive = true;
@@ -65,6 +66,7 @@ namespace AutoBrew.UIElements.Cookbook
             var instructionsHandle = MoveUIHandle.Create("DescriptionWindow", 1000);
             instructionsHandle.ReplaceLink(panel, panel.Instructions, new(0f, 1f));
             instructionsHandle.IsActive = true;
+            */
 
             panel.IsActive = true;
             return panel;
@@ -113,6 +115,11 @@ namespace AutoBrew.UIElements.Cookbook
         public void Toggle()
         {
             IsActive = !IsActive;
+        }
+
+        public void StartBrewing()
+        {
+            BrewMaster.StartBrew();
         }
 
         public void Reset()

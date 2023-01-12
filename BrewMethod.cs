@@ -66,6 +66,31 @@ namespace AutoBrew
         }
 
         private readonly List<BrewOrder> _data;
+
+        public int CurrentIndex
+        {
+            get { return currentIndex; }
+        }
+
+        public int CurrentVisibleIndex
+        {
+            get
+            {
+                int offset = 0;
+                for (int i = 0; i <= currentIndex; i++)
+                {
+                    switch (_data[i].Stage)
+                    {
+                        case BrewOrderType.GrindPercent:
+                        {
+                            offset++;
+                            break;
+                        }
+                    }
+                }
+                return currentIndex - offset;
+            }
+        }
         private int currentIndex;
 
         public readonly PotionBase Base;

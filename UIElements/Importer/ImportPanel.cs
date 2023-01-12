@@ -203,7 +203,7 @@ namespace AutoBrew.UIElements.Importer
             Show(false, Vector2.zero);
             if (deactivationType == DarkScreenDeactivationType.ClickSubmit)
             {
-                BrewMaster.InitBrew();
+                BrewMaster.ParseRecipe(Data);
             }
         }
 

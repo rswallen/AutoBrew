@@ -21,55 +21,38 @@ namespace AutoBrew.UIElements.Cookbook.BrewControls
             panel.start = StartBrewButton.Create(panel);
             panel.start.transform.localPosition = new(0f, 0f);
 
-            panel.pause = PauseBrewButton.Create(panel);
+            panel.pause = ContinueBrewButton.Create(panel);
             panel.pause.transform.localPosition = new(0f, 0.625f);
 
-            panel.step = StepBrewButton.Create(panel);
+            panel.step = ModeBrewButton.Create(panel);
             panel.step.transform.localPosition = new(-0.625f, -0.625f);
 
             panel.abort = AbortBrewButton.Create(panel);
             panel.abort.transform.localPosition = new(0.625f, -0.625f);
 
-            panel.cookbook = parent;
+            panel.Cookbook = parent;
             obj.SetActive(true);
             return panel;
         }
 
-        private CookbookPanel cookbook;
+        public CookbookPanel Cookbook { get; private set; }
         private StartBrewButton start;
-        private PauseBrewButton pause;
-        private StepBrewButton step;
+        private ContinueBrewButton pause;
+        private ModeBrewButton step;
         private AbortBrewButton abort;
 
-        private void Awake()
+        private void Start()
         {
-            AbortBrew();
-        }
-
-        public void StartBrew()
-        {
-            start.IsActive = false;
-            pause.IsActive = true;
-            step.IsActive = true;
-            abort.IsActive = true;
-        }
-
-        public void PauseBrew()
-        {
-
-        }
-
-        public void ContinueBrew()
-        {
-
-        }
-
-        public void AbortBrew()
-        {
+            ShowButtons(false);
             start.IsActive = true;
-            pause.IsActive = false;
-            step.IsActive = false;
-            abort.IsActive = false;
+        }
+
+        public void ShowButtons(bool brewActive)
+        {
+            start.IsActive = !brewActive;
+            pause.IsActive = brewActive;
+            step.IsActive = brewActive;
+            abort.IsActive = brewActive;
         }
     }
 }

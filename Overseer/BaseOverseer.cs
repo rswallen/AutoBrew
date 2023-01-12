@@ -79,6 +79,7 @@ namespace AutoBrew.Overseer
             {
                 Log.LogInfo($"Order '{order.Stage}' completed in {Duration:N2}s, {Accuracy:P4} of target, error of {Precision:N4}u");
                 BrewMaster.PrintRecipeMapMessage($"Order '{order.Stage}' completed", BrewMaster.OrderCompleteOffset);
+                
                 Reset();
                 BrewMaster.AdvanceOrder();
             }
@@ -126,7 +127,7 @@ namespace AutoBrew.Overseer
             _stage = OverseerStage.Failed;
         }
 
-        private protected bool ConsumeVoidSalt(int amount)
+        private bool ConsumeVoidSalt(int amount)
         {
             Salt voidSalt = Salt.GetByName("Void Salt", false, false);
             if (voidSalt == null)

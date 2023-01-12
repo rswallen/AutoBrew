@@ -26,9 +26,21 @@ namespace AutoBrew
         public static void CanBeInteractedNow_Postfix(InteractiveItem __instance, ref bool __result)
         {
             // only override if game says item can be interacted with, or if we are brewing
-            if (!__result || (!BrewMaster.Brewing))
+            if (!__result)
             {
                 return;
+            }
+
+            switch (BrewMaster.State)
+            {
+                case BrewState.Brewing:
+                {
+                    break;
+                }
+                default:
+                {
+                    return;
+                }
             }
 
             // only override user interaction with equipment and ingredients

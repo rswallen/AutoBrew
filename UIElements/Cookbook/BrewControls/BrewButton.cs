@@ -79,11 +79,20 @@ namespace AutoBrew.UIElements.Cookbook.BrewControls
         }
         private bool isActive = false;
 
-        public override void Awake()
+        public override void Start()
         {
-            base.Awake();
+            base.Start();
             isActive = false;
             gameObject.SetActive(false);
+        }
+
+        private protected void SetSprites(Sprite img)
+        {
+            spriteRenderer.sprite = img;
+            hoveredSprite = img;
+            lockedSprite = img;
+            normalSprite = img;
+            pressedSprite = img;
         }
     }
 }

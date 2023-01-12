@@ -13,6 +13,7 @@ using PotionCraft.NotificationSystem;
 using PotionCraft.ObjectBased.RecipeMap;
 using PotionCraft.ObjectBased.RecipeMap.RecipeMapObject;
 using PotionCraft.ObjectBased.UIElements.FloatingText;
+using PotionCraft.ObjectBased.UIElements.PotionCraftPanel;
 using PotionCraft.ScriptableObjects;
 using PotionCraft.Settings;
 using System;
@@ -21,6 +22,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Events;
+using static UnityEngine.UIElements.StylePropertyAnimationSystem;
 
 namespace AutoBrew
 {
@@ -44,7 +47,8 @@ namespace AutoBrew
         private static readonly Key _brewFalseStartBaseIssue = new("autobrew_brew_falsestart_baseissue");
 
         private static bool _init;
-        private static bool _brewing;
+        private static BrewState state = BrewState.Idle;
+        private static BrewMode mode = BrewMode.Continuous;
         private static double _orderInterval;
         public static Vector2 OrderCompleteOffset;
         private static double _gtLastOrder;
@@ -57,6 +61,12 @@ namespace AutoBrew
         public static SolventOverseer Pourer { get; private set; }
         public static BellowsOverseer Boiler { get; private set; }
 
+        public static readonly UnityEvent<BrewState> OnStateChanged = new();
+        public static readonly UnityEvent<BrewMode> OnModeChanged = new();
+        public static readonly UnityEvent<int, BrewOrder> OnOrderStarted = new();
+        public static readonly UnityEvent<int, BrewOrder> OnOrderCompleted = new();
+        public static readonly UnityEvent<int, BrewOrder> OnOrderFailed = new();
+
         public static bool Initialised
         {
             get { return _init; }
@@ -64,7 +74,19 @@ namespace AutoBrew
 
         public static bool Brewing
         {
-            get { return _brewing; }
+            get { return state != BrewState.Idle; }
+        }
+
+        public static BrewState State
+        {
+            get { return state; }
+            set { ChangeBrewState(value); }
+        }
+
+        public static BrewMode Mode
+        {
+            get { return mode; }
+            set { ChangeBrewMode(value); }
         }
 
         public static void Awake()
@@ -90,34 +112,39 @@ namespace AutoBrew
 
         public static void Update()
         {
-            if (!Brewing)
+            switch (State)
             {
-                return;
-            }
+                case BrewState.Complete:
+                {
+                    Log.LogInfo("Brew succeeded");
+                    //Notification.ShowText("AutoBrew: Brew succeeded", "Brew complete", Notification.TextType.EventText);
+                    Notification.ShowText(_brewComplete.GetAutoBrewText(), _brewCompleteDesc.GetAutoBrewText(), Notification.TextType.EventText);
+                    Reset();
+                    return;
+                }
+                case BrewState.Brewing:
+                {
+                    if (!VerifyInLab())
+                    {
+                        Abort(_brewAbortNotInLab);
+                        return;
+                    }
 
-            if (_recipe.Complete)
-            {
-                Log.LogInfo("Brew succeeded");
-                //Notification.ShowText("AutoBrew: Brew succeeded", "Brew complete", Notification.TextType.EventText);
-                Notification.ShowText(_brewComplete.GetAutoBrewText(), _brewCompleteDesc.GetAutoBrewText(), Notification.TextType.EventText);
-                Reset();
-                return;
-            }
+                    double gtNextOrder = _gtLastOrder + _orderInterval;
+                    if (gtNextOrder > Time.timeAsDouble)
+                    {
+                        return;
+                    }
 
-            if (!VerifyInLab())
-            {
-                Abort(_brewAbortNotInLab);
-                return;
+                    _recipe.GetCurrentOrder(out BrewOrder order);
+                    GetStageOverseer(order).Update(order);
+                    return;
+                }
+                default:
+                {
+                    return;
+                }
             }
-
-            double gtNextOrder = _gtLastOrder + _orderInterval;
-            if (gtNextOrder > Time.timeAsDouble)
-            {
-                return;
-            }
-
-            _recipe.GetCurrentOrder(out BrewOrder order);
-            GetStageOverseer(order).Update(order);
         }
 
         public static void Reconfigure(Dictionary<string, string> data)
@@ -128,7 +155,7 @@ namespace AutoBrew
 
         public static void Reset()
         {
-            _brewing = false;
+            State = BrewState.Idle;
             _recipe = null;
             _gtLastOrder = Time.timeAsDouble;
 
@@ -142,7 +169,7 @@ namespace AutoBrew
 
         public static void Abort(Key reason)
         {
-            if (_brewing)
+            if (Brewing)
             {
                 reason ??= new("autobrew_brew_abort_unknown");
                 Log.LogInfo($"Brew Aborted: {reason.GetAutoBrewText(LocalizationManager.Locale.en)}");
@@ -152,6 +179,12 @@ namespace AutoBrew
         }
 
         public static void InitBrew()
+        {
+            string data = Managers.Potion.potionCraftPanel.potionCustomizationPanel.currentDescriptionText;
+            ParseRecipe(data);
+        }
+
+        public static void ParseRecipe(string data)
         {
             if (Managers.SaveLoad.SystemState != SaveLoadManager.SystemStateEnum.Idle)
             {
@@ -167,9 +200,9 @@ namespace AutoBrew
 
             //PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
             //if (PlotterUrlDecoder.IsPlotterURL(customizer.currentDescriptionText))
-            if (PlotterUrlDecoder.IsPlotterURL(UIManager.Importer.Data))
+            if (PlotterUrlDecoder.IsPlotterURL(data))
             {
-                if (!LoadPlotterUrlFromDesc())
+                if (!LoadPlotterUrl(data))
                 {
                     Notification.ShowText(_brewFalseStart.GetAutoBrewText(), _brewFalseStartUrlErr.GetAutoBrewText(), Notification.TextType.EventText);
                     return;
@@ -177,7 +210,7 @@ namespace AutoBrew
             }
             else
             {
-                if (!LoadJsonFromDesc())
+                if (!LoadJson(data))
                 {
                     Notification.ShowText(_brewFalseStart.GetAutoBrewText(), _brewFalseStartJsonErr.GetAutoBrewText(), Notification.TextType.EventText);
                     return;
@@ -185,7 +218,10 @@ namespace AutoBrew
             }
 
             UIManager.Cookbook.LoadMethod(_recipe);
+        }
 
+        public static void StartBrew()
+        {
             if (!CheckMapAndPotion())
             {
                 Notification.ShowText(_brewFalseStart.GetAutoBrewText(), _brewFalseStartBaseIssue.GetAutoBrewText(), Notification.TextType.EventText);
@@ -267,44 +303,36 @@ namespace AutoBrew
             return true;
         }
 
-        public static bool LoadJsonFromDesc()
+        public static bool LoadJson(string data)
         {
             if (Brewing)
             {
                 return false;
             }
 
-            //PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
-            //if (customizer.currentDescriptionText == string.Empty)
-            string data = UIManager.Importer.Data;
             if (string.IsNullOrEmpty(data))
             {
                 Log.LogError("Please paste json data into the custom description of the potion customizer panel");
                 return false;
             }
 
-            //_recipe = BrewMethod.FromJson(customizer.currentDescriptionText);
             _recipe = BrewMethod.FromJson(data);
             return ((_recipe != null) && (_recipe.Length != 0));
         }
 
-        public static bool LoadPlotterUrlFromDesc()
+        public static bool LoadPlotterUrl(string data)
         {
             if (Brewing)
             {
                 return false;
             }
 
-            //PotionCustomizationPanel customizer = Managers.Potion.potionCraftPanel.potionCustomizationPanel;
-            //if (customizer.currentDescriptionText == string.Empty)
-            string data = UIManager.Importer.Data;
             if (string.IsNullOrEmpty(data))
             {
                 Log.LogError("Please paste a plotter url into the custom description of the potion customizer panel");
                 return false;
             }
 
-            //_recipe = BrewMethod.FromPlotterUrl(customizer.currentDescriptionText);
             _recipe = BrewMethod.FromPlotterUrl(data);
             return ((_recipe != null) && (_recipe.Length != 0));
         }
@@ -363,7 +391,8 @@ namespace AutoBrew
             }
             Log.LogInfo("We have enough ingredients. Proceeding to brew.");
 
-            //_brewing = true;
+            State = BrewState.Brewing;
+            OnOrderStarted.Invoke(_recipe.CurrentVisibleIndex, null);
             return true;
         }
 
@@ -376,6 +405,22 @@ namespace AutoBrew
                     Abort(_brewAbortAdvFail);
                 }
                 _gtLastOrder = Time.timeAsDouble;
+
+                if (_recipe.Complete)
+                {
+                    State = BrewState.Complete;
+                    return;
+                }
+
+                if (Mode == BrewMode.StepForward)
+                {
+                    State = BrewState.Paused;
+                }
+
+                if (_recipe.GetCurrentOrder(out BrewOrder order))
+                {
+                    OnOrderStarted.Invoke(_recipe.CurrentVisibleIndex, order);
+                }
             }
         }
 
@@ -455,6 +500,39 @@ namespace AutoBrew
             Vector2 msgPos = recipeMapObject.transmitterWindow.ViewRect.center + offset;
             CollectedFloatingText.SpawnNewText(prefab, msgPos, new CollectedFloatingText.FloatingTextContent(message.GetAutoBrewText(), CollectedFloatingText.FloatingTextContent.Type.Text, 0f), Managers.Game.Cam.transform, false, false);
         }
+
+        private static void ChangeBrewState(BrewState newValue)
+        {
+            if (state != newValue)
+            {
+                state = newValue;
+                OnStateChanged.Invoke(newValue);
+            }
+        }
+
+        private static void ChangeBrewMode(BrewMode newValue)
+        {
+            if (mode != newValue)
+            {
+                mode = newValue;
+                OnModeChanged.Invoke(newValue);
+            }
+        }
+    }
+
+    public enum BrewMode
+    {
+        Continuous,
+        StepForward,
+    }
+
+    public enum BrewState
+    {
+        Idle,
+        Brewing,
+        Paused,
+        Complete,
+        Aborted,
     }
 
     public enum BrewOrderType
@@ -467,6 +545,6 @@ namespace AutoBrew
         HeatVortex,
         AddSalt,
         AddEffect,
-        Complete
+        Complete,
     }
 }

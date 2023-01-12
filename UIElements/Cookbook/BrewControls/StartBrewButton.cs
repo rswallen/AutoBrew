@@ -13,8 +13,8 @@ namespace AutoBrew.UIElements.Cookbook.BrewControls
             button.label.transform.SetParent(button.transform, false);
             button.label.transform.localPosition = new(0f, 0f);
             button.label.text.text = "Start\nBrewing";
-
-            button.spriteRenderer.sprite = UIUtilities.GetSpriteByName("Confirmation Yes Button");
+            
+            button.SetSprites(UIUtilities.GetSpriteByName("Confirmation Yes Button"));
             button.spriteRenderer.size = new(2.5f, 2.5f);
 
             (button.thisCollider as BoxCollider2D).size = button.spriteRenderer.size;
@@ -28,7 +28,8 @@ namespace AutoBrew.UIElements.Cookbook.BrewControls
         public override void OnButtonReleasedPointerInside()
         {
             base.OnButtonReleasedPointerInside();
-            controller.StartBrew();
+            controller.ShowButtons(true);
+            controller.Cookbook.StartBrewing();
         }
     }
 }

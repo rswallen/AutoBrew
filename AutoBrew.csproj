@@ -36,6 +36,10 @@
       <HintPath>..\PotionCraftLibs\0Toolbar.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DOTween">
+      <HintPath>..\PotionCraftLibs\DOTween.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="PotionCraft.Core">
       <HintPath>..\PotionCraftLibs\PotionCraft.Core.dll</HintPath>
       <Private>False</Private>
